@@ -165,5 +165,15 @@ func Example_iterate_weekdays() {
 }
 
 func (d WeekDay) String() string {
-	return [...]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}[d]
+	var weekDays = [...]string{
+		"Sunday",
+		"Monday",
+		"Tuesday",
+		"Wednesday",
+		"Thursday",
+		"Friday",
+		"Saturday",
+	}
+
+	return weekDays[int(d)%len(weekDays)]
 }
