@@ -177,3 +177,26 @@ func (d WeekDay) String() string {
 
 	return weekDays[int(d)%len(weekDays)]
 }
+
+func Example_iota_bitwise_role_예제() {
+	const (
+		isAdmin = 1 << iota
+		isHeadquarters
+		canSeeFinancials
+
+		canSeeAfrica
+		canSeeAsia
+		canSeeEurope
+		canSeeNorthAmerica
+		canSeeSouthAmerica
+	)
+
+	var myRoles byte = isAdmin | canSeeFinancials | canSeeEurope
+	fmt.Printf("%b\n", myRoles)
+	fmt.Printf("is admin? %v\n", isAdmin&myRoles == isAdmin)
+	fmt.Printf("is HQ? %v\n", isHeadquarters&myRoles == isHeadquarters)
+	//Output:
+	//100101
+	//is admin? true
+	//is HQ? false
+}
