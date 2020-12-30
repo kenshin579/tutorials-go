@@ -180,15 +180,15 @@ func (d WeekDay) String() string {
 
 func Example_iota_bitwise_role_예제() {
 	const (
-		isAdmin = 1 << iota
-		isHeadquarters
-		canSeeFinancials
+		isAdmin          = 1 << iota //1
+		isHeadquarters               //10
+		canSeeFinancials             //100
 
-		canSeeAfrica
-		canSeeAsia
-		canSeeEurope
-		canSeeNorthAmerica
-		canSeeSouthAmerica
+		canSeeAfrica       //1000
+		canSeeAsia         //10000
+		canSeeEurope       //100000
+		canSeeNorthAmerica //1000000
+		canSeeSouthAmerica //10000000
 	)
 
 	var myRoles byte = isAdmin | canSeeFinancials | canSeeEurope
