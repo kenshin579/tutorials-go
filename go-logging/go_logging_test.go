@@ -12,6 +12,14 @@ func Test_기본_Logger(t *testing.T) {
 	log.Println("Logging") //2020/12/30 10:27:11 Logging
 }
 
+func Test_Fatal(t *testing.T) {
+	log.Fatal("fatal") //메시지 출력 + os.Exit(1)
+}
+
+func Test_Panic(t *testing.T) {
+	log.Panic("panic") //메시지 출력 + panic()
+}
+
 func Test_기본_Logger_Flags_설정_날짜_시간_표시_X(t *testing.T) {
 	log.SetFlags(0)
 	log.Println("Logging") //Logging
