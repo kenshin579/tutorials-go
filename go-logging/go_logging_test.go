@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func Test_기본_Logger(t *testing.T) {
+func Test_Basic_Logger(t *testing.T) {
 	log.Println("Logging") //2020/12/30 10:27:11 Logging
 }
 
@@ -20,12 +20,12 @@ func Test_Panic(t *testing.T) {
 	log.Panic("panic") //메시지 출력 + panic()
 }
 
-func Test_기본_Logger_Flags_설정_날짜_시간_표시_X(t *testing.T) {
+func Test_Basic_Logger_Flags_Setting_DateTime_Display_X(t *testing.T) {
 	log.SetFlags(0)
 	log.Println("Logging") //Logging
 }
 
-func Test_기본_Logger_Flags_설정2(t *testing.T) {
+func Test_Basic_Logger_Flags_Setting2(t *testing.T) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
 	log.SetPrefix("INFO: ")
 	log.Println("Logging")
@@ -33,7 +33,7 @@ func Test_기본_Logger_Flags_설정2(t *testing.T) {
 	//INFO: 2020/12/30 15:41:20 /Users/ykoh/GolandProjects/tutorials-go/go-logging/go_logging_test.go:23: Logging
 }
 
-func Test_기본_Logger_File(t *testing.T) {
+func Test_Basic_Logger_File(t *testing.T) {
 	logFile, err := os.OpenFile("logfile.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
