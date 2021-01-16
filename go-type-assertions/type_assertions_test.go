@@ -1,6 +1,8 @@
 package go_type_assertions
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Example_TypeAssertion() {
 	var i interface{} = "foo"
@@ -29,25 +31,50 @@ func Example_TypeAssertion_Illegal() {
 	//Output:
 }
 
-type geometry interface {
-	area() float64
-	perimeter() float64
+type Shape interface {
+	Area() float64
 }
 
-type rect struct {
-	width, height float64
+type Object interface {
+	Volume() float64
 }
 
-func (r rect) area() float64 {
-	return r.width * r.height
+type Cube struct {
+	side float64
+}
+
+func (c Cube) Area() float64 {
+	return 6 * (c.side * c.side)
+}
+
+func (c Cube) Volume() float64 {
+	return c.side * c.side * c.side
+}
+
+type Skin interface {
+	Color() float64
+}
+
+func Example_Shape() {
+	var s Shape = Cube{3}
+	c := s.(Cube) //Shape -> Cube
+	fmt.Println(c.Area())
+	fmt.Println(c.Volume())
+
+	//Output:
+	//54
+	//27
 }
 
 func Example() {
-	r := rect{width: 3, height: 4}
-	fmt.Println(r.area())
+	var s Shape = Cube{3}
+	value1, ok1 := s.(Object) //Shape -> Object
+	fmt.Printf("shape 값(%v) Object 인터페이스를 구현되어 있나? %v\n", value1, ok1)
 
-	//type assertion
-	//r2 := r.()
+	value2, ok2 := s.(Skin)
+	fmt.Printf("shape 값(%v) Skin 인테퍼이스를 구현되어 있나?? %v\n", value2, ok2)
 
 	//Output:
+	//shape 값({3}) Object 인터페이스를 구현되어 있나? true
+	//shape 값(<nil>) Skin 인테퍼이스를 구현되어 있나?? false
 }
