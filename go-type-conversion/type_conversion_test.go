@@ -56,28 +56,29 @@ type Pet struct {
 }
 
 func Example_TypeConversion_Between_Structs() {
-	bob := Parent{
-		name: "bob",
+	parent := Parent{
+		name: "parent",
 		age:  15,
 	}
-	babyBob := Child(bob)
-	fmt.Println(bob)
-	fmt.Println(babyBob)
+	child := Child(parent)
+	fmt.Println(child)
+	parent = Parent(child)
+	fmt.Println(parent)
 
 	//Output:
-	//{bob 15}
-	//{bob 15}
+	//{parent 15}
+	//{parent 15}
 }
 
 func Example_TypeConversion_Between_Structs_변환_안되는_경우() {
-	bob := Parent{
-		name: "bob",
+	parent := Parent{
+		name: "parent",
 		age:  15,
 	}
 
-	//babyBod := Pet(bob) //cannot convert bob (type Parent) to type Pet
-	fmt.Println(bob)
+	//babyBod := Pet(parent) //cannot convert parent (type Parent) to type Pet
+	fmt.Println(parent)
 
 	//Output:
-	//{bob 15}
+	//{parent 15}
 }
