@@ -19,7 +19,7 @@ func Example_TypeConversion() {
 
 type myInt int
 
-func Example_TypeConversion2() {
+func Example_TypeConversion_custmonType() {
 	var i myInt = 4
 	originalInt := int(i)
 	i = myInt(originalInt)
