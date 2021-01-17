@@ -8,7 +8,7 @@ import (
 //참고 : https://hoonyland.medium.com/%EB%B2%88%EC%97%AD-interfaces-in-go-d5ebece9a7ea
 
 // person interface
-type Person interface {
+type person interface {
 	getFullName() string
 }
 
@@ -24,7 +24,7 @@ type Employee struct {
 	salary    int
 }
 
-// using this method, Employee implements Person interface
+// using this method, Employee implements person interface
 func (e Employee) getFullName() string {
 	return e.firstName + " " + e.lastName
 }
@@ -36,7 +36,7 @@ func (e Employee) getSalary() int {
 
 //타입 단언 : 다른 인터페이스로 변환할 때도 사용된다
 func Example_TypeAssertion_Convert_Employee_Salary() {
-	var johnP Person = Employee{"John", "Adams", 2000}
+	var johnP person = Employee{"John", "Adams", 2000}
 
 	// show john's salary
 	fmt.Printf("full name : %v \n", reflect.ValueOf(johnP).Interface())
