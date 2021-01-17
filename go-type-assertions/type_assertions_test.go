@@ -31,50 +31,68 @@ func Example_TypeAssertion_Empty_Interface_Illegal() {
 	//Output:
 }
 
-type Shape interface {
-	Area() float64
+type Person interface {
+	getName() string
 }
 
-type Object interface {
-	Volume() float64
+type Phone interface {
+	getPhone() string
 }
 
-type Cube struct {
-	side float64
+type Student struct {
+	name  string
+	age   int
+	phone string
 }
 
-func (c Cube) Area() float64 {
-	return 6 * (c.side * c.side)
+func (c Student) getName() string {
+	return c.name
 }
 
-func (c Cube) Volume() float64 {
-	return c.side * c.side * c.side
+func (c Student) getPhone() string {
+	return c.phone
 }
 
-type Skin interface {
-	Color() float64
+type Animal interface {
+	walk()
 }
 
-func Example_TypeAssertion_Interface_With_Method() {
-	var s Shape = Cube{3}
-	c := s.(Cube) //Shape -> Cube - Cube의 실제 값을 가져온다.
-	fmt.Println(c.Area())
-	fmt.Println(c.Volume())
+func Example_TypeAssertion_인터페이스_구현이_된_상태() {
+	var p Person = Student{"Frank", 13, "1111"}
+	s := p.(Student) //person -> Student - student의 실제 값을 가져온다.
+	fmt.Println(s.getName())
+	fmt.Println(s.getPhone())
 
 	//Output:
-	//54
-	//27
+	//Frank
+	//1111
 }
 
-func Example() {
-	var s Shape = Cube{3}
-	value1, ok1 := s.(Object) //Shape -> Object
-	fmt.Printf("shape 값(%v) Object 인터페이스를 구현되어 있나? %v\n", value1, ok1)
-
-	value2, ok2 := s.(Skin)
-	fmt.Printf("shape 값(%v) Skin 인테퍼이스를 구현되어 있나?? %v\n", value2, ok2)
+//타입 T가 인터페이스를 구현하고 있지 않기 때문에 컴파일 에러가 발생한다
+func Example_TypeAssertion_인터페이스가_타입_T의_동적_값을_소유하지_않을_경우_컴파일_에러가_발생한다() {
+	//var p Person = Student{"Frank", 13, "1111"}
+	//value := p.(string) //impossible type assertion: string does not implement person (missing getName method)
+	//fmt.Printf("%v, %T\n", value, value)
 
 	//Output:
-	//shape 값({3}) Object 인터페이스를 구현되어 있나? true
-	//shape 값(<nil>) Skin 인테퍼이스를 구현되어 있나?? false
+}
+
+func Example_TypeAssertion_인터페이스가_타입_T의_실제_값을_가지고_있지_않는_경우_panic이_발생한다() {
+	var p Person = nil
+	//value := p.(Student) //panic: interface conversion: go_type_assertions.Person is nil, not go_type_assertions.Student
+	value, ok := p.(Student)
+	fmt.Printf("(%v, %T), ok: %v\n", value, value, ok)
+
+	//Output:
+	//({ 0 }, go_type_assertions.Student), ok: false
+}
+
+func Example_TypeAssertion_다른_인터페이스가_타입_T를_구현하지_않고_있으면_panic이_발생한다() {
+	var p Person = Student{"Frank", 13, "1111"}
+	//value := p.(Animal) //panic: interface conversion: go_type_assertions.Student is not go_type_assertions.Animal: missing method walk
+	value, ok := p.(Animal)
+	fmt.Printf("(%v, %T) %v\n", value, value, ok)
+
+	//Output:
+	//(<nil>, <nil>) false
 }
