@@ -57,7 +57,7 @@ type Skin interface {
 
 func Example_TypeAssertion_Interface_With_Method() {
 	var s Shape = Cube{3}
-	c := s.(Cube) //Shape -> Cube
+	c := s.(Cube) //Shape -> Cube - Cube의 실제 값을 가져온다.
 	fmt.Println(c.Area())
 	fmt.Println(c.Volume())
 
