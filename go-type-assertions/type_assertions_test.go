@@ -57,14 +57,27 @@ type Animal interface {
 	walk()
 }
 
-func Example_TypeAssertion_인터페이스_구현이_된_상태() {
+func Example_TypeAssertion_인터페이스_데이터_타입_Student_값을_가져온다() {
 	var p Person = Student{"Frank", 13, "1111"}
-	s := p.(Student) //person -> Student - student의 실제 값을 가져온다.
+	fmt.Println(p.getName())
+
+	s := p.(Student) //Person -> Student - student의 실제 값을 가져온다.
 	fmt.Println(s.getName())
 	fmt.Println(s.getPhone())
 
 	//Output:
 	//Frank
+	//Frank
+	//1111
+}
+
+func Example_TypeAssertion_다른_인터페이스로_값을_가져온다() {
+	var p Person = Student{"Frank", 13, "1111"}
+
+	ph := p.(Phone) //Person -> Phone
+	fmt.Println(ph.getPhone())
+
+	//Output:
 	//1111
 }
 
