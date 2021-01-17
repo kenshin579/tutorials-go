@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Example_TypeAssertion() {
+func Example_TypeAssertion_Empty_Interface() {
 	var i interface{} = "foo"
 
 	var s = i.(string)
@@ -22,7 +22,7 @@ func Example_TypeAssertion() {
 	//0 false
 }
 
-func Example_TypeAssertion_Illegal() {
+func Example_TypeAssertion_Empty_Interface_Illegal() {
 	var i interface{} = "foo"
 
 	var n = i.(int) //panic: interface conversion: interface {} is string, not int
@@ -55,7 +55,7 @@ type Skin interface {
 	Color() float64
 }
 
-func Example_Shape() {
+func Example_TypeAssertion_Interface_With_Method() {
 	var s Shape = Cube{3}
 	c := s.(Cube) //Shape -> Cube
 	fmt.Println(c.Area())
