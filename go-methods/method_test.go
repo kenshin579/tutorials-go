@@ -24,6 +24,10 @@ func Example_Method_Value_Receiver() {
 	//Frank
 }
 
+//todo : pointer receiver ex
+//todo : struct 외에도 기본형도 가능하다
+
+//todo : pointer의 차이점
 func Example_Method_Pointer_Receiver() {
 	employee := Employee{"Frank", 20, 1000}
 	fmt.Println(employee.Name())
