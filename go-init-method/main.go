@@ -1,8 +1,10 @@
 package main
 
+//import된 순서대로 init()가 호출된다
 import (
 	"fmt"
-	"github.com/kenshin579/tutorials-go/go-init-method/lib"
+	"github.com/kenshin579/tutorials-go/go-init-method/abc"
+	"github.com/kenshin579/tutorials-go/go-init-method/lib1"
 )
 
 var version string
@@ -15,5 +17,6 @@ func init() {
 func main() {
 	fmt.Println("main called")
 	fmt.Println(version)
-	fmt.Println(lib.Version())
+	fmt.Println(lib1.Version())
+	fmt.Println(abc.Version())
 }
