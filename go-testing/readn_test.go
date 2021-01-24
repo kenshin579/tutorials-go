@@ -2,8 +2,12 @@ package go_testing
 
 import (
 	"errors"
+	"io"
 	"testing"
 )
+
+//todo: 이거 왜 필요한가? - memory-free trick 시키는 방법 - 잘 이해가 안됨
+var _ io.Reader = (*MockReader)(nil)
 
 //Interface Mocking
 type MockReader struct {
