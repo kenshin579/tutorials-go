@@ -12,12 +12,13 @@ type EmailSender interface {
 }
 
 func (m *MailMan) Send(subject, body string, to ...*mail.Address) {
-	// some code
+	fmt.Println("sending mail to -> ", to[0])
 }
 func New() *MailMan {
 	return &MailMan{}
 }
 
+//func SendWelcomeEmail(m *MailMan, to ...*mail.Address) //인터페이스를 받도록 수정함
 func SendWelcomeEmail(m EmailSender, to ...*mail.Address) {
-	fmt.Println("SendWelcomeEmail")
+	fmt.Println("m", m)
 }
