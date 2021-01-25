@@ -1,37 +1,59 @@
 package go_methods
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
-type Employee struct {
-	name   string
-	age    int
-	salary int
+type Car struct {
+	brand   string
+	color   string
+	mileage int
+	speed   int
 }
 
-func (e Employee) Name() string {
-	return e.name
+func (c Car) Color() string {
+	return c.color
 }
 
-func (e *Employee) Salary() int {
-	return e.salary
+func (c *Car) SpeedUp(s int) {
+	c.speed += s
 }
 
 func Example_Method_Value_Receiver() {
-	employee := Employee{"Frank", 20, 1000}
-	fmt.Println(employee.Name())
+	hyundaiCar := Car{"현대", "빨강", 10000, 0}
+	//fmt.Println("hyundaiCar", hyundaiCar)
+
+	fmt.Println(hyundaiCar.Color())
 
 	//Output:
-	//Frank
+	//빨강
 }
 
-//todo : pointer receiver ex
-//todo : struct 외에도 기본형도 가능하다
-
-//todo : pointer의 차이점
 func Example_Method_Pointer_Receiver() {
-	employee := Employee{"Frank", 20, 1000}
-	fmt.Println(employee.Name())
+	hyundaiCar1 := Car{"현대", "빨강", 10000, 0}
+	fmt.Println("hyundaiCar1", hyundaiCar1)
+
+	hyundaiCar1.SpeedUp(10)
+	fmt.Println("hyundaiCar1", hyundaiCar1)
+
+	//https://golangbot.com/methods/
 
 	//Output:
-	//Frank
+	//hyundaiCar1 {현대 빨강 10000 0}
+	//hyundaiCar1 {현대 빨강 10000 10}
+}
+
+type myFloat float64
+
+func (v myFloat) ceil() float64 {
+	return math.Ceil(float64(v))
+}
+
+func Example_Method_Non_Struct_Type() {
+	v := myFloat(1.3)
+	fmt.Println(v)
+
+	//Output:
+	//1.3
 }
