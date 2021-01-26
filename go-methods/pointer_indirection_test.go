@@ -2,79 +2,78 @@ package go_methods
 
 import "fmt"
 
-type Point struct {
-	x, y float64
+type Rectangle struct {
+	height, width int
 }
 
-func (v *Point) ScalePointerReceiver(f float64) {
-	v.x = v.x * f
-	v.y = v.y * f
+func (r *Rectangle) area() {
+	fmt.Println(r.height * r.width)
 }
 
-func (v Point) ScaleValueReceiver(f float64) {
-	fmt.Printf("v.x:%.2f, v.y:%.2f\n", v.x*f, v.y*f)
+func area(r *Rectangle) {
+	fmt.Println(r.height * r.width)
 }
 
-func ScaleFuncPointerParameter(v *Point, f float64) {
-	v.x = v.x * f
-	v.y = v.y * f
+func (r Rectangle) perimeter() {
+	fmt.Println(2 * (r.height * r.width))
 }
 
-func ScaleFuncValueParameter(v Point, f float64) {
-	fmt.Printf("v.x:%.2f, v.y:%.2f\n", v.x*f, v.y*f)
+func perimeter(r Rectangle) {
+	fmt.Println(2 * (r.height * r.width))
 }
 
-//indirection 의미 : dereferencing이라는 의미로 자체 값 대신에 다른 방법(ex. 메모리 주소)으로 참조할 수 있는 방법
-func Example_Func_Pointer_Parameter_Indirection() {
-	p := Point{3, 4}
-	fmt.Printf("value:%+v type:%T\n", p, p)
-	//ScaleFuncPointerParameter(p, 10) //컴파일 오류 발생함
-	ScaleFuncPointerParameter(&p, 10) //포인터 인자는 주소 값만 받음
-	fmt.Println(p)
+func Example_Indirection_Func_Pointer_Parameter() {
+	r := Rectangle{
+		height: 10,
+		width:  3,
+	}
+
+	//area(r) //컴파일 오류 - 함수는 포인터 인자만 받을 수 있음
+	area(&r)
 
 	//Output:
-	//value:{x:3 y:4} type:go_methods.Point
-	//{30 40}
+	//30
+
 }
 
-func Example_Func_Value_Parameter_Indirection() {
-	p := Point{3, 4}
-	fmt.Printf("value:%+v type:%T\n", p, p)
-	//ScaleFuncPointerParameter(&p, 10) //컴파일 오류 - value 인자는 주소 값으로 넘겨줄 수 없음
-	ScaleFuncValueParameter(p, 10)
-	fmt.Println(p)
+func Example_Indirection_Method_Pointer_Receiver() {
+	r := Rectangle{
+		height: 10,
+		width:  3,
+	}
+
+	r.area()
+	(&r).area()
 
 	//Output:
-	//value:{x:3 y:4} type:go_methods.Point
-	//v.x:30.00, v.y:40.00
-	//{3 4}
+	//30
+	//30
+
 }
 
-func Example_Method_Pointer_Receiver_Indirection() {
-	p1 := Point{1, 2}
-	fmt.Printf("value:%+v type:%T\n", p1, p1)
-	p1.ScalePointerReceiver(3) //p는 value이지만, Go는 자동으로 (&p1).ScalePointerReceiver(3)으로 해석해서 실행함
-	fmt.Println(p1)
+func Example_Indirection_Func_Value_Parameter() {
+	r := Rectangle{
+		height: 10,
+		width:  3,
+	}
 
-	p2 := &Point{4, 3}
-	fmt.Printf("value:%+v type:%T\n", p2, p2)
-	p2.ScalePointerReceiver(3) //p2 포인터이여도 잘 실행됨
-	fmt.Println(*p2)
+	//perimeter(&r) //컴파일 오류 - 함수는 value 인자만 받을 수 있음
+	perimeter(r)
 
 	//Output:
-	//value:{x:1 y:2} type:go_methods.Point
-	//{3 6}
-	//{12 9}
+	//60
 }
 
-func Example_Method_Value_Receiver_Indirection() {
-	p := &Point{4, 3}
-	fmt.Printf("value:%+v type:%T\n", p, p)
-	p.ScaleValueReceiver(3) //p는 pointer이지만, Go는 자동으로 (*p).ScaleValueReceiver(3)으로 해석해서 실행함
-	fmt.Println(*p)
+func Example_Indirection_Method_Value_Receiver() {
+	r := Rectangle{
+		height: 10,
+		width:  3,
+	}
+
+	r.perimeter()
+	(&r).perimeter()
 
 	//Output:
-	//value:&{x:4 y:3} type:*go_methods.Point
-	//v.x:12.00, v.y:9.00
-	//&{4 3}
+	//60
+	//60
 }
