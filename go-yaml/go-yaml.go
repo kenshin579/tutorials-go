@@ -28,7 +28,7 @@ type T struct {
 func main() {
 	t := T{}
 
-	err := yaml.Unmarshal([]byte(data), &t)
+	err := yaml.Unmarshal([]byte(data), &t) //구조체에 담음
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -40,7 +40,7 @@ func main() {
 	}
 	fmt.Printf("--- t dump:\n%s\n\n", string(d))
 
-	m := make(map[interface{}]interface{})
+	m := make(map[interface{}]interface{}) //map으로도 남음
 
 	err = yaml.Unmarshal([]byte(data), &m)
 	if err != nil {
