@@ -44,16 +44,16 @@ func Example_Method_Pointer_Receiver() {
 	//hyundaiCar1 {현대 빨강 10000 10}
 }
 
+//receiver 인자를 type으로 정의된 데이터 타임만 올 수 있다.
+//func (i int) ceil() float64 {
+//	return math.Ceil(float64(i))
+//}
+
 type myFloat float64
 
 func (m myFloat) ceil() float64 {
 	return math.Ceil(float64(m))
 }
-
-//receiver 인자를 type으로 정의된 데이터 타임만 올 수 있다.
-//func (i int) ceil() float64 {
-//	return math.Ceil(float64(i))
-//}
 
 func Example_Method_Non_Struct_Type() {
 	v := myFloat(1.3)
