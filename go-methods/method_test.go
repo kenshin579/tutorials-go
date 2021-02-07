@@ -50,6 +50,11 @@ func (v myFloat) ceil() float64 {
 	return math.Ceil(float64(v))
 }
 
+//receiver 인자를 type으로 정의된 데이터 타임만 올 수 있다.
+//func (i int) ceil() float64 {
+//	return math.Ceil(float64(i))
+//}
+
 func Example_Method_Non_Struct_Type() {
 	v := myFloat(1.3)
 	fmt.Println(v)
