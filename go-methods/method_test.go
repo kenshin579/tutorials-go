@@ -31,21 +31,21 @@ func Example_Method_Value_Receiver() {
 }
 
 func Example_Method_Pointer_Receiver() {
-	hyundaiCar1 := Car{"현대", "빨강", 10000, 0}
-	fmt.Println("hyundaiCar1", hyundaiCar1)
+	hyundaiCar := Car{"현대", "빨강", 10000, 0}
+	fmt.Println("hyundaiCar", hyundaiCar)
 
-	hyundaiCar1.SpeedUp(10)
-	fmt.Println("hyundaiCar1", hyundaiCar1)
+	hyundaiCar.SpeedUp(10)
+	fmt.Println("hyundaiCar", hyundaiCar)
 
 	//https://golangbot.com/methods/
 
 	//Output:
-	//hyundaiCar1 {현대 빨강 10000 0}
-	//hyundaiCar1 {현대 빨강 10000 10}
+	//hyundaiCar {현대 빨강 10000 0}
+	//hyundaiCar {현대 빨강 10000 10}
 }
 
-//receiver 인자를 type으로 정의된 데이터 타임만 올 수 있다.
-//func (i int) ceil() float64 {
+//int 타입과 ceil 메서드는 같은 패키지 레벨이 존재하지 않기 떄문에 컴파일 오류가 발생한다
+//func (f float64) ceil() float64 {
 //	return math.Ceil(float64(i))
 //}
 
