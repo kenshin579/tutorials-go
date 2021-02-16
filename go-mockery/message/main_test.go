@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"testing"
-
 	"github.com/stretchr/testify/mock"
+	"testing"
 )
 
 // smsServiceMock
