@@ -4,12 +4,11 @@ services:
     image: mongo
     container_name: mongodb
     environment:
-      - MONGO_INITDB_DATABASE=go-mongo
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
-      #    - /home/barry/mongodb/database:/data/db
-      - ${HOME}/data/docker/mongo_go:/data/db
+      - ${HOME}/data/docker/${MONGO_INITDB_DATABASE}:/data/db
     ports:
       - 27017:27017
     restart: unless-stopped
