@@ -4,8 +4,8 @@ import "github.com/kenshin579/tutorials-go/algorithm/leetcode/algorithm/medium/c
 
 /*
 429. N-ary Tree Level Order Traversal
-Difficulty : Easy
-Tags : String
+Difficulty : Medium
+Tags : Tree
 https://leetcode.com/problems/n-ary-tree-level-order-traversal/
 https://leetcode.com/problems/n-ary-tree-level-order-traversal/discuss/759076/Golang-Clean-and-Concise-DFS-Solution-beat-100
 */
