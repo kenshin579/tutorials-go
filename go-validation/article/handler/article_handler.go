@@ -26,7 +26,10 @@ func (h *Handler) CreateArticle(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
-	//todo: validation 추가
+	if err := c.Validate(request); err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewValidatorError(err))
+	}
+
 	err := h.articleUsecase.CreateArticle(request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
