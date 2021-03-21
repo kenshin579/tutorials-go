@@ -7,6 +7,7 @@ import (
 //https://stackoverflow.com/questions/19374219/how-to-find-the-difference-between-two-slices-of-strings
 //https://stackoverflow.com/questions/19374219/how-to-find-the-difference-between-two-slices-of-strings
 // difference returns the elements in `a` that aren't in `b`.
+//todo : 다시 스터디 필요
 func difference(a, b []string) []string {
 	mb := make(map[string]struct{}, len(b))
 	for _, x := range b {
