@@ -10,7 +10,7 @@ import (
 
 func main() {
 	fx.New(
-		fx.Provide(http.NewServeMux),
+		fx.Provide(http.NewServeMux), //NewServeMux를 server.New로 넘겨주기 위해서 추가됨
 		fx.Invoke(server.New),
 		fx.Invoke(registerHooks),
 	).Run()
