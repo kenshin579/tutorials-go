@@ -17,10 +17,10 @@ func New(s *http.ServeMux) *Handler {
 
 // RegisterRoutes for all http endpoints
 func (h *Handler) registerRoutes() {
-	h.mux.HandleFunc("/", h.HelloWorld)
+	h.mux.HandleFunc("/", h.helloWorldHandler)
 }
 
-func (h *Handler) HelloWorld(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Write([]byte("Hello World"))
 }
