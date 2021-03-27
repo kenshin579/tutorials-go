@@ -25,11 +25,12 @@ func registerHooks(
 	lifecycle.Append(
 		fx.Hook{
 			OnStart: func(context.Context) error {
-				logger.Info("Listening on localhost:8080")
+				logger.Info("OnStart :: Listening on localhost:8080")
 				go http.ListenAndServe(":8080", mux)
 				return nil
 			},
 			OnStop: func(context.Context) error {
+				logger.Info("OnStop...")
 				return logger.Sync()
 			},
 		},
