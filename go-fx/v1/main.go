@@ -3,11 +3,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/go-fx/server"
+	"github.com/kenshin579/tutorials-go/go-fx/v1/server"
 )
 
 func main() {
-	//1.DI 사용하지 않는 방식
 	mux := http.NewServeMux()
 	server.New(mux)
 
