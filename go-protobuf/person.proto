@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package main;
+
+option go_package = "github.com/kenshin579/tutorials-go/go-protobuf/main";
+
+message SocialFollowers {
+  int32 youtube = 1;
+  int32 twitter = 2;
+}
+
+message Person {
+  string name = 1;
+  int32 age = 2;
+  SocialFollowers socialFollowers = 3;
+}
