@@ -2,6 +2,8 @@ package rpc
 
 import (
 	"net/rpc"
+
+	"github.com/labstack/gommon/log"
 )
 
 // Handler is the interface which exposes the User Server methods
@@ -21,5 +23,7 @@ func New() *Handler {
 // GetUsers function returns the list of users
 func (rh *Handler) GetUsers(payload int, reply *string) error {
 	// add logic to return users
+	log.Info("payload", payload)
+	log.Info("reply", *reply)
 	return nil
 }
