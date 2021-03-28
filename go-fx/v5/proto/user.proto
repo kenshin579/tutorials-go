@@ -1,0 +1,28 @@
+syntax = "proto3";
+package users;
+
+//option go_package = ".;user";
+option go_package = "github.com/kenshin579/tutorials-go/go-fx/v5/proto/user";
+
+// Users Service
+service Users {
+  // GetUsers
+  rpc GetUsers(EmptyReq) returns (GetUsersResponse) {};
+}
+
+// EmptyReq message
+message EmptyReq {}
+
+// GetUsersResponse message
+message GetUsersResponse {
+  // User message
+  repeated User users = 1;
+}
+
+// User message
+message User {
+  // The user name
+  string name = 1;
+  // The user age
+  int32 age = 2;
+}
