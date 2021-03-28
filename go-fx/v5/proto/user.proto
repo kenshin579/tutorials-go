@@ -1,8 +1,8 @@
 syntax = "proto3";
 package users;
 
-//todo : 이 부분 수정하기
-option go_package = "..;user";
+//option go_package = ".;user";
+option go_package = "github.com/kenshin579/tutorials-go/go-fx/v5/proto/user";
 
 // Users Service
 service Users {
