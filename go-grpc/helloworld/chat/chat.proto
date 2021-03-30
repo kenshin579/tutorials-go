@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/kenshin579/tutorials-go/go-grpc/helloworld/chat/chat";
+option go_package = "github.com/kenshin579/tutorials-go/go-grpc/helloworld/chat";
 
 package chat;
 
