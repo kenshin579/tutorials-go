@@ -10,6 +10,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang/protobuf v1.5.1
 	github.com/google/uuid v1.2.0
+	github.com/jnewmano/grpc-json-proxy v0.0.2
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.2.1
 	github.com/labstack/gommon v0.3.0

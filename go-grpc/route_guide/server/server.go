@@ -17,6 +17,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	_ "github.com/jnewmano/grpc-json-proxy/codec"
 	pb "github.com/kenshin579/tutorials-go/go-grpc/route_guide/routeguide"
 )
 
