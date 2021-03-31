@@ -339,5 +339,5 @@ var RouteGuide_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "routeguide/route_guide.proto",
+	Metadata: "route_guide/routeguide/route_guide.proto",
 }
