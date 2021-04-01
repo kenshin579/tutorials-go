@@ -3,7 +3,10 @@ package go_json
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"testing"
+
+	"github.com/labstack/gommon/log"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -101,4 +104,34 @@ func Test(t *testing.T) {
 	json.Unmarshal([]byte(jsonStr), &response2)
 
 	assert.Equal(t, len(response2.StudentList), 1)
+}
+
+//https://stackoverflow.com/questions/58434023/how-to-parse-http-response-body-to-json-format-in-golang
+func TestGet의_Response_값이_Json_Array인_경우_sliceOfMap으로_decode하는_방법(t *testing.T) {
+	url := "https://skishore.github.com/inkstone/all.json"
+
+	resp, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	keys := make([]map[string]interface{}, 0)
+	err = json.NewDecoder(resp.Body).Decode(&keys)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("first item", keys[0])
+}
+
+//https://coderwall.com/p/4c2zig/decode-top-level-json-array-into-a-slice-of-structs-in-golang
+func TestJson_Array를_sliceOfMap로_decode하는_방법(t *testing.T) {
+	keysBody := []byte(`[{"id": 1,"key": "-"},{"id": 2,"key": "-"},{"id": 3,"key": "-"}]`)
+	keys := make([]map[string]interface{}, 0)
+	err := json.Unmarshal(keysBody, &keys)
+	if err != nil {
+		log.Error(err)
+	}
+	fmt.Printf("%#v\n", keys)
+	fmt.Println("first item", keys[0]["id"])
 }
