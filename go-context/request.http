@@ -1,7 +1,0 @@
-### hello
-GET http://localhost:8090/hello
-Accept: application/json
-
-### welcome
-GET http://localhost:8080/welcome
-Accept: application/json

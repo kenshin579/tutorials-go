@@ -1,4 +1,4 @@
-package go_context
+package main
 
 import (
 	"fmt"
@@ -7,14 +7,14 @@ import (
 )
 
 //https://gobyexample.com/context
-func hello(w http.ResponseWriter, req *http.Request) {
+func HelloHandler(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
-	fmt.Println("server: hello handler started")
-	defer fmt.Println("server: hello handler ended")
+	fmt.Println("server: HelloHandler handler started")
+	defer fmt.Println("server: HelloHandler handler ended")
 
 	select {
-	case <-time.After(10 * time.Second):
-		fmt.Fprintf(w, "hello\n")
+	case <-time.After(1 * time.Second):
+		fmt.Fprintf(w, "hello world!")
 	case <-ctx.Done():
 
 		err := ctx.Err()
@@ -25,6 +25,6 @@ func hello(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/HelloHandler", HelloHandler)
 	http.ListenAndServe(":8090", nil)
 }
