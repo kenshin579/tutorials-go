@@ -15,31 +15,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type Student struct {
-	Name string
-}
-
-type Response1 struct {
-	Data        interface{}       `json:"data,omitempty"`
-	Message     string            `json:"message,omitempty"`
-	MessageList []string          `json:"messageList,omitempty"`
-	Errors      map[string]string `json:"errors,omitempty"`
-	Student     Student           `json:"student,omitempty"`
-	StudentList []Student         `json:"studentList,omitempty"`
-}
-
 func ExampleJsonMarshal_Struct_To_Json_구조체_다_값이_있는_경우() {
-	response := Response1{
+	response := model.StudentResponse{
 		Data:        3,
 		Message:     "this is a message",
 		MessageList: []string{"msg`", "msg1"},
 		Errors: map[string]string{
 			"error": "error1",
 		},
-		Student: Student{
+		Student: model.Student{
 			Name: "Frank",
 		},
-		StudentList: []Student{{Name: "Frank1"}},
+		StudentList: []model.Student{{Name: "Frank1"}},
 	}
 
 	jsonResponse, _ := json.MarshalIndent(response, "", "\t")
@@ -68,7 +55,7 @@ func ExampleJsonMarshal_Struct_To_Json_구조체_다_값이_있는_경우() {
 }
 
 func ExampleJsonMarshal_Struct_To_Json_구조체_값이_다_없는_경우() {
-	response := Response1{}
+	response := model.StudentResponse{}
 	jsonResponse, _ := json.MarshalIndent(response, "", "\t")
 	fmt.Println("jsonResponse", string(jsonResponse))
 
