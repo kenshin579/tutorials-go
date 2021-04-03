@@ -3,8 +3,12 @@ package go_json
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"testing"
+
+	"github.com/kenshin579/tutorials-go/go-json/model"
 
 	"github.com/labstack/gommon/log"
 
@@ -134,4 +138,27 @@ func TestJson_Array를_sliceOfMap로_decode하는_방법(t *testing.T) {
 	}
 	fmt.Printf("%#v\n", keys)
 	fmt.Println("first item", keys[0]["id"])
+}
+
+//Dto에서 필요한 속성만 정의해서 사용하면 된다
+func TestJsonArray를_sliceOfStruct로_decode하는_방법(t *testing.T) {
+	courseList := getScenarioNodeFromTestJsonFile("data/array.json")
+
+	assert.Equal(t, "Lessons 1-4", courseList[0].Name)
+}
+
+func getScenarioNodeFromTestJsonFile(path string) []model.CourseResponse {
+	var courseResponseList []model.CourseResponse
+
+	jsonFile, err := ioutil.ReadFile(filepath.Join(path))
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(jsonFile, &courseResponseList)
+	if err != nil {
+		panic(err)
+	}
+
+	return courseResponseList
 }
