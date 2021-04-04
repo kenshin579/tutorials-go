@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>EventSource Demo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: whitesmoke;
+            font: 100%/1.5 system-ui, -apple-system, sans-serif;
+            padding: 1rem 3rem;
+        }
+
+        .container {
+            max-width: 45rem;
+            margin: 0 auto;
+            padding: 1.25rem;
+            background-color: white;
+            border: 1px solid lightgray;
+        }
+
+        .container > * + * {
+            margin-top: 1.5rem;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 2rem;
+            font-weight: normal;
+            color: gray;
+        }
+
+        #chat [type="text"] {
+            width: 100%;
+            padding: 0.25rem 0;
+            border-width: 0 0 2px 0;
+            border-style: solid;
+            border-color: dimgray;
+            font-size: 1.25rem;
+            transition: all 0.3s cubic-bezier(0, 0, 0.3, 1);
+        }
+
+        #chat [type="text"]:focus {
+            outline: none;
+            border-color: dodgerblue;
+        }
+
+        #messages {
+            max-height: 30rem;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>EventSource Demo</h1>
+    <form id="chat">
+        <input type="hidden" name="sender"/>
+        <input
+                type="text"
+                name="message"
+                placeholder="Send a message..."
+                autofocus
+        />
+    </form>
+    <div id="messages"></div>
+</div>
+<script type="module">
+    const form = document.querySelector("#chat");
+    form.sender.value = `u-${Math.random()
+        .toString(32)
+        .substr(2, 7)}`;
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const input = event.target.message;
+        const text = input.value.trim();
+        if (!text) return;
+
+        const res = await fetch("/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({text, sender: event.target.sender.value})
+        });
+        if (!res.ok) {
+            console.error("could not send message", res.statusText);
+        } else {
+            console.log(await res.text());
+            input.value = "";
+        }
+    });
+
+    const source = new EventSource("/events");
+    source.addEventListener("open", function (event) {
+        console.log("eventsource connection open");
+    });
+    source.addEventListener("error", function (event) {
+        if (event.target.readyState === 0) {
+            console.log("reconnecting to eventsource");
+        } else {
+            console.error("eventsource error");
+        }
+    });
+    source.addEventListener("message", function (event) {
+        const el = document.createElement("div");
+        el.textContent = event.data.replace(form.sender.value, "You said");
+        document.querySelector("#messages").prepend(el);
+    });
+</script>
+</body>
+</html>
