@@ -17,6 +17,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/onsi/ginkgo v1.15.0 // indirect
 	github.com/onsi/gomega v1.10.5 // indirect
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	go.mongodb.org/mongo-driver v1.4.6
 	go.uber.org/fx v1.13.1
