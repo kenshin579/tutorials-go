@@ -2,7 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"testing"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,7 +27,12 @@ type Address struct {
 	VisitedAt time.Time `bson:"visitedAt,omitempty"`
 }
 
-const TestCollection = ""
+var TestCollection = getCurrentFilename()
+
+func Test(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	fmt.Println("filename", filename)
+}
 
 func Example() {
 	//flatbson.Flatten(User{Address: {VisitedAt: time.Now().UTC()}}) //todo: 왜 오류가 발생하나?
@@ -49,4 +59,11 @@ func connect() *mongo.Client {
 		log.Fatal(err)
 	}
 	return client
+}
+
+func getCurrentFilename() string {
+	_, filename, _, _ := runtime.Caller(0)
+	fmt.Println(filepath.Base(filename))
+	extension := filepath.Ext(filename)
+	return strings.TrimSuffix(filename, extension)
 }
