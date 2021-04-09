@@ -11,17 +11,17 @@ var (
 	ErrNotFound = errors.New("Article not found")
 )
 
-type articleStore struct {
+type ArticleStore struct {
 	storeList []model.Article
 }
 
-func NewArticleStore() *articleStore {
-	return &articleStore{
+func NewArticleStore() *ArticleStore { //todo: 어떻게 interface로 반환을 해야 하나?
+	return &ArticleStore{
 		storeList: make([]model.Article, 0),
 	}
 }
 
-func (as *articleStore) Create(request *model.ArticleRequest) error {
+func (as *ArticleStore) Create(request *model.ArticleRequest) error {
 	a := model.Article{
 		ArticleID:   uuid.New().String(),
 		Title:       request.Title,
@@ -32,7 +32,7 @@ func (as *articleStore) Create(request *model.ArticleRequest) error {
 	return nil
 }
 
-func (as *articleStore) Delete(articleID string) error {
+func (as *ArticleStore) Delete(articleID string) error {
 	temp := as.storeList[:0]
 	for _, article := range as.storeList {
 		if article.ArticleID != articleID {
@@ -43,7 +43,7 @@ func (as *articleStore) Delete(articleID string) error {
 	return ErrNotFound
 }
 
-func (as *articleStore) GetByID(articleID string) (*model.Article, error) {
+func (as *ArticleStore) GetByID(articleID string) (*model.Article, error) {
 	for _, article := range as.storeList {
 		if article.ArticleID == articleID {
 			return &article, nil
@@ -52,6 +52,6 @@ func (as *articleStore) GetByID(articleID string) (*model.Article, error) {
 	return nil, ErrNotFound
 }
 
-func (as *articleStore) List() ([]model.Article, error) {
+func (as *ArticleStore) List() ([]model.Article, error) {
 	return as.storeList, nil
 }
