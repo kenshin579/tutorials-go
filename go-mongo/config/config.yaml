@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+mongodb:
+  uri: mongodb://localhost:27017
+  database: go-mongo-test
+#  username: mongoadmin
+#  password: mongopassword

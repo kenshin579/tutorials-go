@@ -2,11 +2,11 @@ version: "3.8"
 services:
   mongodb:
     image: mongo
-    container_name: mongodb
+    container_name: go-mongo-mongodb
     environment:
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+#      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+#      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - ${HOME}/data/docker/${MONGO_INITDB_DATABASE}:/data/db
     ports:
