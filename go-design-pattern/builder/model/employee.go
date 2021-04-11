@@ -1,30 +1,39 @@
 package model
 
-type Employee struct {
+type employee struct {
 	Name      string
 	Role      string
 	MinSalary int
 	MaxSalary int
 }
 
-type EmployeeBuilder struct {
-	e Employee
+type employeeBuilder struct {
+	e employee
 }
 
-func (b *EmployeeBuilder) Build() Employee {
-	return b.e
+func EmployeeBuilder() *employeeBuilder {
+	return &employeeBuilder{}
 }
 
-func (b *EmployeeBuilder) Name(name string) *EmployeeBuilder {
-	b.e.Name = name
-	return b
+func (eb *employeeBuilder) Name(name string) *employeeBuilder {
+	eb.e.Name = name
+	return eb
 }
 
-func (b *EmployeeBuilder) Role(role string) *EmployeeBuilder {
+func (eb *employeeBuilder) Role(role string) *employeeBuilder {
 	if role == "manager" {
-		b.e.MinSalary = 20000
-		b.e.MaxSalary = 60000
+		eb.e.MinSalary = 20000
+		eb.e.MaxSalary = 60000
 	}
-	b.e.Role = role
-	return b
+	eb.e.Role = role
+	return eb
+}
+
+func (eb *employeeBuilder) Build() employee {
+	return employee{
+		Name:      eb.e.Name,
+		Role:      eb.e.Role,
+		MinSalary: eb.e.MinSalary,
+		MaxSalary: eb.e.MaxSalary,
+	}
 }
