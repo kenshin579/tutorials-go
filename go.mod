@@ -3,6 +3,7 @@ module github.com/kenshin579/tutorials-go
 go 1.15
 
 require (
+	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/chidiwilliams/flatbson v0.3.0
 	github.com/go-playground/locales v0.13.0
