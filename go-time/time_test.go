@@ -2,56 +2,78 @@ package main
 
 import (
 	"fmt"
-	"testing"
 	"time"
 )
 
-/*
-- 문자열 파싱 <-- todo : 이거 부터 하면 됨
-- 날짜 계산
-- days in month
-- time zones
-- measure of piece of code
-- time.Now(), time.Date(), time.Parse()
+const (
+	LayoutISO    = "2006-01-02"
+	LayoutUS     = "January 2, 2006"
+	LayoutCustom = "2006-01-02 15:04:05"
+)
 
-*/
-
-func Test(t *testing.T) {
-	// The date we're trying to parse, work with and format
-	myDateString := "2018-01-20 04:35"
-	fmt.Println("My Starting Date:\t", myDateString)
-
-	// Parse the date string into Go's time object
-	// The 1st param specifies the format, 2nd is our date string
-	myDate, err := time.Parse("2006-01-02 15:04", myDateString)
-	if err != nil {
-		panic(err)
-	}
-
-	// Format uses the same formatting style as parse, or we can use a pre-made constant
-	fmt.Println("My Date Reformatted:\t", myDate.Format(time.RFC822))
-
-	// In Y-m-d
-}
-
-func TestParse_Date_String(t *testing.T) {
-	dateStr := "2019-03-20 02:22:30"
-	parseDate, _ := time.Parse("1999-01-02 00:00:00", dateStr)
-	fmt.Println(parseDate.Format("2000-01-02"))
-	//fmt.Println(parseDate.Year())
-}
-
-func Example_diff() {
-	currentTime := time.Date(2020, 1, 1, 1, 48, 32, 0, time.UTC)
-	totalTime := time.Date(2020, 1, 1, 6, 39, 57, 0, time.UTC)
-	diffTime := totalTime.Sub(currentTime)
-	totalTimeInSeconds := float64(totalTime.Second() + totalTime.Hour()*24*60 + totalTime.Minute()*60)
-	fmt.Println("currentTime", currentTime)
-	fmt.Println("totalTime", totalTime)
-	fmt.Println("totalTimeInSeconds", totalTimeInSeconds)
-	fmt.Println("diffTime", diffTime.Seconds())
-	fmt.Println("T", diffTime.Seconds()/totalTimeInSeconds)
+func ExampleTimeParse_Date_String() {
+	dateStr := "2020-04-20"
+	parseDate, _ := time.Parse(LayoutISO, dateStr)
+	fmt.Println(parseDate)
+	fmt.Println(parseDate.Format(time.RFC822))
+	fmt.Println(parseDate.Format(time.RFC3339))
 
 	//Output:
-
+	//2020-04-20 00:00:00 +0000 UTC
+	//20 Apr 20 00:00 UTC
+	//2020-04-20T00:00:00Z
 }
+
+func ExampleTimeParse_DateTime_String() {
+	dateStr := "2020-04-20 12:33:30"
+	parseDate, _ := time.Parse(LayoutCustom, dateStr)
+	fmt.Println(parseDate)
+	fmt.Println(parseDate.Format(time.RFC822))
+	fmt.Println(parseDate.Format(time.RFC3339))
+
+	//Output:
+	//2020-04-20 12:33:30 +0000 UTC
+	//20 Apr 20 12:33 UTC
+	//2020-04-20T12:33:30Z
+}
+
+//https://mingrammer.com/gobyexample/time-formatting-parsing/
+func ExampleTimeParse_DateTime_RFC3339() {
+	dateStr := "2021-04-18T15:04:05+09:00"
+	parseDate, _ := time.Parse(time.RFC3339, dateStr)
+	fmt.Println(parseDate)
+	fmt.Println(parseDate.Format(time.RFC822))
+	fmt.Println(parseDate.Format(time.RFC3339))
+
+	//Output:
+	//2021-04-18 15:04:05 +0900 KST
+	//18 Apr 21 15:04 KST
+	//2021-04-18T15:04:05+09:00
+}
+
+func ExampleTimeDate() {
+	t := time.Date(2020, time.January, 4, 12, 26, 0, 0, time.UTC)
+	fmt.Println(t)
+	fmt.Println(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+	fmt.Println(t.Weekday(), t.Unix(), t.Nanosecond())
+
+	//Output:
+	//2020-01-04 12:26:00 +0000 UTC
+	//2020 January 4 12 26 0
+	//Saturday 1578140760 0
+}
+
+/*
+- 날짜 계산
+- time zones
+*/
+
+//todo: 시간, 날짜 add, sub하기
+func ExampleDate_AddDate() {
+	t := time.Date(2021, time.Month(4), 10, 0, 0, 0, 0, time.UTC)
+	fmt.Println(t.AddDate(0, 1, 0))
+
+	//Output: 2021-05-10 00:00:00 +0000 UTC
+}
+
+//todo: timezone
