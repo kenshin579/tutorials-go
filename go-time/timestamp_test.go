@@ -26,10 +26,9 @@ func expensiveCall() {
 func TestDuration1(t *testing.T) {
 	start := time.Now()
 	expensiveCall()
-	end := time.Now()
-	duration := time.Since(end)
+	duration := time.Since(start) //time.Now().Sub(t)와 동일함
 
-	fmt.Printf("The call took %v to run.\n", end.Sub(start))
+	fmt.Printf("The call took %v to run.\n", time.Now().Sub(start))
 	fmt.Printf("The call took %v to run.\n", duration.Seconds())
 }
 
