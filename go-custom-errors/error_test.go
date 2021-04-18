@@ -32,3 +32,27 @@ func ExampleCreating_Custom_Error() {
 	fmt.Println(model.ErrRequestUser)
 	//Output: 400:10100:Request is invalid
 }
+
+func ExampleCreating_Custom_Error2() {
+	err := validate("", "")
+	if err != nil {
+		if err, ok := err.(*model.InputError); ok {
+			fmt.Println(err)
+			fmt.Printf("Missing Field is %s\n", err.GetMissingField())
+		}
+	}
+
+	//Output:
+	//Name is mandatory
+	//Missing Field is name
+}
+
+func validate(name, gender string) error {
+	if name == "" {
+		return &model.InputError{Message: "Name is mandatory", MissingField: "name"}
+	}
+	if gender == "" {
+		return &model.InputError{Message: "Gender is mandatory", MissingField: "gender"}
+	}
+	return nil
+}
