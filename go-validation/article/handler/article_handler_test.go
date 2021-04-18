@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -38,15 +37,16 @@ func TestCreateArticle(t *testing.T) {
 	setup()
 	defer teardown()
 
-	request := httptest.NewRequest(echo.GET, "/api/articles", nil)
-	request.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	responseRecorder := httptest.NewRecorder()
-	context := e.NewContext(request, responseRecorder)
-	assert.NoError(t, h.GetArticle(context))
-	fmt.Println("responseRecorder", responseRecorder.Body)
-	if assert.Equal(t, http.StatusOK, responseRecorder.Code) {
+	req := httptest.NewRequest(echo.GET, "/api/articles", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	assert.NoError(t, h.GetArticle(c))
+
+	if assert.Equal(t, http.StatusOK, rec.Code) {
 		//var aa articleListResponse
-		//err := json.Unmarshal(responseRecorder.Body.Bytes(), &aa)
+		//err := json.Unmarshal(rec.Body.Bytes(), &aa)
 		//assert.NoError(t, err)
 		//assert.Equal(t, 2, aa.ArticlesCount)
 	}
