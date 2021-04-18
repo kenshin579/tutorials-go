@@ -1,0 +1,6 @@
+{
+  "errors": {
+    "Body": "required",
+    "Description": "required"
+  }
+}
