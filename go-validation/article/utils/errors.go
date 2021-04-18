@@ -32,6 +32,16 @@ func NewValidatorError(err error) Error {
 	errs := err.(validator.ValidationErrors)
 
 	for _, v := range errs {
+		/*
+			{
+			  "time": "2021-04-18T18:20:23.050955+09:00",
+			  "level": "ERROR",
+			  "prefix": "-",
+			  "file": "errors.go",
+			  "line": "36",
+			  "message": "vKey: 'ArticleRequest.Description' Error:Field validation for 'Description' failed on the 'required' tag"
+			}
+		*/
 		log.Error("v", v)
 		e.Errors[v.Field()] = fmt.Sprintf("%v", v.Tag())
 	}
