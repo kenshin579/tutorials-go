@@ -31,14 +31,14 @@ func NewArticleResponse(a *Article) *ArticleResponse {
 
 type ArticleUsecase interface {
 	GetArticle(string) (*ArticleResponse, error)
-	CreateArticle(*ArticleRequest) error
+	CreateArticle(*ArticleRequest) (ArticleResponse, error)
 	DeleteArticle(string) error
 	ListArticle() []ArticleResponse
 }
 
 type ArticleStore interface {
 	GetByID(string) (*Article, error)
-	Create(*ArticleRequest) error
+	Create(*ArticleRequest) (ArticleResponse, error)
 	Delete(string) error
 	List() ([]Article, error)
 }

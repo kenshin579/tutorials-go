@@ -1,14 +1,8 @@
 package store
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	"github.com/kenshin579/tutorials-go/go-validation/article/model"
-)
-
-var (
-	ErrNotFound = errors.New("Article not found")
 )
 
 type ArticleStore struct {
@@ -21,7 +15,7 @@ func NewArticleStore() *ArticleStore { //todo: 어떻게 interface로 반환을 
 	}
 }
 
-func (as *ArticleStore) Create(request *model.ArticleRequest) error {
+func (as *ArticleStore) Create(request *model.ArticleRequest) (model.ArticleResponse, error) {
 	a := model.Article{
 		ArticleID:   uuid.New().String(),
 		Title:       request.Title,
@@ -29,7 +23,13 @@ func (as *ArticleStore) Create(request *model.ArticleRequest) error {
 		Body:        request.Body,
 	}
 	as.storeList = append(as.storeList, a)
-	return nil
+	response := model.ArticleResponse{
+		ArticleID:   a.ArticleID,
+		Title:       a.Title,
+		Description: a.Description,
+		Body:        a.Body,
+	}
+	return response, nil
 }
 
 func (as *ArticleStore) Delete(articleID string) error {
@@ -40,7 +40,7 @@ func (as *ArticleStore) Delete(articleID string) error {
 		}
 	}
 	as.storeList = temp
-	return ErrNotFound
+	return model.ErrArticleNotFound
 }
 
 func (as *ArticleStore) GetByID(articleID string) (*model.Article, error) {
@@ -49,7 +49,7 @@ func (as *ArticleStore) GetByID(articleID string) (*model.Article, error) {
 			return &article, nil
 		}
 	}
-	return nil, ErrNotFound
+	return nil, model.ErrArticleNotFound
 }
 
 func (as *ArticleStore) List() ([]model.Article, error) {
