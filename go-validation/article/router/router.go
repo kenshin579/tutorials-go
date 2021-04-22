@@ -8,6 +8,7 @@ import (
 func New() *echo.Echo {
 	e := echo.New()
 	e.Logger.SetLevel(log.DEBUG)
+	e.HTTPErrorHandler = customHTTPErrorHandler
 	e.Validator = NewValidator()
 	return e
 }

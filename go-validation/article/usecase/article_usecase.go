@@ -15,7 +15,7 @@ func NewArticleUsecase(as model.ArticleStore) model.ArticleUsecase {
 	}
 }
 
-func (a *articleUsecase) CreateArticle(request *model.ArticleRequest) error {
+func (a *articleUsecase) CreateArticle(request *model.ArticleRequest) (model.ArticleResponse, error) {
 	return a.articleStore.Create(request)
 }
 
