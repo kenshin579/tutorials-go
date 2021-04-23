@@ -7,6 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kenshin579/tutorials-go/go-validation/article/model/errors"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/kenshin579/tutorials-go/go-validation/article/store"
@@ -80,8 +82,8 @@ func TestCreateArticle_필요한_Request가_없는_경우_Err를_반환한다(t 
 	err := h.CreateArticle(c)
 	assert.Error(t, err)
 
-	if customError, ok := err.(*model.CustomError); ok {
+	if customError, ok := err.(*errors.CustomError); ok {
 		assert.Equal(t, http.StatusBadRequest, customError.HttpCode())
-		assert.Equal(t, model.ErrInvalidRequest.Error(), customError.Error())
+		assert.Equal(t, errors.ErrInvalidRequest.Error(), customError.Error())
 	}
 }
