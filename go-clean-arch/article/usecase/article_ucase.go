@@ -151,6 +151,16 @@ func (a *articleUsecase) StoreArticle(c context.Context, m *domain.Article) (err
 		return domain.ErrConflict
 	}
 
+	now := time.Now()
+	m.CreatedAt = now
+	m.UpdatedAt = now
+
+	existedAuthor, err := a.authorRepo.GetByID(ctx, m.Author.ID)
+	if err != nil {
+		return err
+	}
+	m.Author = existedAuthor
+
 	err = a.articleRepo.Store(ctx, m)
 	return
 }
