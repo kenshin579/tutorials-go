@@ -39,7 +39,7 @@ func (a *ArticleHandler) FetchArticle(c echo.Context) error {
 	cursor := c.QueryParam("cursor")
 	ctx := c.Request().Context()
 
-	listAr, nextCursor, err := a.AUsecase.Fetch(ctx, cursor, int64(num))
+	listAr, nextCursor, err := a.AUsecase.FetchArticle(ctx, cursor, int64(num))
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -58,7 +58,7 @@ func (a *ArticleHandler) GetByID(c echo.Context) error {
 	id := int64(idP)
 	ctx := c.Request().Context()
 
-	art, err := a.AUsecase.GetByID(ctx, id)
+	art, err := a.AUsecase.GetArticleByID(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -89,7 +89,7 @@ func (a *ArticleHandler) Store(c echo.Context) (err error) {
 	}
 
 	ctx := c.Request().Context()
-	err = a.AUsecase.Store(ctx, &article)
+	err = a.AUsecase.StoreArticle(ctx, &article)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -107,7 +107,7 @@ func (a *ArticleHandler) Delete(c echo.Context) error {
 	id := int64(idP)
 	ctx := c.Request().Context()
 
-	err = a.AUsecase.Delete(ctx, id)
+	err = a.AUsecase.DeleteArticleByID(ctx, id)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}

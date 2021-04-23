@@ -29,7 +29,7 @@ func TestFetch(t *testing.T) {
 	mockListArticle = append(mockListArticle, mockArticle)
 	num := 1
 	cursor := "2"
-	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(mockListArticle, "10", nil)
+	mockUCase.On("FetchArticle", mock.Anything, cursor, int64(num)).Return(mockListArticle, "10", nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
@@ -53,7 +53,7 @@ func TestFetchError(t *testing.T) {
 	mockUCase := new(mocks.ArticleUsecase)
 	num := 1
 	cursor := "2"
-	mockUCase.On("Fetch", mock.Anything, cursor, int64(num)).Return(nil, "", domain.ErrInternalServerError)
+	mockUCase.On("FetchArticle", mock.Anything, cursor, int64(num)).Return(nil, "", domain.ErrInternalServerError)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/article?num=1&cursor="+cursor, strings.NewReader(""))
@@ -82,7 +82,7 @@ func TestGetByID(t *testing.T) {
 
 	num := int(mockArticle.ID)
 
-	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockArticle, nil)
+	mockUCase.On("GetArticleByID", mock.Anything, int64(num)).Return(mockArticle, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/article/"+strconv.Itoa(num), strings.NewReader(""))
@@ -118,7 +118,7 @@ func TestStore(t *testing.T) {
 	j, err := json.Marshal(tempMockArticle)
 	assert.NoError(t, err)
 
-	mockUCase.On("Store", mock.Anything, mock.AnythingOfType("*domain.Article")).Return(nil)
+	mockUCase.On("StoreArticle", mock.Anything, mock.AnythingOfType("*domain.Article")).Return(nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.POST, "/article", strings.NewReader(string(j)))
@@ -148,7 +148,7 @@ func TestDelete(t *testing.T) {
 
 	num := int(mockArticle.ID)
 
-	mockUCase.On("Delete", mock.Anything, int64(num)).Return(nil)
+	mockUCase.On("DeleteArticleByID", mock.Anything, int64(num)).Return(nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.DELETE, "/article/"+strconv.Itoa(num), strings.NewReader(""))

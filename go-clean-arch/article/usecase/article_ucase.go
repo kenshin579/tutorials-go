@@ -81,7 +81,7 @@ func (a *articleUsecase) fillAuthorDetails(c context.Context, data []domain.Arti
 	return data, nil
 }
 
-func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
+func (a *articleUsecase) FetchArticle(c context.Context, cursor string, num int64) (res []domain.Article, nextCursor string, err error) {
 	if num == 0 {
 		num = 10
 	}
@@ -101,7 +101,7 @@ func (a *articleUsecase) Fetch(c context.Context, cursor string, num int64) (res
 	return
 }
 
-func (a *articleUsecase) GetByID(c context.Context, id int64) (res domain.Article, err error) {
+func (a *articleUsecase) GetArticleByID(c context.Context, id int64) (res domain.Article, err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
@@ -118,7 +118,7 @@ func (a *articleUsecase) GetByID(c context.Context, id int64) (res domain.Articl
 	return
 }
 
-func (a *articleUsecase) Update(c context.Context, ar *domain.Article) (err error) {
+func (a *articleUsecase) UpdateArticle(c context.Context, ar *domain.Article) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
@@ -126,7 +126,7 @@ func (a *articleUsecase) Update(c context.Context, ar *domain.Article) (err erro
 	return a.articleRepo.Update(ctx, ar)
 }
 
-func (a *articleUsecase) GetByTitle(c context.Context, title string) (res domain.Article, err error) {
+func (a *articleUsecase) GetArticleByTitle(c context.Context, title string) (res domain.Article, err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	res, err = a.articleRepo.GetByTitle(ctx, title)
@@ -143,10 +143,10 @@ func (a *articleUsecase) GetByTitle(c context.Context, title string) (res domain
 	return
 }
 
-func (a *articleUsecase) Store(c context.Context, m *domain.Article) (err error) {
+func (a *articleUsecase) StoreArticle(c context.Context, m *domain.Article) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
-	existedArticle, _ := a.GetByTitle(ctx, m.Title)
+	existedArticle, _ := a.GetArticleByTitle(ctx, m.Title)
 	if existedArticle != (domain.Article{}) {
 		return domain.ErrConflict
 	}
@@ -155,7 +155,7 @@ func (a *articleUsecase) Store(c context.Context, m *domain.Article) (err error)
 	return
 }
 
-func (a *articleUsecase) Delete(c context.Context, id int64) (err error) {
+func (a *articleUsecase) DeleteArticleByID(c context.Context, id int64) (err error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 	existedArticle, err := a.articleRepo.GetByID(ctx, id)
