@@ -1,0 +1,16 @@
+{
+  "debug": true,
+  "server": {
+    "address": ":8080"
+  },
+  "context":{
+    "timeout":2
+  },
+  "database": {
+      "host": "localhost",
+      "port": "3306",
+      "user": "user",
+      "pass": "password",
+      "name": "article"
+  }
+}
