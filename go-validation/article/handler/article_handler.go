@@ -3,6 +3,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/kenshin579/tutorials-go/go-validation/article/model/errors"
+
 	"github.com/kenshin579/tutorials-go/go-validation/article/utils"
 
 	"github.com/kenshin579/tutorials-go/go-validation/article/model"
@@ -23,7 +25,7 @@ func (h *Handler) CreateArticle(c echo.Context) error {
 	request := &model.ArticleRequest{}
 
 	if err := c.Bind(&request); err != nil {
-		return model.ErrBinding
+		return errors.ErrBinding
 	}
 
 	if err := c.Validate(request); err != nil {

@@ -3,6 +3,7 @@ package store
 import (
 	"github.com/google/uuid"
 	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/go-validation/article/model/errors"
 )
 
 type ArticleStore struct {
@@ -40,7 +41,7 @@ func (as *ArticleStore) Delete(articleID string) error {
 		}
 	}
 	as.storeList = temp
-	return model.ErrArticleNotFound
+	return errors.ErrArticleNotFound
 }
 
 func (as *ArticleStore) GetByID(articleID string) (*model.Article, error) {
@@ -49,7 +50,7 @@ func (as *ArticleStore) GetByID(articleID string) (*model.Article, error) {
 			return &article, nil
 		}
 	}
-	return nil, model.ErrArticleNotFound
+	return nil, errors.ErrArticleNotFound
 }
 
 func (as *ArticleStore) List() ([]model.Article, error) {
