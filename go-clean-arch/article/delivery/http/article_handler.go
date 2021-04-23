@@ -27,9 +27,9 @@ func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
 		AUsecase: us,
 	}
 	e.GET("/articles", handler.FetchArticle)
-	e.POST("/articles", handler.Store)
-	e.GET("/articles/:id", handler.GetByID)
-	e.DELETE("/articles/:id", handler.Delete)
+	e.POST("/articles", handler.StoreArticle)
+	e.GET("/articles/:id", handler.GetArticle)
+	e.DELETE("/articles/:id", handler.DeleteArticle)
 }
 
 // FetchArticle will fetch the article based on given params
@@ -48,8 +48,8 @@ func (a *ArticleHandler) FetchArticle(c echo.Context) error {
 	return c.JSON(http.StatusOK, listAr)
 }
 
-// GetByID will get article by given id
-func (a *ArticleHandler) GetByID(c echo.Context) error {
+// GetArticle will get article by given id
+func (a *ArticleHandler) GetArticle(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
@@ -75,8 +75,8 @@ func isRequestValid(m *domain.Article) (bool, error) {
 	return true, nil
 }
 
-// Store will store the article by given request body
-func (a *ArticleHandler) Store(c echo.Context) (err error) {
+// StoreArticle will store the article by given request body
+func (a *ArticleHandler) StoreArticle(c echo.Context) (err error) {
 	var article domain.Article
 	err = c.Bind(&article)
 	if err != nil {
@@ -97,8 +97,8 @@ func (a *ArticleHandler) Store(c echo.Context) (err error) {
 	return c.JSON(http.StatusCreated, article)
 }
 
-// Delete will delete article by given param
-func (a *ArticleHandler) Delete(c echo.Context) error {
+// DeleteArticle will delete article by given param
+func (a *ArticleHandler) DeleteArticle(c echo.Context) error {
 	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())

@@ -96,7 +96,7 @@ func TestGetByID(t *testing.T) {
 	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	err = handler.GetByID(c)
+	err = handler.GetArticle(c)
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
@@ -132,7 +132,7 @@ func TestStore(t *testing.T) {
 	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	err = handler.Store(c)
+	err = handler.StoreArticle(c)
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
@@ -162,7 +162,7 @@ func TestDelete(t *testing.T) {
 	handler := articleHttp.ArticleHandler{
 		AUsecase: mockUCase,
 	}
-	err = handler.Delete(c)
+	err = handler.DeleteArticle(c)
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusNoContent, rec.Code)
