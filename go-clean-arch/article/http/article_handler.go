@@ -22,7 +22,7 @@ type ArticleHandler struct {
 }
 
 // NewArticleHandler will initialize the articles/ resources endpoint
-func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
+func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) *ArticleHandler {
 	handler := &ArticleHandler{
 		AUsecase: us,
 	}
@@ -30,6 +30,8 @@ func NewArticleHandler(e *echo.Echo, us domain.ArticleUsecase) {
 	e.POST("/articles", handler.StoreArticle)
 	e.GET("/articles/:id", handler.GetArticle)
 	e.DELETE("/articles/:id", handler.DeleteArticle)
+
+	return handler
 }
 
 // FetchArticle will fetch the article based on given params

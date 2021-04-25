@@ -1,72 +1,97 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
-	"net/url"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/labstack/echo"
-	"github.com/spf13/viper"
-
-	_articleHttpDelivery "github.com/kenshin579/tutorials-go/go-clean-arch/article/delivery/http"
-	_articleHttpDeliveryMiddleware "github.com/kenshin579/tutorials-go/go-clean-arch/article/delivery/http/middleware"
+	_articleHttp "github.com/kenshin579/tutorials-go/go-clean-arch/article/http"
 	_articleRepo "github.com/kenshin579/tutorials-go/go-clean-arch/article/repository/mysql"
 	_articleUcase "github.com/kenshin579/tutorials-go/go-clean-arch/article/usecase"
 	_authorRepo "github.com/kenshin579/tutorials-go/go-clean-arch/author/repository/mysql"
+	"github.com/kenshin579/tutorials-go/go-clean-arch/common/config"
+	"github.com/kenshin579/tutorials-go/go-clean-arch/common/database"
+
+	"github.com/labstack/echo"
+
+	"github.com/spf13/viper"
+
+	_articleHttpMiddleware "github.com/kenshin579/tutorials-go/go-clean-arch/article/http/middleware"
+	"go.uber.org/fx"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-func init() {
-	viper.SetConfigFile(`go-clean-arch/config.json`)
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	if viper.GetBool(`debug`) {
-		log.Println("Service RUN on DEBUG mode")
-	}
+func registerHooks(lifecycle fx.Lifecycle, e *echo.Echo, v *viper.Viper) {
+	lifecycle.Append(
+		fx.Hook{
+			OnStart: func(context.Context) error {
+				fmt.Println("Starting server")
+				go e.Start(v.GetString("server.address"))
+				return nil
+			},
+			OnStop: func(context.Context) error {
+				fmt.Println("Stopping server")
+				//logger.Print("Stopping admin server.")
+				//return logger.Sync()
+				return nil
+			},
+		},
+	)
 }
 
-func main() {
-	dbHost := viper.GetString(`database.host`)
-	dbPort := viper.GetString(`database.port`)
-	dbUser := viper.GetString(`database.user`)
-	dbPass := viper.GetString(`database.pass`)
-	dbName := viper.GetString(`database.name`)
-	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
-	val := url.Values{}
-	val.Add("parseTime", "1")
-	val.Add("loc", "Asia/Seoul")
-	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
-	dbConn, err := sql.Open(`mysql`, dsn)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = dbConn.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer func() {
-		err := dbConn.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
+func NewEcho() *echo.Echo {
 	e := echo.New()
-	middle := _articleHttpDeliveryMiddleware.InitMiddleware()
+	middle := _articleHttpMiddleware.InitMiddleware()
 	e.Use(middle.CORS)
-	authorRepo := _authorRepo.NewMysqlAuthorRepository(dbConn)
-	ar := _articleRepo.NewMysqlArticleRepository(dbConn)
+	return e
+}
 
-	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	_articleHttpDelivery.NewArticleHandler(e, au)
+func ProvideBasicConfig() time.Duration {
+	duration := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	return duration
+}
 
-	log.Fatal(e.Start(viper.GetString("server.address")))
+//todo: 구동이후에 api 호출 주소가 등록이 안된 것 같음
+func main() {
+	app := fx.New(
+		fx.Provide(
+			config.New,
+			database.New,
+			NewEcho,
+			ProvideBasicConfig,
+
+			_articleHttp.NewArticleHandler,
+
+			_articleUcase.NewArticleUsecase,
+			_articleRepo.NewMysqlArticleRepository,
+
+			_authorRepo.NewMysqlAuthorRepository,
+		),
+		fx.Invoke(registerHooks),
+	)
+
+	startCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := app.Start(startCtx); err != nil {
+		log.Fatal(err)
+	}
+
+	<-app.Done()
+
+	//아래 버전은 잘 됨
+	//v := config.New()
+	//db, _ := database.New(v)
+	//
+	//e := NewEcho()
+	//
+	//authorRepo := _authorRepo.NewMysqlAuthorRepository(db)
+	//ar := _articleRepo.NewMysqlArticleRepository(db)
+	//
+	//timeoutContext := time.Duration(v.GetInt("context.timeout")) * time.Second
+	//au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
+	//_articleHttp.NewArticleHandler(e, au)
+	//
+	//e.Start(v.GetString("server.address"))
 }
