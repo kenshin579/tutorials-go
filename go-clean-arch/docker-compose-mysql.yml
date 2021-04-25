@@ -1,0 +1,14 @@
+version: '3'
+services:
+  fullstack-mysql:
+    image: mysql:5.7
+    container_name: go-clean-arch-mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=article
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ${HOME}/data/docker/go-clean-arch-mysql:/var/lib/mysql
