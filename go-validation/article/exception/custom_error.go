@@ -1,4 +1,4 @@
-package errors
+package exception
 
 type CustomError struct {
 	httpCode     int
