@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/model/errors"
+	"github.com/kenshin579/tutorials-go/go-validation/article/exception"
 
 	"github.com/go-playground/validator/v10"
 
@@ -34,10 +34,10 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 			e.Errors["message"] = extractErrorMessage(ev.Error())
 			break
 		}
-		e.Code = errors.ErrInvalidRequest.ErrorCode()
-		e.Message = errors.ErrInvalidRequest.ErrorMessage()
-		httpCode = errors.ErrInvalidRequest.HttpCode()
-	case *errors.CustomError:
+		e.Code = exception.ErrInvalidRequest.ErrorCode()
+		e.Message = exception.ErrInvalidRequest.ErrorMessage()
+		httpCode = exception.ErrInvalidRequest.HttpCode()
+	case *exception.CustomError:
 		fmt.Printf("case CustomError!!! : %v\n", v)
 		e.Code = v.ErrorCode()
 		e.Message = v.Error()
