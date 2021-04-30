@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/kenshin579/tutorials-go/go-validation/article/handler"
-	"github.com/kenshin579/tutorials-go/go-validation/article/router"
-	"github.com/kenshin579/tutorials-go/go-validation/article/store"
-	"github.com/kenshin579/tutorials-go/go-validation/article/usecase"
+	"github.com/kenshin579/tutorials-go/go-echo/article/handler"
+	"github.com/kenshin579/tutorials-go/go-echo/article/router"
+	"github.com/kenshin579/tutorials-go/go-echo/article/store"
+	"github.com/kenshin579/tutorials-go/go-echo/article/usecase"
 )
 
 func main() {

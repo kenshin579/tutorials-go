@@ -3,9 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/utils"
-
-	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/go-echo/article/model"
+	"github.com/kenshin579/tutorials-go/go-echo/article/utils"
 	"github.com/labstack/echo"
 )
 

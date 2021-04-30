@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/go-echo/article/model"
 	"github.com/labstack/gommon/log"
 )
 
