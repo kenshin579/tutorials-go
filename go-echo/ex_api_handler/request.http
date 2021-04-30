@@ -1,0 +1,11 @@
+POST http://localhost:8080/api/test
+Content-Type: application/json
+
+{
+  "id": "emp-1",
+  "name": "Frank",
+  "phone": "0104011111"
+}
+
+###
+
