@@ -18,6 +18,13 @@ func Example_Functional_Index() {
 	//Output: 2
 }
 
+func Example_Functional_Include() {
+	strList := setup()
+
+	fmt.Println(util.Include(strList, "grape"))
+	//Output: false
+}
+
 func Example_Functional_Any() {
 	strList := setup()
 
