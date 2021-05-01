@@ -3,6 +3,7 @@ package sort
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/kenshin579/tutorials-go/go-data-structure/sort/model"
 )
@@ -77,6 +78,7 @@ func Example_Sort_Map_By_Key_or_Value() {
 	sortKeys := make([]string, 0, len(m))
 
 	for k := range m {
+		fmt.Println("k", k)
 		sortKeys = append(sortKeys, k)
 	}
 	sort.Strings(sortKeys) //keys로 정렬을 함
@@ -90,4 +92,36 @@ func Example_Sort_Map_By_Key_or_Value() {
 	//Alice 2
 	//Bob 3
 	//Cecil 1
+}
+
+func Example_Sort_Map_By_Key_or_Value2() {
+	m := map[string]int{
+		"1100::1111": 2,
+		"1000::2222": 1,
+		"0900::2222": 3,
+		"2200::2222": 3,
+	}
+
+	sortKeys := make([]string, 0, len(m))
+
+	for k := range m {
+		//fmt.Println("k", k)
+		sortKeys = append(sortKeys, k)
+	}
+	sort.SliceStable(sortKeys, func(i, j int) bool {
+		return strings.Split(sortKeys[i], "::")[0] < strings.Split(sortKeys[j], "::")[0]
+	})
+
+	//fmt.Println(sortKeys)
+
+	//정렬한 keys 값으로 데이터를 출력함
+	for _, k := range sortKeys {
+		fmt.Println(k, m[k])
+	}
+
+	//Output:
+	//0900::2222 3
+	//1000::2222 1
+	//1100::1111 2
+	//2200::2222 3
 }
