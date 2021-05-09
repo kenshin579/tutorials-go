@@ -1,4 +1,4 @@
-package go_once_do
+package once_do
 
 import (
 	"fmt"
