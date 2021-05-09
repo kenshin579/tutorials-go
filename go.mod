@@ -6,7 +6,6 @@ require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/bxcodec/faker v2.0.1+incompatible
-	github.com/bxcodec/go-clean-arch v2.0.1+incompatible
 	github.com/chidiwilliams/flatbson v0.3.0
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
@@ -22,6 +21,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/onsi/ginkgo v1.15.0 // indirect
 	github.com/onsi/gomega v1.10.5 // indirect
+	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
