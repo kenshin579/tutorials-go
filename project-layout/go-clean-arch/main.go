@@ -6,18 +6,18 @@ import (
 	"log"
 	"time"
 
-	_articleHttp "github.com/kenshin579/tutorials-go/go-clean-arch/article/http"
-	_articleRepo "github.com/kenshin579/tutorials-go/go-clean-arch/article/repository/mysql"
-	_articleUcase "github.com/kenshin579/tutorials-go/go-clean-arch/article/usecase"
-	_authorRepo "github.com/kenshin579/tutorials-go/go-clean-arch/author/repository/mysql"
-	"github.com/kenshin579/tutorials-go/go-clean-arch/common/config"
-	"github.com/kenshin579/tutorials-go/go-clean-arch/common/database"
+	_articleHttp "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/http"
+	_articleRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/repository/mysql"
+	_articleUcase "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/usecase"
+	_authorRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/author/repository/mysql"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/common/config"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/common/database"
 
 	"github.com/labstack/echo"
 
 	"github.com/spf13/viper"
 
-	_articleHttpMiddleware "github.com/kenshin579/tutorials-go/go-clean-arch/article/http/middleware"
+	_articleHttpMiddleware "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/http/middleware"
 	"go.uber.org/fx"
 
 	_ "github.com/go-sql-driver/mysql"

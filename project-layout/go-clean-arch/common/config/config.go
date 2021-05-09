@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ConfigPath = "go-clean-arch/config.json"
+	ConfigPath = "project-layout/go-clean-arch/config.json"
 )
 
 func New() *viper.Viper {
