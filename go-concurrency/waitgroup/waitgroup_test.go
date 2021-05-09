@@ -7,6 +7,48 @@ import (
 	"time"
 )
 
+//https://tutorialedge.net/golang/go-waitgroup-tutorial/
+func TestGoroutine(t *testing.T) {
+	fmt.Println("Hello World")
+	go myFunc()
+	fmt.Println("Finished Execution")
+}
+
+func myFunc() {
+	time.Sleep(time.Second)
+	fmt.Println("Inside my goroutine") //호출하는 메서드가 먼저 종료되어서 출력이 안될 수 있음
+}
+
+func TestWaitGroup_Simple(t *testing.T) {
+	fmt.Println("Hello World")
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go myFuncSimple(&wg)
+	wg.Wait()
+
+	fmt.Println("Finished Execution")
+}
+
+func myFuncSimple(wg *sync.WaitGroup) {
+	fmt.Println("Inside my goroutine")
+	wg.Done()
+}
+
+func TestWaitGroup_Anonymous_Func(t *testing.T) {
+	fmt.Println("Hello World")
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		fmt.Println("Inside my goroutine")
+		wg.Done()
+	}()
+	wg.Wait()
+
+	fmt.Println("Finished Execution")
+}
+
 func TestWaitGroup(t *testing.T) {
 	var wg sync.WaitGroup
 
