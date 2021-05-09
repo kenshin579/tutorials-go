@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/kenshin579/tutorials-go/go-schedule/job"
 	"github.com/robfig/cron/v3"
 )
@@ -121,10 +123,6 @@ func Test_Validate_Cron_Expression_Invalid(t *testing.T) {
 	}
 }
 
-func Test_WithTimeZone(t *testing.T) {
-
-}
-
 //job안에 panic이 발생해도 recover하고 job의 나머지 작업이 실행된다
 func Test_Cron_WithChain_Recover(t *testing.T) {
 	c := cron.New()
@@ -175,5 +173,28 @@ func Test_Cron_TimeZone(t *testing.T) {
 	time.Sleep(time.Second * 5)
 }
 
+func Test_Cron_Remove_Job(t *testing.T) {
+	c := cron.New()
+	jobList := make([]cron.EntryID, 0)
+
+	entryID, _ := c.AddFunc("@every 1s", func() {
+		fmt.Println("job1")
+	})
+	jobList = append(jobList, entryID)
+	entryID, _ = c.AddFunc("@every 1s", func() {
+		fmt.Println("job2")
+	})
+	jobList = append(jobList, entryID)
+
+	c.Start()
+
+	entries := c.Entries()
+	assert.Equal(t, 2, len(entries))
+	fmt.Println("entryID", jobList[0])
+	c.Remove(1)
+
+	assert.Equal(t, 1, len(c.Entries()))
+	time.Sleep(10 * time.Second)
+}
+
 //todo: job 생성이후 pause, stop 시킬 수 있나?
-//todo: job 삭제하려면 어떻게 해야 하나?
