@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -9,17 +10,21 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	fmt.Println("starting scheduler")
+	file, err := os.OpenFile("logs-second.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.SetOutput(file)
 
-	c := cron.New(cron.WithLogger(cron.VerbosePrintfLogger(log.New(file, "cron: ", log.LstdFlags))))
+	c := cron.New(
+		cron.WithSeconds(),
+		cron.WithLogger(cron.VerbosePrintfLogger(log.New(file, "cron: ", log.LstdFlags))))
 
-	c.AddFunc("* 09-18 * * MON-FRI", func() {
-		log.Println("hello world")
+	//초단위로 잘 되는거 확인함
+	c.AddFunc("* * 09-18 * * MON-FRI", func() {
+		log.Println("hello world - seconds")
 	})
 	c.Start()
 
