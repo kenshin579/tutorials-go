@@ -1,4 +1,4 @@
-package go_schedule
+package robfig
 
 import (
 	"fmt"
