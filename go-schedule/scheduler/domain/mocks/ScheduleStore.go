@@ -26,16 +26,51 @@ func (_m *ScheduleStore) Create(request domain.ScheduleRequest) error {
 	return r0
 }
 
+// Delete provides a mock function with given fields: jobID
+func (_m *ScheduleStore) Delete(jobID string) error {
+	ret := _m.Called(jobID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(jobID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Get provides a mock function with given fields: jobID
+func (_m *ScheduleStore) Get(jobID string) (domain.ScheduleInfo, error) {
+	ret := _m.Called(jobID)
+
+	var r0 domain.ScheduleInfo
+	if rf, ok := ret.Get(0).(func(string) domain.ScheduleInfo); ok {
+		r0 = rf(jobID)
+	} else {
+		r0 = ret.Get(0).(domain.ScheduleInfo)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(jobID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // List provides a mock function with given fields:
-func (_m *ScheduleStore) List() ([]domain.ScheduleInfo, error) {
+func (_m *ScheduleStore) List() ([]*domain.ScheduleInfo, error) {
 	ret := _m.Called()
 
-	var r0 []domain.ScheduleInfo
-	if rf, ok := ret.Get(0).(func() []domain.ScheduleInfo); ok {
+	var r0 []*domain.ScheduleInfo
+	if rf, ok := ret.Get(0).(func() []*domain.ScheduleInfo); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]domain.ScheduleInfo)
+			r0 = ret.Get(0).([]*domain.ScheduleInfo)
 		}
 	}
 
@@ -70,6 +105,20 @@ func (_m *ScheduleStore) Stop() error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func() error); ok {
 		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Update provides a mock function with given fields: request
+func (_m *ScheduleStore) Update(request domain.ScheduleRequest) error {
+	ret := _m.Called(request)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(domain.ScheduleRequest) error); ok {
+		r0 = rf(request)
 	} else {
 		r0 = ret.Error(0)
 	}

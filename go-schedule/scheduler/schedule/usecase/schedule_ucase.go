@@ -16,8 +16,20 @@ func (s *scheduleUsecase) CreateJob(request domain.ScheduleRequest) error {
 	return s.scheduleStore.Create(request)
 }
 
-func (s *scheduleUsecase) ListJob() ([]domain.ScheduleInfo, error) {
+func (s *scheduleUsecase) UpdateJob(request domain.ScheduleRequest) error {
+	return s.scheduleStore.Update(request)
+}
+
+func (s *scheduleUsecase) ListJob() ([]*domain.ScheduleInfo, error) {
 	return s.scheduleStore.List()
+}
+
+func (s *scheduleUsecase) DeleteJob(jobID string) error {
+	return s.scheduleStore.Delete(jobID)
+}
+
+func (s *scheduleUsecase) GetJob(jobID string) (domain.ScheduleInfo, error) {
+	return s.scheduleStore.Get(jobID)
 }
 
 func (s *scheduleUsecase) Start() error {

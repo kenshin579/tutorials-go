@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/gommon/log"
@@ -32,7 +31,6 @@ func NewScheduleHandler(g *echo.Group, su domain.ScheduleUsecase) *scheduleHandl
 	scheduler.POST("/stop", handler.StopScheduler)
 
 	return handler
-
 }
 
 func (s *scheduleHandler) CreateJob(c echo.Context) error {
@@ -41,8 +39,6 @@ func (s *scheduleHandler) CreateJob(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return errors.ErrBinding
 	}
-
-	fmt.Printf("test %v\n", request.JobRequest)
 
 	if err := c.Validate(request); err != nil {
 		return err
@@ -66,11 +62,16 @@ func (s *scheduleHandler) ListJob(c echo.Context) error {
 }
 
 func (s *scheduleHandler) GetJob(c echo.Context) error {
-	return nil
+	job, err := s.scheduleUsecase.GetJob(c.Param("jobId"))
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return c.JSON(http.StatusOK, job)
 }
 
 func (s *scheduleHandler) DeleteJob(c echo.Context) error {
-	return nil
+	return s.scheduleUsecase.DeleteJob(c.Param("jobId"))
 }
 
 func (s *scheduleHandler) StartScheduler(c echo.Context) error {

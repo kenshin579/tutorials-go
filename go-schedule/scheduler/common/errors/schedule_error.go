@@ -31,6 +31,7 @@ func NewScheduleError(httpCode int, errorCode int, errorMessage string) *Schedul
 	}
 }
 
+//todo: 한번 set되면 다시 replace가 안되는 이슈가 있음
 func (se *ScheduleError) WithParams(params ...string) *ScheduleError {
 	var newMessage = se.Error()
 	for i, param := range params {
