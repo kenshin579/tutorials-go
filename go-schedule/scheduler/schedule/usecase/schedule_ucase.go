@@ -1,14 +1,35 @@
 package usecase
 
-import "github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
+import (
+	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/config"
+	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
+	"github.com/labstack/gommon/log"
+)
 
 type scheduleUsecase struct {
 	scheduleStore domain.ScheduleStore
+	cfg           *config.Config
 }
 
-func NewScheduleUsecase(ss domain.ScheduleStore) domain.ScheduleUsecase {
+func NewScheduleUsecase(ss domain.ScheduleStore, cfg *config.Config) domain.ScheduleUsecase {
 	return &scheduleUsecase{
 		scheduleStore: ss,
+		cfg:           cfg,
+	}
+}
+
+func (s *scheduleUsecase) InitializeJobs() {
+	for _, cronJob := range s.cfg.CronConfig {
+
+		err := s.CreateJob(domain.ScheduleRequest{
+			JobDescription: cronJob.Description,
+			JobType:        cronJob.JobType,
+			Schedule:       cronJob.Schedule,
+			JobRequest:     cronJob.JobRequest,
+		})
+		if err != nil {
+			log.Error(err)
+		}
 	}
 }
 

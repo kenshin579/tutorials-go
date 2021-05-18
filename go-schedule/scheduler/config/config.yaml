@@ -1,9 +1,16 @@
 listen: :8080
 
-server:
-  addr: https://6254da0e-f2cd-444b-a51e-0f53f1c6a700.mock.pstmn.io
-
 cron:
-  - description: "calling"
-    url: /api/test
-    schedule: "* 09-18 * * MON-FRI"
+  - description: "print message1"
+    jobType: "print"
+    schedule: "* * * * * *"
+    jobRequest:
+      message: "this is a test1"
+  - description: "move file"
+    jobType: "http:post"
+    schedule: "* * * * * *"
+    jobRequest:
+      "url": "https://6254da0e-f2cd-444b-a51e-0f53f1c6a700.mock.pstmn.io/api/move/files"
+      "body":
+        "fileName": "test.txt"
+        "destination": "/test"

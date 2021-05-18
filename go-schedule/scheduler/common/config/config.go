@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
+
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Listen       string    `yaml:"listen"`
-	ServerConfig ApiConfig `yaml:"server"`
-}
-
-type ApiConfig struct {
-	Addr string `yaml:"addr"`
+	Listen     string `yaml:"listen"`
+	CronConfig []struct {
+		Description string                 `yaml:"description"`
+		JobType     domain.JobType         `yaml:"jobType"`
+		Schedule    string                 `yaml:"schedule"`
+		JobRequest  map[string]interface{} `yaml:"jobRequest"`
+	} `yaml:"cron"`
 }
 
 func New(configPath string) (*Config, error) {
