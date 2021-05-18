@@ -8,12 +8,13 @@ import (
 )
 
 type Config struct {
-	Listen       string    `yaml:"listen"`
-	ServerConfig ApiConfig `yaml:"server"`
-}
-
-type ApiConfig struct {
-	Addr string `yaml:"addr"`
+	Listen     string `yaml:"listen"`
+	CronConfig []struct {
+		Description string            `yaml:"description"`
+		JobType     string            `yaml:"jobType"`
+		Schedule    string            `yaml:"schedule"`
+		JobRequest  map[string]string `yaml:"jobRequest"`
+	} `yaml:"cron"`
 }
 
 func New(configPath string) (*Config, error) {
