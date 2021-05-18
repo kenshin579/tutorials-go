@@ -30,8 +30,9 @@ func main() {
 	api := r.Group("/api")
 
 	scheduleStore := _scheduleStore.NewLocalScheduleStore(c)
-	scheduleUsecase := _scheduleUsecase.NewScheduleUsecase(scheduleStore)
+	scheduleUsecase := _scheduleUsecase.NewScheduleUsecase(scheduleStore, cfg)
 	_scheduleHandler.NewScheduleHandler(api, scheduleUsecase)
 
+	scheduleUsecase.InitializeJobs()
 	r.Logger.Fatal(r.Start(cfg.Listen))
 }

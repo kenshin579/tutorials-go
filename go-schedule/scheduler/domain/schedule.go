@@ -47,6 +47,7 @@ type ScheduleUsecase interface {
 	GetJob(jobID string) (ScheduleInfo, error)
 	DeleteJob(jobID string) error
 	UpdateJob(request ScheduleRequest) error
+	InitializeJobs()
 }
 
 type ScheduleStore interface {
