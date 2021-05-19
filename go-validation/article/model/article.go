@@ -1,16 +1,26 @@
 package model
 
+type PostStatus string
+
+const (
+	None      PostStatus = "None"
+	Draft     PostStatus = "Draft"
+	Published PostStatus = "Published"
+)
+
 type Article struct {
 	ArticleID   string
 	Title       string
 	Description string
 	Body        string
+	PostStatus  PostStatus
 }
 
 type ArticleRequest struct {
-	Title       string `json:"title" validate:"required"`
-	Description string `json:"description" validate:"required"`
-	Body        string `json:"body" validate:"required"`
+	Title       string     `json:"title" validate:"required"`
+	Description string     `json:"description" validate:"required"`
+	Body        string     `json:"body" validate:"required"`
+	PostStatus  PostStatus `json:"postStatus" validate:"required,status"` //todo: custom validator rule 추가해보기
 }
 
 type ArticleResponse struct {
