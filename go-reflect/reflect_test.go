@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"testing"
+
 	"github.com/kenshin579/tutorials-go/go-reflect/model"
 )
 
@@ -196,7 +198,7 @@ func Test_Reflect_Method에_대한_설명(t *testing.T) {
 	// reflect.Float64와 비교
 	fmt.Println(typ.Kind() == reflect.Int64) // false: 자료형 종류를 알아내어 reflect.Int64와 비교
 
-	fmt.Println(val.Type())                    // float64: 값이 담긴 변수의 자료형 이름 출력
+	fmt.Println(val.Type()) // float64: 값이 담긴 변수의 자료형 이름 출력
 
 	fmt.Println(val.Kind() == reflect.Float64) // true: 값이 담긴 변수의 자료형 종류를
 	// 알아내어 reflect.Float64와 비교
