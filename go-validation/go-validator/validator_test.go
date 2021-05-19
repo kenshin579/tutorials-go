@@ -18,6 +18,22 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+func TestValidation_Oneof_Tag(t *testing.T) {
+	v := validator.New()
+	a := model.ArticleWithOneofTag{
+		Title:      "title1",
+		Body:       "body1",
+		PostStatus: "TestStatus",
+	}
+
+	err := v.Struct(a)
+	assert.Error(t, err)
+
+	for _, e := range err.(validator.ValidationErrors) {
+		fmt.Println(e)
+	}
+}
+
 func TestValidation_Email_Validate(t *testing.T) {
 	v := validator.New()
 	a := model.User{
