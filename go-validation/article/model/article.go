@@ -3,10 +3,13 @@ package model
 type PostStatus string
 
 const (
+	Unknown   PostStatus = "Unknown"
 	None      PostStatus = "None"
 	Draft     PostStatus = "Draft"
 	Published PostStatus = "Published"
 )
+
+var AllPostStatus = []PostStatus{Unknown, None, Draft, Published}
 
 type Article struct {
 	ArticleID   string
@@ -20,7 +23,7 @@ type ArticleRequest struct {
 	Title       string     `json:"title" validate:"required"`
 	Description string     `json:"description" validate:"required"`
 	Body        string     `json:"body" validate:"required"`
-	PostStatus  PostStatus `json:"postStatus" validate:"required,status"` //todo: custom validator rule 추가해보기
+	PostStatus  PostStatus `json:"postStatus" validate:"postStatus"`
 }
 
 type ArticleResponse struct {
