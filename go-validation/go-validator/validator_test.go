@@ -116,9 +116,9 @@ func TestValidation_Check_BasedOn_Another_Field_Value(t *testing.T) {
 
 	// register custom validation: rfe(Required if Field is Equal to some value).
 	v.RegisterValidation(`rfe`, func(fl validator.FieldLevel) bool {
-		param := strings.Split(fl.Param(), `:`)
-		paramField := param[0]
-		paramValue := param[1]
+		param := strings.Split(fl.Param(), `:`) //A:1
+		paramField := param[0]                  //A
+		paramValue := param[1]                  //1
 
 		if paramField == `` {
 			return true
@@ -127,12 +127,14 @@ func TestValidation_Check_BasedOn_Another_Field_Value(t *testing.T) {
 		// param field reflect.Value.
 		var paramFieldValue reflect.Value
 
+		//fl.Parent()는 변수 Foo.A를 가리킨다
 		if fl.Parent().Kind() == reflect.Ptr {
 			paramFieldValue = fl.Parent().Elem().FieldByName(paramField)
 		} else {
 			paramFieldValue = fl.Parent().FieldByName(paramField)
 		}
 
+		//A의 값과 paramValue를 비교하는 로직
 		if isEq(paramFieldValue, paramValue) == false {
 			return true
 		}
@@ -149,6 +151,8 @@ func hasValue(fl validator.FieldLevel) bool {
 	return requireCheckFieldKind(fl, "")
 }
 
+//todo: 다음에 다시 스터디하는 걸로 함
+//필드 값이 존재하는지 체크하는 로직으로 판단됨
 func requireCheckFieldKind(fl validator.FieldLevel, param string) bool {
 	field := fl.Field()
 	if len(param) > 0 {
@@ -175,25 +179,20 @@ func isEq(field reflect.Value, value string) bool {
 
 	case reflect.String:
 		return field.String() == value
-
 	case reflect.Slice, reflect.Map, reflect.Array:
 		p := asInt(value)
-
 		return int64(field.Len()) == p
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		p := asInt(value)
-
 		return field.Int() == p
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		p := asUint(value)
-
 		return field.Uint() == p
 
 	case reflect.Float32, reflect.Float64:
 		p := asFloat(value)
-
 		return field.Float() == p
 	}
 
@@ -201,7 +200,6 @@ func isEq(field reflect.Value, value string) bool {
 }
 
 func asInt(param string) int64 {
-
 	i, err := strconv.ParseInt(param, 0, 64)
 	panicIf(err)
 
@@ -209,7 +207,6 @@ func asInt(param string) int64 {
 }
 
 func asUint(param string) uint64 {
-
 	i, err := strconv.ParseUint(param, 0, 64)
 	panicIf(err)
 
@@ -217,7 +214,6 @@ func asUint(param string) uint64 {
 }
 
 func asFloat(param string) float64 {
-
 	i, err := strconv.ParseFloat(param, 64)
 	panicIf(err)
 
