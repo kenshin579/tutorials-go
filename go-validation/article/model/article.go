@@ -1,16 +1,29 @@
 package model
 
+type PostStatus string
+
+const (
+	Unknown   PostStatus = "Unknown"
+	None      PostStatus = "None"
+	Draft     PostStatus = "Draft"
+	Published PostStatus = "Published"
+)
+
+var AllPostStatus = []PostStatus{Unknown, None, Draft, Published}
+
 type Article struct {
 	ArticleID   string
 	Title       string
 	Description string
 	Body        string
+	PostStatus  PostStatus
 }
 
 type ArticleRequest struct {
-	Title       string `json:"title" validate:"required"`
-	Description string `json:"description" validate:"required"`
-	Body        string `json:"body" validate:"required"`
+	Title       string     `json:"title" validate:"required"`
+	Description string     `json:"description" validate:"required"`
+	Body        string     `json:"body" validate:"required"`
+	PostStatus  PostStatus `json:"postStatus" validate:"postStatus"`
 }
 
 type ArticleResponse struct {
