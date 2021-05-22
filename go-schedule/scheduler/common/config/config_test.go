@@ -22,7 +22,7 @@ func init() {
 	}
 }
 
-func TestParseFromFile(t *testing.T) {
+func TestParseConfigFile(t *testing.T) {
 	cfg, err := config.New("config/config.yaml")
 	assert.NoError(t, err)
 	fmt.Println(cfg)

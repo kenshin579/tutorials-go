@@ -20,10 +20,10 @@ type Config struct {
 }
 
 func New(configPath string) (*Config, error) {
-	return parseFromFile(configPath)
+	return parseConfigFile(configPath)
 }
 
-func parseFromFile(configPath string) (*Config, error) {
+func parseConfigFile(configPath string) (*Config, error) {
 	cfg := &Config{}
 
 	rst, err := ioutil.ReadFile(configPath)
