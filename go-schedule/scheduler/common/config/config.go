@@ -32,7 +32,7 @@ func parseFromFile(configPath string) (*Config, error) {
 	}
 
 	if yaml.Unmarshal(rst, &cfg); err != nil {
-		return nil, fmt.Errorf("failed to Make arbiter config: %v", err)
+		return nil, fmt.Errorf("failed unmarshal config: %v", err)
 	}
 	return cfg, nil
 }
