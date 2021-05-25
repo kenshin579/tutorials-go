@@ -1,4 +1,4 @@
-package config_test
+package config
 
 import (
 	"fmt"
@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/config"
 )
 
 func init() {
@@ -22,10 +20,13 @@ func init() {
 	}
 }
 
-func TestParseConfigFile(t *testing.T) {
-	cfg, err := config.New("config/config.yaml")
+func TestConfigFile(t *testing.T) {
+	cfg, err := New("config/config.yaml")
 	assert.NoError(t, err)
+
 	fmt.Println(cfg)
 
-	assert.NotEmpty(t, cfg.CronConfig)
+	assert.NotEmpty(t, cfg.Listen)
+	assert.NotEmpty(t, cfg.Tasks)
+	assert.NotEmpty(t, cfg.Tasks[0].Name)
 }
