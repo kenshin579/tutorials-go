@@ -10,8 +10,8 @@ import (
 type Config struct {
 	Listen string `yaml:"listen"`
 	Tasks  []struct {
-		name        string `yaml:"name"`
-		description string `yaml:"description"`
+		Name        string `yaml:"name"`
+		Description string `yaml:"description"`
 	} `yaml:"tasks"`
 }
 
