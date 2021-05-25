@@ -63,3 +63,20 @@ func isPersonIDFound(people []model.Person, deletedPersonID int) bool {
 	}
 	return false
 }
+
+//todo: 아래부분 스터디해보기
+//https://yourbasic.org/golang/delete-element-slice/
+func Example_Delete_Item_From_Slice() {
+	strList := []string{"A", "B", "C", "D", "E"}
+	deletedIndex := 2
+
+	// Remove the element at index deletedIndex from strList.
+	strList[deletedIndex] = strList[len(strList)-1] // Copy last element to index deletedIndex.
+	strList[len(strList)-1] = ""                    // Erase last element (write zero value).
+	strList = strList[:len(strList)-1]              // Truncate slice.
+
+	fmt.Println(strList)
+
+	//Output:
+	//[A B E D]
+}
