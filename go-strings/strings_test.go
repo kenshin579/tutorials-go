@@ -32,6 +32,11 @@ func TestStrings(t *testing.T) {
 	assert.Equal(t, "hello world", "hello"+" world")
 	assert.Equal(t, "hello world", fmt.Sprintf("%s %s", "hello", "world"))
 
+	f := func(r rune) rune {
+		return r + 1
+	}
+	assert.Equal(t, "bc", strings.Map(f, "ab"))
+
 	var b strings.Builder
 	for i := 3; i >= 1; i-- {
 		fmt.Fprintf(&b, "%d...", i)
