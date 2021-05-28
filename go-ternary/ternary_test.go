@@ -22,8 +22,8 @@ func Example_Ternary_Operator_EqualCheck() {
 			return true
 		}
 		return false
-	}
+	}("done")
 
-	fmt.Println(checkStatus("done"))
+	fmt.Println(checkStatus)
 	//Output: true
 }
