@@ -63,3 +63,15 @@ func TestTimeout_NewTimer으로_Stop_시킬수_있다(t *testing.T) {
 		}
 	}
 }
+
+func TestTimeout_AfterFunc(t *testing.T) {
+	//AfterFunc으로 duration이 지난는 경우 실행할 수 함수를 인자로 넘겨준다
+	timer := time.AfterFunc(time.Second*2, func() {
+		fmt.Println("Foo run for two seconds")
+	})
+
+	defer timer.Stop() //취소시킬 수 있음
+
+	// Do heavy work
+	time.Sleep(time.Second * 1)
+}
