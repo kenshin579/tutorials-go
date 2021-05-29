@@ -7,7 +7,7 @@ import (
 )
 
 //https://mingrammer.com/gobyexample/timers/
-func TestTimer(t *testing.T) {
+func TestTimeout_NewTimer_timerC로_expired될때까지_블록이_된다(t *testing.T) {
 	//대기 시간만큼 타이머에게 지정해줌
 	timer1 := time.NewTimer(time.Second * 2)
 	<-timer1.C //blocked (timer1.C는 타이머가 만료되었음을 알려주는 값을 보내기전까지 타이머의 C 채널을 블로킹시킨다)
@@ -26,7 +26,7 @@ func TestTimer(t *testing.T) {
 }
 
 //https://yourbasic.org/golang/time-reset-wait-stop-timeout-cancel-interval/
-func TestTimeout(t *testing.T) {
+func TestTimeout_TimeAfter_사용해서_타임아웃_예제(t *testing.T) {
 	CNN := make(chan string)
 	go func() { //goroutine에서 news article을 쓴다
 		time.Sleep(time.Second * 1)
@@ -37,13 +37,13 @@ func TestTimeout(t *testing.T) {
 	select {
 	case news := <-CNN:
 		fmt.Println(news)
-	case <-time.After(time.Second * 3): //waits for a specfied duration and
+	case <-time.After(time.Second * 3): //waits for a specified duration and
 		fmt.Println("No news")
 	}
 }
 
 //time.Timer (?) 는 timer가 fires 되지 않으면 GC에 의해서 처리가 안되어서
-func TestTimeout_NewTimer(t *testing.T) {
+func TestTimeout_NewTimer으로_Stop_시킬수_있다(t *testing.T) {
 	CNN := make(chan string)
 	go func() { //goroutine에서 news article을 쓴다
 		time.Sleep(time.Second * 1)
