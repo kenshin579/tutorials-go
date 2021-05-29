@@ -1,4 +1,4 @@
-package go_string_formatting
+package go_strings
 
 import (
 	"fmt"
