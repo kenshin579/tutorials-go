@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-my-redis-cluster-master-0
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/redis-cluster-master-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-my-redis-cluster-slave-0
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/redis-cluster-slave-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-my-redis-cluster-master-1
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/redis-cluster-master-1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-my-redis-cluster-slave-1
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/redis-cluster-slave-1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-my-redis-cluster-master-2
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/redis-cluster-master-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-my-redis-cluster-slave-2
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/redis-cluster-slave-2
