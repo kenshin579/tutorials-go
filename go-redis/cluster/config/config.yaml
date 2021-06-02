@@ -1,0 +1,5 @@
+redis:
+  servers:
+    - server1:6379
+    - server2:6379
+    - server3:6379
