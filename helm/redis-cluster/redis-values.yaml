@@ -1,6 +1,0 @@
-password: arbiter
-persistence:
-  enabled: true
-  path: /bitnami
-  matchLabels:
-    foo: bar
