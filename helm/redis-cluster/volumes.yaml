@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-0
+  labels:
+    foo: bar
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/redis-cluster-example/mnt/redis-data-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-1
+  labels:
+    foo: bar
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/redis-cluster-example/mnt/redis-data-1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-2
+  labels:
+    foo: bar
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/redis-cluster-example/mnt/redis-data-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-3
+  labels:
+    foo: bar
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/redis-cluster-example/mnt/redis-data-3
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-4
+  labels:
+    foo: bar
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/redis-cluster-example/mnt/redis-data-4
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-5
+  labels:
+    foo: bar
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/redis-cluster-example/mnt/redis-data-5
