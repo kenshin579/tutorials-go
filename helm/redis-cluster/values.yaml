@@ -1,0 +1,6 @@
+password: password
+persistence:
+  enabled: true
+  path: /bitnami
+  matchLabels:
+    name: go-redis-cluster

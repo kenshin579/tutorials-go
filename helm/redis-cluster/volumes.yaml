@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: redis-data-0
   labels:
-    foo: bar
+    name: go-redis-cluster
 spec:
   storageClassName: manual
   capacity:
@@ -18,7 +18,7 @@ kind: PersistentVolume
 metadata:
   name: redis-data-1
   labels:
-    foo: bar
+    name: go-redis-cluster
 spec:
   storageClassName: manual
   capacity:
@@ -33,7 +33,7 @@ kind: PersistentVolume
 metadata:
   name: redis-data-2
   labels:
-    foo: bar
+    name: go-redis-cluster
 spec:
   storageClassName: manual
   capacity:
@@ -48,7 +48,7 @@ kind: PersistentVolume
 metadata:
   name: redis-data-3
   labels:
-    foo: bar
+    name: go-redis-cluster
 spec:
   storageClassName: manual
   capacity:
@@ -63,7 +63,7 @@ kind: PersistentVolume
 metadata:
   name: redis-data-4
   labels:
-    foo: bar
+    name: go-redis-cluster
 spec:
   storageClassName: manual
   capacity:
@@ -78,7 +78,7 @@ kind: PersistentVolume
 metadata:
   name: redis-data-5
   labels:
-    foo: bar
+    name: go-redis-cluster
 spec:
   storageClassName: manual
   capacity:
