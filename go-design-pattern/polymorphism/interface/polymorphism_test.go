@@ -3,7 +3,7 @@ package _interface
 import "fmt"
 
 type Animal interface {
-	makeNoise() string
+	makeSound() string
 }
 
 type Dog struct {
@@ -11,16 +11,16 @@ type Dog struct {
 	legs int
 }
 
-type Duck struct {
+type Cat struct {
 	name string
 	legs int
 }
 
-func (d *Dog) makeNoise() string {
-	return d.name + " says woof!"
+func (d *Dog) makeSound() string {
+	return d.name + " says 멍멍!"
 }
-func (d *Duck) makeNoise() string {
-	return d.name + " says quack!"
+func (c *Cat) makeSound() string {
+	return c.name + " says 야옹!"
 }
 
 func NewDog(name string) Animal {
@@ -30,23 +30,23 @@ func NewDog(name string) Animal {
 	}
 }
 
-func NewDuck(name string) Animal {
-	return &Duck{
+func NewCat(name string) Animal {
+	return &Cat{
 		legs: 4,
 		name: name,
 	}
 }
 
 func Example_Polymorphism_Interface_사용하는_방법() {
-	var dog, duck Animal
+	var dog, cat Animal
 
-	dog = NewDog("fido")
-	duck = NewDuck("donald")
+	dog = NewDog("초코")
+	cat = NewCat("루시")
 
-	fmt.Println(dog.makeNoise())
-	fmt.Println(duck.makeNoise())
+	fmt.Println(dog.makeSound())
+	fmt.Println(cat.makeSound())
 
 	//Output:
-	//fido says woof!
-	//donald says quack!
+	//초코 says 멍멍!
+	//루시 says 야옹!
 }
