@@ -9,7 +9,10 @@ import (
 
 type Config struct {
 	RedisConfig struct {
-		ServerList []string `yaml:"servers"`
+		ClusterConfig struct {
+			Password   string   `yaml:"password"`
+			ServerList []string `yaml:"serverList"`
+		} `yaml:"cluster"`
 	} `yaml:"redis"`
 }
 
