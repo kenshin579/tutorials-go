@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   redis7001:
-    image: redis:6
+    image: redis:4
     container_name: redis7001
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
@@ -21,7 +21,7 @@ services:
         max-file: '10'
 
   redis7002:
-    image: redis:6
+    image: redis:4
     container_name: redis7002
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
@@ -40,7 +40,7 @@ services:
         max-file: '10'
 
   redis7003:
-    image: redis:6
+    image: redis:4
     container_name: redis7003
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
@@ -59,7 +59,7 @@ services:
         max-file: '10'
 
   redis7004:
-    image: redis:6
+    image: redis:4
     container_name: redis7004
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
@@ -78,7 +78,7 @@ services:
         max-file: '10'
 
   redis7005:
-    image: redis:6
+    image: redis:4
     container_name: redis7005
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
@@ -97,7 +97,7 @@ services:
         max-file: '10'
 
   redis7006:
-    image: redis:6
+    image: redis:4
     container_name: redis7006
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
