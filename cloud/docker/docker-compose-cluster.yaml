@@ -2,12 +2,14 @@ version: '3.7'
 
 services:
   redis7001:
+#    image: redis:6
     image: redis:4
     container_name: redis7001
     command:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
     volumes:
       - ./7001/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./7001/script/:/usr/local/etc/redis/redis.conf
       - ./7001/data:/data
     ports:
       - "7001:7001"
