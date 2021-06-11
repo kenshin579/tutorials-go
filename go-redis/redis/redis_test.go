@@ -5,9 +5,23 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kenshin579/tutorials-go/go-redis/model"
+
 	"github.com/go-redis/redis"
 	"github.com/stretchr/testify/assert"
 )
+
+var (
+	client *redis.Client
+)
+
+func setup() {
+	client = newRedisClient()
+}
+
+func teardown() {
+	client.Close()
+}
 
 func newRedisClient() *redis.Client {
 	client := redis.NewClient(&redis.Options{
@@ -19,7 +33,8 @@ func newRedisClient() *redis.Client {
 }
 
 func Test_Ping(t *testing.T) {
-	client := newRedisClient()
+	setup()
+	defer teardown()
 
 	pong, err := client.Ping().Result()
 
@@ -28,9 +43,10 @@ func Test_Ping(t *testing.T) {
 }
 
 func Test_Set_Get_With_Primitive_Data_Type(t *testing.T) {
-	const TestValue = "Elliot"
+	setup()
+	defer teardown()
 
-	client := newRedisClient()
+	const TestValue = "Elliot"
 
 	err := client.Set("name", TestValue, 0).Err()
 	assert.NoError(t, err)
@@ -40,23 +56,19 @@ func Test_Set_Get_With_Primitive_Data_Type(t *testing.T) {
 	assert.Equal(t, TestValue, val)
 }
 
-type Author struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
-
 func Test_Set_Get_With_Struct(t *testing.T) {
+	setup()
+	defer teardown()
+
 	const TestKey = "id1234"
 
-	client := newRedisClient()
-
-	authorJson, err := json.Marshal(Author{Name: "Elliot", Age: 25})
+	authorJson, err := json.Marshal(model.Author{Name: "Elliot", Age: 25})
 	assert.NoError(t, err)
 	err = client.Set(TestKey, authorJson, 0).Err()
 	val, err := client.Get(TestKey).Result()
 
 	fmt.Printf("%v %T\n", val, val)
-	var a Author
+	var a model.Author
 
 	err = json.Unmarshal([]byte(val), &a)
 	assert.NoError(t, err)
