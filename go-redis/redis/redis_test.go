@@ -9,12 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Ping(t *testing.T) {
+func newRedisClient() *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
+	return client
+}
+
+func Test_Ping(t *testing.T) {
+	client := newRedisClient()
 
 	pong, err := client.Ping().Result()
 
@@ -25,11 +30,7 @@ func Test_Ping(t *testing.T) {
 func Test_Set_Get_With_Primitive_Data_Type(t *testing.T) {
 	const TestValue = "Elliot"
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
+	client := newRedisClient()
 
 	err := client.Set("name", TestValue, 0).Err()
 	assert.NoError(t, err)
@@ -47,11 +48,7 @@ type Author struct {
 func Test_Set_Get_With_Struct(t *testing.T) {
 	const TestKey = "id1234"
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
+	client := newRedisClient()
 
 	authorJson, err := json.Marshal(Author{Name: "Elliot", Age: 25})
 	assert.NoError(t, err)
