@@ -75,3 +75,50 @@ func TestTimeout_AfterFunc(t *testing.T) {
 	// Do heavy work
 	time.Sleep(time.Second * 1)
 }
+
+func command(maxWaitInSecond time.Duration) string {
+	fmt.Println("start working")
+	time.Sleep(time.Second * maxWaitInSecond)
+	fmt.Println("finish working")
+	return "done"
+}
+
+func TestCommand_실행후_Timeout되기전에_실행완료되는_경우(t *testing.T) {
+	msg := make(chan string)
+	go func() {
+		msg <- command(1)
+	}()
+
+	for working := true; working; {
+		timer := time.NewTimer(time.Second * 3)
+		select {
+		case <-msg:
+			working = false
+			timer.Stop()
+			fmt.Println("stopping timer")
+		case <-timer.C:
+			working = false
+			fmt.Println("command 완료")
+		}
+	}
+}
+
+func TestCommand_완료전에_timeout되는_경우(t *testing.T) {
+	msg := make(chan string)
+	go func() {
+		msg <- command(4) //command 실행이 4초 이상되는 경우
+	}()
+
+	for working := true; working; {
+		timer := time.NewTimer(time.Second * 3) //timeout 3초이후에 됨
+		select {
+		case <-msg:
+			working = false
+			timer.Stop()
+			fmt.Println("stopping timer")
+		case <-timer.C:
+			working = false
+			fmt.Println("command 완료")
+		}
+	}
+}
