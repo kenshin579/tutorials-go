@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-data
+  labels:
+    name: jenkins-data
+spec:
+  storageClassName: jenkins-manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /c/Users/user/Projects/jenkins/mnt/jenkins-data

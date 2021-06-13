@@ -1,0 +1,4 @@
+adminPassword: admin
+persistence:
+  enabled: true
+  storageClass: jenkins-manual
