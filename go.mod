@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
+	github.com/benweissmann/memongo v0.1.1
 	github.com/bxcodec/faker v2.0.1+incompatible
 	github.com/chidiwilliams/flatbson v0.3.0
 	github.com/go-playground/locales v0.13.0
@@ -35,5 +36,6 @@ require (
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
