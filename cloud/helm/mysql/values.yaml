@@ -1,0 +1,8 @@
+#https://github.com/bitnami/charts/tree/master/bitnami/mysql
+auth:
+  rootPassword: password
+# todo: mysql NodePort로 노출시키기 - 잘 안됨
+#primary:
+#  service:
+#    type: NodePort
+#    nodePort: 30691

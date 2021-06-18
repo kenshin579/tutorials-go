@@ -3,7 +3,7 @@ services:
   redis:
     image: redis
     command: redis-server --port 6379
-    container_name: redis-go
+    container_name: go_redis
     hostname: redis
     labels:
       - "name=redis"
