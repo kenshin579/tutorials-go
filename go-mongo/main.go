@@ -6,13 +6,11 @@ import (
 	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson"
-
-	"github.com/kenshin579/tutorials-go/go-mongo/pkg/mongodb"
-
-	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/kenshin579/tutorials-go/go-mongo/pkg/config"
 )
@@ -42,7 +40,7 @@ func main() {
 	ping(client, ctx)
 
 	//define collection
-	dbCollection := client.Database(cfg.MongoDBConfig.Database).Collection(CollectionName)
+	dbCollection := client.Database(cfg.MongoConfig.Database).Collection(CollectionName)
 
 	insertOne(dbCollection, ctx)
 
@@ -195,6 +193,6 @@ func ping(c *mongo.Client, ctx context.Context) {
 }
 
 func connect(ctx context.Context, cfg *config.Config) *mongo.Client {
-	m, _ := mongodb.New(ctx, cfg)
+	m, _ := mongo.New(ctx, cfg)
 	return m.Client
 }

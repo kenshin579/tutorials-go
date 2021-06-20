@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"runtime"
@@ -23,6 +24,8 @@ func TestReadConfigFile(t *testing.T) {
 	cfg, err := New("config/config.yaml")
 	assert.NoError(t, err)
 
-	assert.True(t, strings.ContainsAny("localhost", cfg.MongoDBConfig.Uri))
-	assert.NotEmpty(t, cfg.MongoDBConfig.Database)
+	fmt.Println(cfg)
+
+	assert.True(t, strings.ContainsAny("localhost", cfg.MongoConfig.Uri))
+	assert.NotEmpty(t, cfg.MongoConfig.Database)
 }

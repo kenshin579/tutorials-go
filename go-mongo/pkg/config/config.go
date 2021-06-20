@@ -8,10 +8,10 @@ import (
 )
 
 type Config struct {
-	MongoDBConfig MongoDBConfig `yaml:"mongodb"`
+	MongoConfig MongoConfig `yaml:"mongodb"`
 }
 
-type MongoDBConfig struct {
+type MongoConfig struct {
 	Uri      string `yaml:"uri"`
 	Database string `yaml:"database"`
 	Username string `yaml:"username"`

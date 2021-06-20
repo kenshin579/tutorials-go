@@ -1,9 +1,10 @@
-package go_memongo
+package main
 
 import (
 	"fmt"
-	"github.com/benweissmann/memongo"
 	"testing"
+
+	"github.com/benweissmann/memongo"
 )
 
 func Test(t *testing.T) {
