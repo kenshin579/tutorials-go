@@ -5,12 +5,13 @@ go 1.15
 require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
+	github.com/benweissmann/memongo v0.1.1
 	github.com/bxcodec/faker v2.0.1+incompatible
 	github.com/chidiwilliams/flatbson v0.3.0
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.4.1
-	github.com/go-redis/redis v6.15.9+incompatible // indirect
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.9.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.5.1
@@ -34,5 +35,6 @@ require (
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
