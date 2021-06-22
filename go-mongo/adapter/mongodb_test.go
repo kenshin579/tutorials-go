@@ -1,4 +1,4 @@
-package mongo
+package adapter
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/pkg/config"
+	"github.com/kenshin579/tutorials-go/go-mongo/config"
 )
 
 var (
@@ -17,7 +17,7 @@ var (
 )
 
 func setup() {
-	cfg, err := config.New("../../../config/config.yaml")
+	cfg, err := config.New("../../config/config.yaml")
 	if err != nil {
 		log.Panic("config error: ", err)
 	}
@@ -29,7 +29,7 @@ func setup() {
 }
 
 func teardown() {
-	mongodb.client.Disconnect(context.Background())
+	mongodb.Client.Disconnect(context.Background())
 }
 
 func TestPing(t *testing.T) {
@@ -39,6 +39,6 @@ func TestPing(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	err := mongodb.client.Ping(ctx, readpref.Primary())
+	err := mongodb.Client.Ping(ctx, readpref.Primary())
 	assert.NoError(t, err)
 }

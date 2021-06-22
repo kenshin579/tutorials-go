@@ -1,16 +1,17 @@
-package mongo
+package adapter
 
 import (
 	"context"
 	"log"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/pkg/config"
+	"github.com/kenshin579/tutorials-go/go-mongo/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Mongodb struct {
-	client *mongo.Client
+	Client *mongo.Client
+	DB     *mongo.Database
 }
 
 func New(ctx context.Context, cfg *config.Config) (*Mongodb, error) {
@@ -28,6 +29,7 @@ func New(ctx context.Context, cfg *config.Config) (*Mongodb, error) {
 	}
 
 	return &Mongodb{
-		client: client,
+		Client: client,
+		DB:     client.Database(cfg.MongoConfig.Database),
 	}, nil
 }
