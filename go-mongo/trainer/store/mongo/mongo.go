@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/kenshin579/tutorials-go/go-mongo/adapter"
 	"github.com/kenshin579/tutorials-go/go-mongo/domain"
@@ -68,11 +69,11 @@ func (m *mongoStore) InsertMany(ctx context.Context, trainerList []domain.Traine
 	return nil
 }
 
-func (m *mongoStore) FindAll(ctx context.Context) ([]*domain.Trainer, error) {
+func (m *mongoStore) FindAll(ctx context.Context, findOptions *options.FindOptions) ([]*domain.Trainer, error) {
 	dbCollection := m.db.Collection(domain.CollectionName)
 	//findOptions을 주지 않고 검색하면 limit없이 검색이 된다
-	findOptions := options.Find()
-	findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
+	//findOptions := options.Find()
+	////findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
 
 	var result []*domain.Trainer
 
@@ -121,7 +122,7 @@ func (m *mongoStore) Update(ctx context.Context, filter interface{}, update inte
 func (m *mongoStore) Delete(ctx context.Context, filter interface{}) error {
 	dbCollection := m.db.Collection(domain.CollectionName)
 
-	deleteResult, err := dbCollection.DeleteMany(ctx, bson.D{{}})
+	deleteResult, err := dbCollection.DeleteMany(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 		return err
