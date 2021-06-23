@@ -84,8 +84,10 @@ func TestInsertMany_FindAll(t *testing.T) {
 
 	err := store.InsertMany(ctx, trainerList)
 	assert.NoError(t, err)
+	findOptions := options.Find()
+	//findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
 
-	list, err := store.FindAll(ctx) //todo : 잘 안됨
+	list, err := store.FindAll(ctx, findOptions)
 	assert.NoError(t, err)
 	assert.Equal(t, len(trainerList), len(list))
 }
@@ -116,7 +118,11 @@ func TestDeleteMany(t *testing.T) {
 	err := store.InsertMany(ctx, trainerList)
 	assert.NoError(t, err)
 
-	err = store.Delete(ctx, bson.D{{}})
+	err = store.Delete(ctx, bson.D{{"name", "Ash"}})
 	assert.NoError(t, err)
-	//todo: findAll로 확인하기
+	findOptions := options.Find()
+	//findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
+
+	list, err := store.FindAll(ctx, findOptions)
+	assert.Equal(t, len(trainerList)-1, len(list))
 }
