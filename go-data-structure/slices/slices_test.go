@@ -27,13 +27,22 @@ func Test_Delete_Item_Index_From_Slice(t *testing.T) {
 
 }
 
+func TestSlice(t *testing.T) {
+	people := createSamplePerson(5)
+	fmt.Println(people)
+
+	fmt.Println(people[:2])
+	fmt.Println(people[2:])
+	fmt.Println(people[1:3])
+}
+
 func Test_Delete_Item_Index_From_Slice_Without_Temp(t *testing.T) {
 	people := createSamplePerson(5)
 	deletedPersonID := 2
 
 	for i, person := range people {
-		if person.ID == deletedPersonID {
-			people = append(people[:i], people[i+1:]...) //todo: 이거에 대한 설명이 필요함
+		if person.ID == deletedPersonID { //i:2
+			people = append(people[:i], people[i+1:]...) //([:2], [3:]...) -> (0, 1, 3, 4, 5)
 		}
 	}
 
@@ -64,19 +73,35 @@ func isPersonIDFound(people []model.Person, deletedPersonID int) bool {
 	return false
 }
 
-//todo: 아래부분 스터디해보기
 //https://yourbasic.org/golang/delete-element-slice/
-func Example_Delete_Item_From_Slice() {
-	strList := []string{"A", "B", "C", "D", "E"}
-	deletedIndex := 2
+func Example_Delete_Item_From_Slice_Fast_Version_Changes_Order() {
+	a := []string{"A", "B", "C", "D", "E"}
+	i := 2
 
-	// Remove the element at index deletedIndex from strList.
-	strList[deletedIndex] = strList[len(strList)-1] // Copy last element to index deletedIndex.
-	strList[len(strList)-1] = ""                    // Erase last element (write zero value).
-	strList = strList[:len(strList)-1]              // Truncate slice.
+	a[i] = a[len(a)-1] // 마지막 요소(E) -> i로 복사
+	a[len(a)-1] = ""   // 마지막 요소 삭제
+	a = a[:len(a)-1]   // slice 크기 줄임
 
-	fmt.Println(strList)
+	fmt.Println(a)
 
 	//Output:
 	//[A B E D]
+}
+
+func Example_Delete_Item_From_Slice_Slow_Version_Maintains_Order() {
+	a := []string{"A", "B", "C", "D", "E"}
+	i := 2
+
+	copy(a[i:], a[i+1:]) // a[2:] <- a[3:] 복사 (A, B, D, E)
+	fmt.Println(len(a))
+	a[len(a)-1] = ""
+	a = a[:len(a)-1] // slice 크기 줄임
+	fmt.Println(len(a))
+
+	fmt.Println(a)
+
+	//Output:
+	//5
+	//4
+	//[A B D E]
 }
