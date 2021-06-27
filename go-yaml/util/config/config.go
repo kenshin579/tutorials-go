@@ -13,6 +13,7 @@ type Config struct {
 		Name        string `yaml:"name"`
 		Description string `yaml:"description"`
 	} `yaml:"tasks"`
+	ServerList []string `yaml:"serverList"`
 }
 
 func New(configPath string) (*Config, error) {

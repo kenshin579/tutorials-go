@@ -4,4 +4,7 @@ tasks:
     description: "this is a test"
   - name: "task2"
     description: "this is a test"
-
+serverList:
+  - localhost:1001
+  - localhost:1002
+  - localhost:1003
