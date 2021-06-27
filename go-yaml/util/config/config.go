@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/kenshin579/tutorials-go/go-yaml/model"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,6 +15,9 @@ type Config struct {
 		Name        string `yaml:"name"`
 		Description string `yaml:"description"`
 	} `yaml:"tasks"`
+	RedisConfig struct {
+		Mode model.RedisMode `yaml:"mode"`
+	} `yaml:"redis"`
 	ServerList []string `yaml:"serverList"`
 }
 
