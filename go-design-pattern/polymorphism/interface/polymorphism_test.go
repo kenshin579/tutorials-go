@@ -1,6 +1,16 @@
 package _interface
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
+
+const (
+	DogType AnimalType = "dog"
+	CatType AnimalType = "cat"
+)
+
+type AnimalType string
 
 type Animal interface {
 	makeSound() string
@@ -37,6 +47,17 @@ func NewCat(name string) Animal {
 	}
 }
 
+func NewAnimal(animalType AnimalType, name string) Animal {
+	if animalType == DogType {
+		return NewDog(name)
+	} else if animalType == CatType {
+		return NewCat(name)
+	} else {
+		fmt.Errorf("unknown type: %s", animalType)
+	}
+	return nil
+}
+
 func Example_Polymorphism_Interface_사용하는_방법() {
 	var dog, cat Animal
 
@@ -49,4 +70,19 @@ func Example_Polymorphism_Interface_사용하는_방법() {
 	//Output:
 	//초코 says 멍멍!
 	//루시 says 야옹!
+}
+
+//https://stackoverflow.com/questions/20170275/how-to-find-the-type-of-an-object-in-go
+func Example_Polymorphism_Type() {
+
+	animal := NewAnimal(DogType, "dogname")
+	fmt.Println(animal.makeSound())
+
+	fmt.Printf("type : %T\n", animal)
+	fmt.Printf("type : %s\n", reflect.TypeOf(animal))
+
+	//Output:
+	//dogname says 멍멍!
+	//type : *_interface.Dog
+	//type : *_interface.Dog
 }
