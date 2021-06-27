@@ -1,13 +1,14 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"testing"
 
 	"github.com/kenshin579/tutorials-go/go-redis/model"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +37,7 @@ func Test_Ping(t *testing.T) {
 	setup()
 	defer teardown()
 
-	pong, err := client.Ping().Result()
+	pong, err := client.Ping(context.Background()).Result()
 
 	assert.NoError(t, err)
 	assert.Equal(t, "PONG", pong)
@@ -48,10 +49,11 @@ func Test_Set_Get_With_Primitive_Data_Type(t *testing.T) {
 
 	const TestValue = "Elliot"
 
-	err := client.Set("name", TestValue, 0).Err()
+	err := client.Set(context.Background(), "name", TestValue, 0).Err()
+
 	assert.NoError(t, err)
 
-	val, err := client.Get("name").Result()
+	val, err := client.Get(context.Background(), "name").Result()
 	assert.NoError(t, err)
 	assert.Equal(t, TestValue, val)
 }
@@ -64,8 +66,8 @@ func Test_Set_Get_With_Struct(t *testing.T) {
 
 	authorJson, err := json.Marshal(model.Author{Name: "Elliot", Age: 25})
 	assert.NoError(t, err)
-	err = client.Set(TestKey, authorJson, 0).Err()
-	val, err := client.Get(TestKey).Result()
+	err = client.Set(context.Background(), TestKey, authorJson, 0).Err()
+	val, err := client.Get(context.Background(), TestKey).Result()
 
 	fmt.Printf("%v %T\n", val, val)
 	var a model.Author
