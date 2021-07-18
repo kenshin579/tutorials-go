@@ -1,16 +1,12 @@
-KAFKA_SERVER_0 := go-kafka-0.go-kafka-headless.default.svc.cluster.local:9092
-TOPIC=go-kafka-topic
+REPOSITORY  := bitnami
+APP         := kafka
+MYAPP         := kafka
 
-build-producer:
-	go build -o bin/producer.go producer/main.go
+.PHONY: helm-install
+helm-install:
+	helm3 install $(MYAPP) $(REPOSITORY)/$(APP) -f kafka-values.yaml
 
-build-consumer:
-	go build -o bin/consumer.go consumer/main.go
-
-
-run-producer: build-producer
-	@bin/producer -brokers=$(KAFKA_SERVER_0) -topic=$(TOPIC)
-
-run-consumer: build-consumer
-	@bin/producer -brokers=$(KAFKA_SERVER_0) -topic=$(TOPIC) -message=$(message)
+.PHONY: helm-uninstall
+helm-uninstall:
+	helm3 uninstall $(MYAPP)
 
