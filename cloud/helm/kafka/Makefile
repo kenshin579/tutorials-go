@@ -1,6 +1,6 @@
 REPOSITORY  := bitnami
 APP         := kafka
-MYAPP       := kafka
+MYAPP       := my-kafka
 
 .PHONY: helm-install
 helm-install:
