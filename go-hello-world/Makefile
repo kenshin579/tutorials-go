@@ -1,7 +1,7 @@
-DOCKERID := kenshin579
-REGISTRY    := advenoh
-TAG         := multi-arch-hello
-IMAGE       := $(DOCKERID)/$(REGISTRY):$(TAG)
+REGISTRY 	:= kenshin579
+APP    		:= rasberrypi
+TAG         := go-multi-arch-hello
+IMAGE       := $(REGISTRY)/$(APP):$(TAG)
 
 .PHONY: docker-push
 docker-push:
