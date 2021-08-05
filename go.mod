@@ -17,6 +17,7 @@ require (
 	github.com/golang/protobuf v1.5.1
 	github.com/google/uuid v1.2.0
 	github.com/gosuri/uilive v0.0.4 // indirect
+	github.com/jarcoal/httpmock v1.0.8
 	github.com/jnewmano/grpc-json-proxy v0.0.2
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.2.1
