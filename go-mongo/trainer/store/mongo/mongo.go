@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kenshin579/tutorials-go/go-mongo/adapter/mongodb"
+
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/adapter"
 	"github.com/kenshin579/tutorials-go/go-mongo/domain"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -18,7 +19,7 @@ type mongoStore struct {
 	db *mongo.Database
 }
 
-func NewMongoStore(db *adapter.Mongodb) *mongoStore {
+func NewMongoStore(db *mongodb.Mongodb) *mongoStore {
 	return &mongoStore{
 		db: db.DB,
 	}

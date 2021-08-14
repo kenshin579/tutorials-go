@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/adapter"
+	"github.com/kenshin579/tutorials-go/go-mongo/adapter/mongodb"
 	"github.com/kenshin579/tutorials-go/go-mongo/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -38,7 +38,7 @@ func setup() {
 
 	fmt.Println(cfg)
 
-	mongodb, err := adapter.New(context.Background(), cfg)
+	mongodb, err := mongodb.New(context.Background(), cfg)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -55,7 +55,7 @@ func TestMain(m *testing.M) {
 	clientOpts := options.Client().ApplyURI(mongoServer.URI())
 	client, err := mongo.Connect(context.Background(), clientOpts)
 	randomDB := client.Database(memongo.RandomDatabase())
-	store = NewMongoStore(&adapter.Mongodb{
+	store = NewMongoStore(&mongodb.Mongodb{
 		Client: client,
 		DB:     randomDB,
 	})
