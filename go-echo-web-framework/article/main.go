@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/kenshin579/tutorials-go/go-echo/article/handler"
-	"github.com/kenshin579/tutorials-go/go-echo/article/router"
-	"github.com/kenshin579/tutorials-go/go-echo/article/store"
-	"github.com/kenshin579/tutorials-go/go-echo/article/usecase"
+	"github.com/kenshin579/tutorials-go/go-echo-web-framework/article/handler"
+	"github.com/kenshin579/tutorials-go/go-echo-web-framework/article/router"
+	"github.com/kenshin579/tutorials-go/go-echo-web-framework/article/store"
+	"github.com/kenshin579/tutorials-go/go-echo-web-framework/article/usecase"
 )
 
 func main() {
