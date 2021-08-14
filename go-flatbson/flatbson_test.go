@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kenshin579/tutorials-go/go-mongo/adapter/mongodb"
+
 	"github.com/chidiwilliams/flatbson"
 
 	"github.com/stretchr/testify/assert"
@@ -18,8 +20,7 @@ import (
 
 	"github.com/kenshin579/tutorials-go/go-flatbson/model"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/pkg/config"
-	"github.com/kenshin579/tutorials-go/go-mongo/pkg/mongodb"
+	"github.com/kenshin579/tutorials-go/go-mongo/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
