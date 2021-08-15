@@ -16,7 +16,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.5.1
 	github.com/google/uuid v1.2.0
-	github.com/gosuri/uilive v0.0.4 // indirect
 	github.com/jarcoal/httpmock v1.0.8
 	github.com/jnewmano/grpc-json-proxy v0.0.2
 	github.com/labstack/echo v3.3.10+incompatible
@@ -38,6 +37,7 @@ require (
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/go-playground/validator.v9 v9.31.0
-	gopkg.in/resty.v1 v1.12.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.21.13
 )
