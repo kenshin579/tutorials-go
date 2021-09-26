@@ -1,4 +1,4 @@
-package go_custom_errors
+package custom
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-custom-errors/model"
+	"github.com/kenshin579/tutorials-go/go-errors/custom/model"
 )
 
 func ExampleCreating_Error_New() {
