@@ -105,3 +105,11 @@ func Example_Delete_Item_From_Slice_Slow_Version_Maintains_Order() {
 	//4
 	//[A B D E]
 }
+
+func Example_Slice_전체() {
+	a := []string{"A", "B", "C", "D", "E"}
+	fmt.Println(a[:])
+
+	//Output:
+	//[A B C D E]
+}
