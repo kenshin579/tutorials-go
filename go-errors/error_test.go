@@ -32,6 +32,10 @@ func (q *QueryError) Error() string {
 	return fmt.Sprintf("%s: %s", q.Query, q.Err)
 }
 
+func (q *QueryError) Unwrap() error {
+	return q.Err
+}
+
 /*
 errors.As()는 interface나 error를 구현한 타입인 경우에 사용할 수 있음
 */
@@ -45,4 +49,22 @@ func TestAs(t *testing.T) {
 	result := errors.As(q, &err)
 	assert.True(t, result)
 	assert.Equal(t, ErrInvalidQuery, err.Err)
+}
+
+func Test_Wrap_Unwrap(t *testing.T) {
+	q1 := &QueryError{
+		Query: "query 1",
+		Err:   errors.New("err 1"),
+	}
+
+	q2 := fmt.Errorf("q2: %w", q1)
+	q3 := fmt.Errorf("q3 : %w", q2)
+
+	fmt.Println(q2)
+	fmt.Println(q3)
+
+	//Unwrap
+	fmt.Println(errors.Unwrap(q3))
+	fmt.Println(errors.Unwrap(q2))
+	fmt.Println(errors.Unwrap(q1))
 }
