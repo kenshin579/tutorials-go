@@ -207,3 +207,40 @@ func Test_Reflect_Method에_대한_설명(t *testing.T) {
 	// 알아내어 reflect.Int64와 비교
 	fmt.Println(val.Float()) // 1.3: 값을 실수형으로 출력
 }
+
+//https://cjwoov.tistory.com/16
+type Cat struct {
+	Name  string   `custom:"name"`
+	Age   int      `custom:"age"`
+	Child []string `custom:"child"`
+}
+
+func TestCatFieldLoop(t *testing.T) {
+	cat := &Cat{
+		Name:  "nabi",
+		Age:   5,
+		Child: []string{"nyang", "kong"},
+	}
+	LoopObjectField(cat)
+}
+
+func LoopObjectField(object interface{}) {
+	e := reflect.ValueOf(object).Elem()
+	fieldNum := e.NumField()
+	var childStr string
+	for i := 0; i < fieldNum; i++ {
+		childStr = ""
+		v := e.Field(i)
+		t := e.Type().Field(i)
+		fmt.Printf("Name: %s / Type: %s / Value: %v / Tag: %s \n",
+			t.Name, t.Type, v.Interface(), t.Tag.Get("custom"))
+		fmt.Printf("%v\n", v.Kind())
+		if v.Kind().String() == "slice" {
+			for j := 0; j < v.Len()-1; j++ {
+				childStr += v.Index(j).String() + ","
+			}
+			childStr += v.Index(v.Len() - 1).String()
+			fmt.Printf("childStr:%v\n", childStr)
+		}
+	}
+}
