@@ -68,3 +68,51 @@ func Test_Wrap_Unwrap(t *testing.T) {
 	fmt.Println(errors.Unwrap(q2))
 	fmt.Println(errors.Unwrap(q1))
 }
+
+const badInput = "abc"
+
+var ErrBadInput = errors.New("bad input")
+
+func validateInputForIs(input string) error {
+	if input == badInput {
+		return fmt.Errorf("validateInput: %w", ErrBadInput) //ErrBadInput error는 fmt.Errorf()의해 생성된 오류에 wrapped됨
+	}
+	return nil
+}
+
+/*
+Is() 함수는 주어진 오류가 다른 특정 오류와 일치하는지 확인하려는 경우에 사용한다
+*/
+func TestError_Is(t *testing.T) {
+	input := badInput
+
+	err := validateInputForIs(input)
+
+	assert.True(t, errors.Is(err, ErrBadInput)) //bad input error
+}
+
+type BadInputError struct {
+	input string
+}
+
+func (e *BadInputError) Error() string {
+	return fmt.Sprintf("bad input: %s", e.input)
+}
+
+func validateInputForAs(input string) error {
+	if input == badInput {
+		return fmt.Errorf("validateInput: %w", &BadInputError{input: input})
+	}
+	return nil
+}
+
+func TestError_As(t *testing.T) {
+	input := badInput
+
+	err := validateInputForAs(input)
+	var badInputErr *BadInputError
+
+	if errors.As(err, &badInputErr) {
+		fmt.Printf("bad input error occured: %#v\n", badInputErr)
+	}
+}
