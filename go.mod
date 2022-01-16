@@ -16,6 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.5.1
 	github.com/google/uuid v1.2.0
+	github.com/gorilla/sessions v1.2.1
 	github.com/jarcoal/httpmock v1.0.8
 	github.com/jnewmano/grpc-json-proxy v0.0.2
 	github.com/labstack/echo v3.3.10+incompatible
@@ -52,6 +53,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.9.5 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
