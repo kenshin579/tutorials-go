@@ -134,3 +134,37 @@ SELECT *,
        ST_Distance_Sphere(`position`, @user_location) AS `distance`
 FROM `locations_earth`
 WHERE ST_Within(`position`, @poly_o);
+
+# 공간 관계 함수
+SET @p0 = POINT(0, 0);
+SET @p1 = POINT(1, 1);
+SET @p2 = POINT(2, 2);
+SET @l1 = ST_GeomFromText('LineString(1 1, 3 3)');
+SET @l2 = ST_GeomFromText('LineString(2 2, 4 4)');
+SET @b1 = ST_GeomFromText('Polygon((1 1,1 10,10 10,10 1,1 1))');
+
+SELECT ST_Equals(@p1, @p1), ST_Equals(@p1, @l1);
+SELECT ST_Disjoint(@b1, @p0), ST_Disjoint(@b1, @p2);
+SELECT ST_Within(@p2, @b1), ST_Within(@b1, @p2);
+SELECT Overlaps(@l1, @l2), Overlaps(@l1, @p1);
+SELECT ST_Intersects(@b1, @p2), ST_Intersects(@b1, @p1);
+SELECT ST_Contains(@b1, @p2), ST_Contains(@p2, @b1);
+SELECT ST_Touches(@b1, @p1), ST_Touches(@b1, @p2);
+SELECT ST_Distance(@p1, @p2);
+
+# 공간 연산 함수 - 공간 연산 함수는 두 공간 객체의 연산 결과로 새로운 공간 객체를 반환해주는 함수
+SET @p0 = POINT(0, 0);
+SET @p1 = POINT(1, 1);
+SET @p2 = POINT(2, 2);
+SET @l1 = ST_GeomFromText('LineString(1 1, 3 3, 5 5, 10 10, 14 14)');
+SET @l2 = ST_GeomFromText('LineString(2 2, 8 8)');
+SET @b1 = ST_GeomFromText('Polygon((1 1,1 10,10 10,10 1,1 1))');
+
+SELECT ST_AsText(ST_Intersection(@p0, @p1)), ST_AsText(ST_Intersection(@b1, @p2));
+SELECT ST_AsText(ST_Union(@p0, @p1)), ST_AsText(ST_Union(@l1, @p1));
+SELECT ST_AsText(ST_Difference(@p0, @p1)), ST_AsText(ST_Difference(@l1, @p2));
+SELECT ST_AsText(ST_Buffer(@b1, 0));
+SELECT ST_AsText(ST_Envelope(@l2));
+SELECT ST_AsText(ST_StartPoint(@l1));
+SELECT ST_AsText(ST_EndPoint(@l1));
+SELECT ST_AsText(ST_PointN(@l1, 3));
