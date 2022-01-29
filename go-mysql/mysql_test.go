@@ -30,6 +30,17 @@ func Test_Create(t *testing.T) {
 	db.Commit()
 }
 
+func Test_Create_4329(t *testing.T) {
+	db := setup()
+
+	for i := 1; i <= 1000; i++ {
+		sql := fmt.Sprintf("INSERT INTO `locations_earth`(`name`, `position`) "+
+			"VALUES ('point_%d', ST_GeomFromText('POINT( %d %d )', 4326));", i, (90/1000)*i, (180/1000)*i)
+		db.Exec(sql)
+	}
+	db.Commit()
+}
+
 func Test_Select(t *testing.T) {
 	db := setup()
 	rows, err := db.Raw("SELECT * from `study_db`.`locations_flat`;").Rows()
