@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: values-yaml
+data:
+  env: {{ .Values.configMapData.env }}
+  log: {{ .Values.configMapData.log }}
+  path: "{{ .Values.configMapData.path }}"
