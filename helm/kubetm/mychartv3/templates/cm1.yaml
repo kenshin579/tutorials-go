@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: function-and-pipeline
+data:
+  Function_Argument:
+    quote: {{ quote .Values.func.enabled }}     # quote(arg1)
+    include: {{ include "mychart.name" . }}  # include(arg1, arg2)
+
+  Function_Quote:
+    function_case1: {{ .Values.func.enabled }}
+    function_case2: {{ quote .Values.func.enabled }}
+    function_case3: "{{ .Values.func.enabled }}"
+
+  Pipeline:
+    upper: {{ .Values.pipe.log | upper }}
+    upper.repeat: {{ .Values.pipe.log | upper | repeat 2 }}
+    upper.repeat.quote: {{ .Values.pipe.log | upper | repeat 2 | quote }}

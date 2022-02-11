@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: built-in-object
+data:
+  .Release: ______________________________________
+  .Release.Name: {{ .Release.Name }}
+  .Release.Namespace: {{ .Release.Namespace }}
+  .Release.IsUpgrade: "{{ .Release.IsUpgrade }}"
+  .Release.IsInstall: "{{ .Release.IsInstall }}"
+  .Release.Revision: "{{ .Release.Revision }}"
+  .Release.Service: {{ .Release.Service }}
+  .Values: ______________________________________
+  .Values.replicaCount: "{{ .Values.replicaCount }}"
+  .Values.image.repository: {{ .Values.image.repository }}
+  .Values.image.pullPolicy: {{ .Values.image.pullPolicy }}
+  .Values.service.type: {{ .Values.service.type }}
+  .Values.service.port: "{{ .Values.service.port }}"
+  .Chart: ______________________________________
+  .Chart.Name: {{ .Chart.Name }}
+  .Chart.Description: {{ .Chart.Description }}
+  .Chart.Type: {{ .Chart.Type }}
+  .Chart.Version: {{ .Chart.Version }}
+  .Chart.AppVersion: {{ .Chart.AppVersion }}
+  .Template: ______________________________________
+  .Template.BasePath: {{ .Template.BasePath }}
+  .Template.Name: {{ .Template.Name }}

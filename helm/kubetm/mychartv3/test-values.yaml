@@ -1,0 +1,11 @@
+# Default values for mychartv3.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+func:
+  enabled: true
+
+pipe:
+  log: info
+
+
