@@ -23,7 +23,7 @@ version: 0.1.0
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
 
-#이거 잘 설치가 안됨
+#todo : 이거 잘 설치가 안됨
 dependencies:
 - name: mariadb
   version: "0.6.0"
