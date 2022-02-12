@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: steps-
+spec:
+  entrypoint: hello-hello-hello    # workflow 시작점 위치
+  templates:
+    #########################
+    # Template을 만듭니다.
+    #########################
+    - name: whalesay
+      inputs:
+        parameters:
+          - name: message
+      container:
+        image: docker/whalesay
+        command: [ cowsay ]
+        args: [ "" ]   # 전달 받은 파라미터를 args에서 사용합니다.
+    #############################################
+    # 위에서 만든 template을 step에서 활용합니다.
+    #############################################
+    - name: hello-hello-hello         # <-- 여기서부터 시작합니다.
+      steps:
+        - - name: hello1                # 1번째 step
+            template: whalesay
+            arguments:
+              parameters:
+                - name: message
+                  value: "hello1"         # message 파라미터를 hello1이라고 넘깁니다.
+        - - name: hello2a               # 더블 대시: 1번째 step 이후에 실행됩니다.
+            template: whalesay
+            arguments:
+              parameters:
+                - name: message
+                  value: "hello2a"        # 또 다른 파라미터 전달
+          - name: hello2b               # 싱글 대시: 2번째 step과 동시에 실행됩니다.
+            template: whalesay
+            arguments:
+              parameters:
+                - name: message
+                  value: "hello2b"
