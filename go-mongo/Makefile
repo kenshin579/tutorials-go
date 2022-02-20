@@ -10,7 +10,8 @@ mongo-create:
 	@docker run --name $(MONGO_CONTAINER_NAME) -d \
 	-e MONGO_INITDB_ROOT_USERNAME=$(USERNAME) \
 	-e MONGO_INITDB_ROOT_PASSWORD=$(PASSWORD) \
-	-p 27017:27017 mongo
+  	-v mongodb-data:/data/db1 \
+	-p 27017:27017 mongo:4.2
 
 .PHONY: mongo-delete
 mongo-delete:
