@@ -3,6 +3,6 @@ server:
 
 mongodb:
   uri: mongodb://localhost:27017
-  database: go-mongo-test
+  database: go-mongo
   username: mongoadmin
   password: mongopassword
