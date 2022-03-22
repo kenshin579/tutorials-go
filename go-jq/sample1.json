@@ -1,0 +1,19 @@
+{
+  "data": {
+    "name": "myname",
+    "values": [
+      {
+        "id": "id0",
+        "url": "url0"
+      },
+      {
+        "id": "id1",
+        "url": "url1"
+      },
+      {
+        "id": "id2",
+        "url": "url2"
+      }
+    ]
+  }
+}
