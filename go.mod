@@ -27,6 +27,7 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	github.com/thoas/go-funk v0.9.2
 	go.mongodb.org/mongo-driver v1.3.3
 	go.uber.org/fx v1.13.1
 	go.uber.org/zap v1.16.0
