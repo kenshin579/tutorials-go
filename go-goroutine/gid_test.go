@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
+	"testing"
 )
 
 func getGID() uint64 {
@@ -17,7 +18,7 @@ func getGID() uint64 {
 	return n
 }
 
-func main() {
+func Test_Print_GID(t *testing.T) {
 	fmt.Println("main", getGID())
 	var wg sync.WaitGroup
 	for i := 0; i < 10; i++ {
