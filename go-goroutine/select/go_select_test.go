@@ -26,6 +26,22 @@ func Test_Select(t *testing.T) {
 	fibonacci(c, quit)
 }
 
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+		select {
+		case c <- x: //channel로 데이터를 보냄
+			x, y = y, x+y
+		case <-quit:
+			fmt.Println("quit")
+			return
+		}
+	}
+}
+
+/*
+select에서 default는 blocking 없이 trhy to send or receive
+*/
 func Test_Default_Select(t *testing.T) {
 	tick := time.Tick(100 * time.Millisecond)
 	boom := time.After(500 * time.Millisecond)
@@ -73,18 +89,5 @@ func Test_Select2(t *testing.T) {
 			fmt.Println("received", msg2)
 		}
 		fmt.Println("end select-----------------")
-	}
-}
-
-func fibonacci(c, quit chan int) {
-	x, y := 0, 1
-	for {
-		select {
-		case c <- x: //channel로 데이터를 보냄
-			x, y = y, x+y
-		case <-quit:
-			fmt.Println("quit")
-			return
-		}
 	}
 }
