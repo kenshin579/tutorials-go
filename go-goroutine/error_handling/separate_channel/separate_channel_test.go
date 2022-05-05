@@ -1,15 +1,10 @@
-package error_handling
+package separate_channel
 
 import (
 	"fmt"
 	"testing"
 	"time"
 )
-
-type Result struct {
-	ErrorName          string
-	NumberOfOccurances int64
-}
 
 func Test_Separate_Channel_Both_Result_And_Error(t *testing.T) {
 	fmt.Println("Using separate channels for error and result")
