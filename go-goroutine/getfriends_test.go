@@ -13,6 +13,8 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+//https://www.fullstory.com/blog/why-errgroup-withcontext-in-golang-server-handlers/
+
 const (
 	nWorkers = 10
 )
@@ -274,9 +276,9 @@ func TestGetFriends(t *testing.T) {
 	}
 
 	for _, tc := range []tc{
-		//{"GetFriends_Serial", GetFriends_Serial},
-		//{"GetFriends_Parallel", GetFriends_Parallel},
-		//{"GetFriends_ErrGroup", GetFriends_ErrGroup},
+		{"GetFriends_Serial", GetFriends_Serial},
+		{"GetFriends_Parallel", GetFriends_Parallel},
+		{"GetFriends_ErrGroup", GetFriends_ErrGroup},
 		{"GetFriends_Selects", GetFriends_Selects},
 	} {
 		log.Printf("%s", tc.name)
