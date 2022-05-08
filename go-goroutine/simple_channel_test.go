@@ -96,3 +96,36 @@ func fibonacci(n int, c chan int) {
 	}
 	close(c) //sender에서 보낼 데이터가 없다고 알려주는 거임
 }
+
+//http://golang.site/go/article/22-Go-%EC%B1%84%EB%84%90
+func Test_Int_Channel(t *testing.T) {
+	// 정수형 채널을 생성한다
+	ch := make(chan int)
+
+	go func() {
+		time.Sleep(time.Second * 2)
+		fmt.Println("1.START")
+		ch <- 123 //채널에 123을 보낸다
+		fmt.Println("1.END")
+	}()
+
+	var i int
+	fmt.Println("2.START")
+	i = <-ch // 채널로부터 123을 받는다 (대기함)
+	fmt.Println("i", i)
+	fmt.Println("2.END")
+}
+
+func Test_Done(t *testing.T) {
+	done := make(chan bool)
+
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(i)
+		}
+		done <- true
+	}()
+
+	// 위의 Go루틴이 끝날 때까지 대기
+	<-done
+}
