@@ -25,7 +25,7 @@ import (
 var (
 	store       *mongoStore
 	ctx         context.Context
-	trainerList = domain.CreateSampleTrainer()
+	trainerList = domain.CreateTrainersSample(2)
 	mongoServer memongo.Server
 )
 

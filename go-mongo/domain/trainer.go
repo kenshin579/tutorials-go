@@ -1,24 +1,36 @@
 package domain
 
+import "fmt"
+
 const (
 	CollectionName = "trainers"
 )
 
 type Trainer struct {
-	Name string `bson:"name"`
-	Age  int    `bson:"age"`
-	City string `bson:"city"`
+	ID   string `bson:"_id" json:"id"`
+	Name string `bson:"name" json:"name"`
+	Age  int    `bson:"age" json:"age"`
+	City string `bson:"city" json:"city"`
 }
 
-func CreateSampleTrainer() []Trainer {
-	var trainers []Trainer
+func CreateTrainerSample(id int) Trainer {
+	return Trainer{
+		ID:   fmt.Sprintf("trainer-%d", id),
+		Name: "Ash",
+		Age:  10,
+		City: "Pallet Town",
+	}
+}
 
-	// Some dummy data to add to the Database
-	ash := Trainer{Name: "Ash", Age: 10, City: "Pallet Town"}
-	misty := Trainer{Name: "Misty", Age: 10, City: "Cerulean City"}
-	brock := Trainer{Name: "Brock", Age: 15, City: "Pewter City"}
-	trainers = append(trainers, ash)
-	trainers = append(trainers, misty)
-	trainers = append(trainers, brock)
-	return trainers
+func CreateTrainersSample(max int) []Trainer {
+	result := make([]Trainer, 0)
+	for i := 0; i < max; i++ {
+		result = append(result, Trainer{
+			ID:   fmt.Sprintf("trainer-%d", i),
+			Name: fmt.Sprintf("Frank%d", i),
+			Age:  5,
+			City: "city",
+		})
+	}
+	return result
 }
