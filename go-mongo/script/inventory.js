@@ -229,6 +229,201 @@ db.inventory.find({item: {$exists: false}})
 //////////////////////////////////////////////////////////////////////////////
 //Update Documents
 //////////////////////////////////////////////////////////////////////////////
+db.inventory.insertMany([
+    {item: "canvas", qty: 100, size: {h: 28, w: 35.5, uom: "cm"}, status: "A"},
+    {item: "journal", qty: 25, size: {h: 14, w: 21, uom: "cm"}, status: "A"},
+    {item: "mat", qty: 85, size: {h: 27.9, w: 35.5, uom: "cm"}, status: "A"},
+    {item: "mousepad", qty: 25, size: {h: 19, w: 22.85, uom: "cm"}, status: "P"},
+    {item: "notebook", qty: 50, size: {h: 8.5, w: 11, uom: "in"}, status: "P"},
+    {item: "paper", qty: 100, size: {h: 8.5, w: 11, uom: "in"}, status: "D"},
+    {item: "planner", qty: 75, size: {h: 22.85, w: 30, uom: "cm"}, status: "D"},
+    {item: "postcard", qty: 45, size: {h: 10, w: 15.25, uom: "cm"}, status: "A"},
+    {item: "sketchbook", qty: 80, size: {h: 14, w: 21, uom: "cm"}, status: "A"},
+    {item: "sketch pad", qty: 95, size: {h: 22.85, w: 30.5, uom: "cm"}, status: "A"}
+]);
+
+
+/*
+Update Documents in a Collection
+- Some update operators, such as $set, will create the field if the field does not exist.
+{
+  <update operator>: { <field1>: <value1>, ... },
+  <update operator>: { <field2>: <value2>, ... },
+  ...
+}
+ */
+
+//1.Update a Single Document - update the first document where item equals to "paper"
+db.inventory.updateOne(
+    {
+        item: "paper"
+    },
+    {
+        $set: {"size.uom": "cm", status: "P"},
+        $currentDate: {lastModified: true}
+    }
+)
+
+
+//2.Update a multiple documents - update all documents where qty is less than 50
+db.inventory.updateMany(
+    {"qty": {$lt: 50}},
+    {
+        $set: {"size.uom": "in", status: "P"},
+        $currentDate: {lastModified: true}
+    }
+)
+
+//replace One - matching 되는 데이터를 교체함
+db.inventory.replaceOne(
+    {item: "paper"},
+    {item: "paper", instock: [{warehouse: "A", qty: 60}, {warehouse: "B", qty: 40}]}
+)
+
+
+/*
+Updates with Aggregation Pipeline:
+- Using the aggregation pipeline allows for a more expressive update statement,
+such as expressing conditional updates based on current field values
+or updating one field using the value of another field(s).
+
+$addFields
+$set
+$project
+$unset
+$replaceRoot
+$replaceWith
+ */
+
+db.students.insertMany([
+    {_id: 1, test1: 95, test2: 92, test3: 90, modified: new Date("2020-01-05")},
+    {_id: 2, test1: 98, test2: 100, test3: 102, modified: new Date("2020-01-05")},
+    {_id: 3, test1: 95, test2: 110, modified: new Date("2020-01-04")}
+])
+
+db.students.find()
+
+/*
+Example 1 - $$NOW 값은 current datetime 값을 얻어 올 수 있다
+1.updateOne() operation uses an aggregation pipeline to update the document with _id: 3:
+Specifically, the pipeline consists of a $set stage which adds the test3 field
+(and sets its value to 98) to the document and sets the modified field to the current datetime.
+The operation uses the aggregation variable NOW for the current datetime.
+To access the variable, prefix with $$ and enclose in quotes.
+ */
+db.students.updateOne({_id: 3}, [{$set: {"test3": 98, modified: "$$NOW"}}])
+db.students.find().pretty()
+
+
+/*
+Example 2 - unset 되어 있는 field에 zero로 세팅해줌
+ */
+db.students2.insertMany([
+    {"_id": 1, quiz1: 8, test2: 100, quiz2: 9, modified: new Date("2020-01-05")},
+    {"_id": 2, quiz2: 5, test1: 80, test2: 89, modified: new Date("2020-01-05")},
+])
+
+/*
+- $replaceRoot stage with a $mergeObjects expression to set default values for the quiz1, quiz2, test1 and test2 fields.
+The aggregation variable ROOT refers to the current document being modified.
+To access the variable, prefix with $$ and enclose in quotes.
+The current document fields will override the default values.
+- $set stage to update the modified field to the current datetime.
+The operation uses the aggregation variable NOW for the current datetime.
+To access the variable, prefix with $$ and enclose in quotes.
+ */
+db.students2.updateMany({},
+    [
+        {
+            $replaceRoot: {
+                newRoot:
+                    {$mergeObjects: [{quiz1: 0, quiz2: 0, test1: 0, test2: 0}, "$$ROOT"]}
+            }
+        },
+        {$set: {modified: "$$NOW"}}
+    ]
+)
+
+/*
+Example 3 - average, grade를 추가로 넣음
+ */
+db.students3.insertMany([
+    {"_id": 1, "tests": [95, 92, 90], "modified": ISODate("2019-01-01T00:00:00Z")},
+    {"_id": 2, "tests": [94, 88, 90], "modified": ISODate("2019-01-01T00:00:00Z")},
+    {"_id": 3, "tests": [70, 75, 82], "modified": ISODate("2019-01-01T00:00:00Z")}
+]);
+
+/*
+- $set stage to calculate the truncated average value of the tests array elements and to update the modified field to the current datetime.
+To calculate the truncated average, the stage uses the $avg and $trunc expressions.
+The operation uses the aggregation variable NOW for the current datetime.
+To access the variable, prefix with $$ and enclose in quotes.
+- $set stage to add the grade field based on the average using the $switch expression.
+ */
+db.students3.updateMany(
+    {},
+    [
+        {$set: {average: {$trunc: [{$avg: "$tests"}, 0]}, modified: "$$NOW"}},
+        {
+            $set: {
+                grade: {
+                    $switch: {
+                        branches: [
+                            {case: {$gte: ["$average", 90]}, then: "A"},
+                            {case: {$gte: ["$average", 80]}, then: "B"},
+                            {case: {$gte: ["$average", 70]}, then: "C"},
+                            {case: {$gte: ["$average", 60]}, then: "D"}
+                        ],
+                        default: "F"
+                    }
+                }
+            }
+        }
+    ]
+)
+
+/*
+Example 4 - quizzes list에 값을 추가함
+ */
+db.students4.insertMany([
+    {"_id": 1, "quizzes": [4, 6, 7]},
+    {"_id": 2, "quizzes": [5]},
+    {"_id": 3, "quizzes": [10, 10, 10]}
+])
+
+db.students4.updateOne({_id: 2},
+    [{$set: {quizzes: {$concatArrays: ["$quizzes", [8, 6]]}}}]
+)
+
+/*x
+Example 5 -
+ */
+db.temperatures.insertMany([
+    {"_id": 1, "date": ISODate("2019-06-23"), "tempsC": [4, 12, 17]},
+    {"_id": 2, "date": ISODate("2019-07-07"), "tempsC": [14, 24, 11]},
+    {"_id": 3, "date": ISODate("2019-10-30"), "tempsC": [18, 6, 8]}
+])
+
+/*
+Specifically, the pipeline consists of an $addFields stage to add a new array field tempsF that contains the temperatures in Fahrenheit.
+To convert each celsius temperature in the tempsC array to Fahrenheit,
+the stage uses the $map expression with $add and $multiply expressions.
+ */
+db.temperatures.updateMany({},
+    [
+        {
+            $addFields: {
+                "tempsF": {
+                    $map: {
+                        input: "$tempsC",
+                        as: "celsius",
+                        in: {$add: [{$multiply: ["$$celsius", 9 / 5]}, 32]}
+                    }
+                }
+            }
+        }
+    ]
+)
 
 //////////////////////////////////////////////////////////////////////////////
 //Delete Documents
@@ -243,3 +438,4 @@ db.inventory.find({item: {$exists: false}})
 //////////////////////////////////////////////////////////////////////////////
 //Transactions
 //////////////////////////////////////////////////////////////////////////////
+
