@@ -44,6 +44,8 @@ require (
 	gorm.io/gorm v1.22.5
 )
 
+require github.com/akamensky/argparse v1.3.1
+
 require (
 	github.com/Shopify/sarama v1.36.0
 	github.com/alicebob/miniredis/v2 v2.30.0
