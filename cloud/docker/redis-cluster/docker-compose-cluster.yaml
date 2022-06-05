@@ -9,7 +9,6 @@ services:
       ["redis-server", "/usr/local/etc/redis/redis.conf"]
     volumes:
       - ./7001/conf/redis.conf:/usr/local/etc/redis/redis.conf
-      - ./7001/script/:/usr/local/etc/redis/redis.conf
       - ./7001/data:/data
     ports:
       - "7001:7001"
