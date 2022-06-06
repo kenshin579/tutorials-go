@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/go-fx/v1/server"
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v1/server"
 )
 
 func main() {

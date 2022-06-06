@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/go-fx/v3/loggerfx"
-	"github.com/kenshin579/tutorials-go/go-fx/v3/server"
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v3/loggerfx"
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v3/server"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

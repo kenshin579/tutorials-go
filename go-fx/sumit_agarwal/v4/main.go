@@ -4,15 +4,14 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"net/rpc"
 
-	httpServer "github.com/kenshin579/tutorials-go/go-fx/v5/http"
-	"github.com/kenshin579/tutorials-go/go-fx/v5/loggerfx"
-	pb "github.com/kenshin579/tutorials-go/go-fx/v5/proto"
-	rpcServer "github.com/kenshin579/tutorials-go/go-fx/v5/rpc"
+	httpServer "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v4/http"
+	rpcServer "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v4/rpc"
 
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v4/loggerfx"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -26,21 +25,21 @@ func main() {
 }
 
 func registerHooks(
-	lifecycle fx.Lifecycle, mux *http.ServeMux, logger *zap.SugaredLogger, rpcServer rpcServer.Handler,
+	lifecycle fx.Lifecycle, mux *http.ServeMux, logger *zap.SugaredLogger,
 ) {
 	lifecycle.Append(
 		fx.Hook{
 			OnStart: func(context.Context) error {
 
-				// rpc server
-				lis, err := net.Listen("tcp", ":8081")
-				if err != nil {
-					logger.Fatalf("failed to listen: %v", err)
-				}
-				var opts []grpc.ServerOption
-				grpcServer := grpc.NewServer(opts...)
-				pb.RegisterUsersServer(grpcServer, rpcServer)
-				go grpcServer.Serve(lis)
+				// start the rpc server
+				l, err := net.Listen("tcp", ":8081")
+				logger.Errorf("Error while starting rpc server: %+v", err)
+				go func() {
+					for {
+						rpc.Accept(l)
+					}
+				}()
+				logger.Info("Listening on port 8081 for RPC requests")
 
 				// start the http server
 				logger.Info("Listening on localhost:8080 for HTTP requests")
