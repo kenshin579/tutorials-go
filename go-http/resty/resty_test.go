@@ -2,6 +2,7 @@ package resty
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -68,4 +69,34 @@ func Test_Resty_Middleware(t *testing.T) {
 	resp, err := client.R().Get(url)
 	require.NoError(t, err)
 	assert.Equal(t, "Hello World", string(resp.Body()))
+}
+
+func Test_Resty_Request_Concurrently(t *testing.T) {
+	url := "http://localhost:8080"
+	client := resty.New()
+
+	var wait sync.WaitGroup
+	max := 3
+	wait.Add(max)
+
+	for i := 0; i < max; i++ {
+		go func(index int) {
+			defer wait.Done()
+			fmt.Printf("%d started\n", index)
+
+			resp, err := client.R().
+				SetQueryParams(map[string]string{
+					"offset":  "0",
+					"limit":   "-1",
+					"floorId": "3d20271e-e5d1-4442-b5a4-b2b8abc5f4ec",
+				}).
+				SetHeader("Accept", "application/json").
+				Get(url)
+
+			fmt.Printf("%d.Status:%s\n", index, resp.Status())
+			fmt.Printf("%d.err:%+v\n", index, err)
+		}(i)
+	}
+
+	wait.Wait()
 }
