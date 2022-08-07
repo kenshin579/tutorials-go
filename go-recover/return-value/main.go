@@ -18,7 +18,7 @@ type Response struct {
 func MyFunc() (resp Response, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = convertRecoverToError(r)
+			err = errors.New(fmt.Sprint(r))
 			resp = Response{
 				Message: "failure",
 			}
@@ -26,15 +26,4 @@ func MyFunc() (resp Response, err error) {
 	}()
 	panic("test")
 	return Response{Message: "success"}, nil
-}
-
-func convertRecoverToError(r interface{}) error {
-	switch x := r.(type) {
-	case string:
-		return errors.New(x)
-	case error:
-		return x
-	default:
-		return errors.New(fmt.Sprint(x))
-	}
 }
