@@ -2,8 +2,6 @@ module github.com/kenshin579/tutorials-go
 
 go 1.17
 
-replace github.com/benweissmann/memongo v0.1.1 => github.com/strikesecurity/memongo v0.2.4
-
 require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
@@ -29,11 +27,12 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	go.mongodb.org/mongo-driver v1.9.0
+	github.com/thoas/go-funk v0.9.2
+	go.mongodb.org/mongo-driver v1.3.3
 	go.uber.org/fx v1.13.1
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
-	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
@@ -54,21 +53,21 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/golang/snappy v0.0.2 // indirect
+	github.com/golang/snappy v0.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
-	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/klauspost/compress v1.9.5 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
-	github.com/pelletier/go-toml v1.7.0 // indirect
+	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/spf13/afero v1.5.1 // indirect
+	github.com/spf13/afero v1.2.1 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
@@ -76,17 +75,15 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
-	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
-	github.com/xdg-go/scram v1.0.2 // indirect
-	github.com/xdg-go/stringprep v1.0.2 // indirect
-	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
+	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
+	github.com/xdg/stringprep v1.0.0 // indirect
 	go.opentelemetry.io/otel v0.20.0 // indirect
 	go.opentelemetry.io/otel/metric v0.20.0 // indirect
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/dig v1.10.0 // indirect
 	go.uber.org/multierr v1.5.0 // indirect
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sys v0.0.0-20210616045830-e2b7044e8c71 // indirect
 	golang.org/x/text v0.3.6 // indirect
