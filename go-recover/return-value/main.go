@@ -20,10 +20,10 @@ func MyFunc() (resp Response, err error) {
 		if r := recover(); r != nil {
 			err = errors.New(fmt.Sprint(r))
 			resp = Response{
-				Message: "failure",
+				Message: "Failure",
 			}
 		}
 	}()
 	panic("test")
-	return Response{Message: "success"}, nil
+	return Response{Message: "Success"}, nil
 }

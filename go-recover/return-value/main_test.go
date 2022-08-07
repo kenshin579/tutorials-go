@@ -10,6 +10,6 @@ func TestMyFunc(t *testing.T) {
 	resp, err := MyFunc()
 	assert.Error(t, err)
 	assert.Equal(t, Response{
-		Message: "failure",
+		Message: "Failure",
 	}, resp)
 }
