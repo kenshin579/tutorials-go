@@ -3,8 +3,9 @@ package main
 //import된 순서대로 init()가 호출된다
 import (
 	"fmt"
-	"github.com/kenshin579/tutorials-go/go-init-method/abc"
-	"github.com/kenshin579/tutorials-go/go-init-method/lib1"
+
+	"github.com/kenshin579/tutorials-go/go-init/abc"
+	"github.com/kenshin579/tutorials-go/go-init/lib1"
 )
 
 var version string
