@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/go-fx/v2/server"
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v2/server"
 	"go.uber.org/fx"
 )
 

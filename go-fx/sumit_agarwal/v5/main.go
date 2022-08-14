@@ -5,10 +5,10 @@ import (
 	"net"
 	"net/http"
 
-	httpServer "github.com/kenshin579/tutorials-go/go-fx/v5/http"
-	"github.com/kenshin579/tutorials-go/go-fx/v5/loggerfx"
-	pb "github.com/kenshin579/tutorials-go/go-fx/v5/proto"
-	rpcServer "github.com/kenshin579/tutorials-go/go-fx/v5/rpc"
+	httpServer "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v5/http"
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v5/loggerfx"
+	pb "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v5/proto"
+	rpcServer "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v5/rpc"
 
 	"go.uber.org/fx"
 	"go.uber.org/zap"
