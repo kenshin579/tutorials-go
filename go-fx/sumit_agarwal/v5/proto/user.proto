@@ -2,7 +2,7 @@ syntax = "proto3";
 package users;
 
 //option go_package = ".;user";
-option go_package = "github.com/kenshin579/tutorials-go/go-fx/v5/proto/user";
+option go_package = "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v5/proto/user";
 
 // Users Service
 service Users {
