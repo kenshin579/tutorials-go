@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"runtime/debug"
 )
 
 func main() {
@@ -18,6 +19,7 @@ type Response struct {
 func MyFunc() (resp Response, err error) {
 	defer func() {
 		if r := recover(); r != nil {
+			debug.PrintStack()
 			err = errors.New(fmt.Sprint(r))
 			resp = Response{
 				Message: "Failure",
