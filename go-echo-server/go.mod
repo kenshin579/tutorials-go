@@ -1,6 +1,6 @@
 module github.com/kenshin579/tutorials-go/go-echo-server
 
-go 1.15
+go 1.18
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
