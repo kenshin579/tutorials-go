@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"net/rpc"
 
-	httpServer "github.com/kenshin579/tutorials-go/go-fx/v4/http"
-	rpcServer "github.com/kenshin579/tutorials-go/go-fx/v4/rpc"
+	httpServer "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v4/http"
+	rpcServer "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v4/rpc"
 
-	"github.com/kenshin579/tutorials-go/go-fx/v4/loggerfx"
+	"github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v4/loggerfx"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

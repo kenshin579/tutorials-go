@@ -1,4 +1,4 @@
 port: 8080
 kafka:
   address:
-    - go-kafka-0.go-kafka-headless.default.svc.cluster.local:9092
+    - localhost:29092

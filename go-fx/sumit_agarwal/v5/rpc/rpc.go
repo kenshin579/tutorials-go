@@ -3,7 +3,7 @@ package rpc
 import (
 	"context"
 
-	pb "github.com/kenshin579/tutorials-go/go-fx/v5/proto"
+	pb "github.com/kenshin579/tutorials-go/go-fx/sumit_agarwal/v5/proto"
 )
 
 type Handler = pb.UsersServer
