@@ -1,4 +1,4 @@
-package test
+package db
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewMemongoDB() *mongo.Database {
+func NewInMemoryMongoDB() *mongo.Database {
 	opts := &memongo.Options{
 		MongoVersion:     "4.2.1",
 		ShouldUseReplica: true,
@@ -27,9 +27,4 @@ func NewMemongoDB() *mongo.Database {
 	}
 
 	return client.Database(memongo.RandomDatabase())
-}
-
-func NewMongoClient() *mongo.Client {
-	db := NewMemongoDB()
-	return db.Client()
 }
