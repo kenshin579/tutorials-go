@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"runtime"
 
 	"github.com/labstack/gommon/log"
 	"github.com/tryvium-travels/memongo"
@@ -10,12 +11,8 @@ import (
 )
 
 func NewInMemoryMongoDB() *mongo.Database {
-	opts := &memongo.Options{
-		MongoVersion:     "4.2.1",
-		ShouldUseReplica: true,
-	}
-
-	mongoServer, err := memongo.StartWithOptions(opts)
+	option := getOption()
+	mongoServer, err := memongo.StartWithOptions(option)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -27,4 +24,28 @@ func NewInMemoryMongoDB() *mongo.Database {
 	}
 
 	return client.Database(memongo.RandomDatabase())
+}
+
+func getOption() *memongo.Options {
+	opts := &memongo.Options{
+		MongoVersion:     "4.2.1",
+		ShouldUseReplica: true,
+	}
+	return opts
+}
+
+func getM1Option() *memongo.Options {
+	opts := &memongo.Options{
+		ShouldUseReplica: true,
+		MongoVersion:     "4.2.1",
+		LogLevel:         2,
+	}
+
+	if runtime.GOARCH == "arm64" {
+		if runtime.GOOS == "darwin" {
+			// Only set the custom url as workaround for arm64 macs
+			opts.DownloadURL = "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-4.2.1.tgz"
+		}
+	}
+	return opts
 }
