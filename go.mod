@@ -46,6 +46,7 @@ require (
 
 require (
 	github.com/Shopify/sarama v1.36.0
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/tryvium-travels/memongo v0.6.1
 )
