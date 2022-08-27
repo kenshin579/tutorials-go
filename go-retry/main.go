@@ -20,10 +20,12 @@ func main() {
 		retry.OnRetry(func(n uint, err error) {
 			log.Printf("#%d: %s\n", n, err)
 		}),
-		retry.Attempts(7),
+		retry.Attempts(3),
 	)
 
-	fmt.Println(err)
+	if err != nil {
+		fmt.Printf("err:%v\n", err)
+	}
 
 }
 
