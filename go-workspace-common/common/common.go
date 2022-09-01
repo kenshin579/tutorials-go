@@ -1,4 +1,4 @@
-package go_workspace_common
+package common
 
 func V1() string {
 	return "v1"
