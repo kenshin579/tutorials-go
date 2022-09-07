@@ -63,10 +63,10 @@ func (suite *counterTestSuite) TestCounterMutex() {
 
 	wg.Wait() // 모든 고루틴이 종료될 때 까지 대기
 
-	c.Display() // c의 값 출력
+	suite.Equal(int64(1000), c.GetNum())
 }
 
-// todo: 이게 잘 안됨
+// todo: 동기화가 꺠짐
 func (suite *counterTestSuite) TestCounterRedisLock() {
 	// 모든 CPU를 사용하도록 함
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -88,7 +88,7 @@ func (suite *counterTestSuite) TestCounterRedisLock() {
 
 	wg.Wait() // 모든 고루틴이 종료될 때 까지 대기
 
-	c.Display() // c의 값 출력
+	suite.Equal(int64(1000), c.GetNum())
 }
 
 func (suite *counterTestSuite) TestCounterRedSync() {
@@ -116,5 +116,5 @@ func (suite *counterTestSuite) TestCounterRedSync() {
 
 	wg.Wait() // 모든 고루틴이 종료될 때 까지 대기
 
-	c.Display() // c의 값 출력
+	suite.Equal(int64(1000), c.GetNum())
 }

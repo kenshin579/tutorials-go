@@ -22,6 +22,10 @@ func (c *CounterRedSync) Increment() {
 	}
 }
 
+func (c *CounterRedSync) GetNum() int64 {
+	return c.Num
+}
+
 func (c *CounterRedSync) Display() {
 	fmt.Println(c.Num)
 }

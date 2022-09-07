@@ -17,6 +17,10 @@ func (c *CounterMutex) Increment() {
 	c.Mutex.Unlock() // Num 값 변경 완료 후 뮤텍스 잠금 해제
 }
 
+func (c *CounterMutex) GetNum() int64 {
+	return c.Num
+}
+
 // counter의 값을 출력
 func (c *CounterMutex) Display() {
 	fmt.Println(c.Num)
