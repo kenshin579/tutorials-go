@@ -12,6 +12,7 @@ import (
 	redislib_v9 "github.com/go-redis/redis/v9"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
+	"github.com/kenshin579/tutorials-go/common/util"
 	"github.com/kenshin579/tutorials-go/go-concurrency/waitgroup/counter"
 	"github.com/kenshin579/tutorials-go/test/localdb"
 	"github.com/stretchr/testify/suite"
@@ -49,8 +50,16 @@ func (suite *counterTestSuite) TestCounterMutex() {
 	// 모든 CPU를 사용하도록 함
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	c := counter.CounterMutex{Num: 0} // 카운터 생성
-	wg := sync.WaitGroup{}            // WaitGroup 생성
+	c := suite.incrementParallelMutex()
+
+	suite.Equal(int64(1000), c.GetNum())
+}
+
+func (suite *counterTestSuite) incrementParallelMutex() *counter.CounterMutex {
+	defer util.Timer()("incrementParallelMutex")
+
+	c := &counter.CounterMutex{Num: 0} // 카운터 생성
+	wg := sync.WaitGroup{}             // WaitGroup 생성
 
 	// c.increment()를 실행하는 1000개의 고루틴 실행
 	for i := 0; i < 1000; i++ {
@@ -63,14 +72,22 @@ func (suite *counterTestSuite) TestCounterMutex() {
 
 	wg.Wait() // 모든 고루틴이 종료될 때 까지 대기
 
-	suite.Equal(int64(1000), c.GetNum())
+	return c
 }
 
 func (suite *counterTestSuite) TestCounterRedisLock() {
 	// 모든 CPU를 사용하도록 함
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	c := counter.CounterRedisLock{
+	c := suite.incrementParallelMutex()
+
+	suite.Equal(int64(1000), c.GetNum())
+}
+
+func (suite *counterTestSuite) incrementParallelRedislock() *counter.CounterRedisLock {
+	defer util.Timer()("incrementParallelRedislock")
+
+	c := &counter.CounterRedisLock{
 		Num:    0,
 		Locker: redislock.New(suite.redisV9Client),
 	} // 카운터 생성
@@ -86,8 +103,7 @@ func (suite *counterTestSuite) TestCounterRedisLock() {
 	}
 
 	wg.Wait() // 모든 고루틴이 종료될 때 까지 대기
-
-	suite.Equal(int64(1000), c.GetNum())
+	return c
 }
 
 func (suite *counterTestSuite) TestCounterRedSync() {
@@ -97,7 +113,15 @@ func (suite *counterTestSuite) TestCounterRedSync() {
 	pool := goredis.NewPool(suite.redisV8Client)
 	rs := redsync.New(pool)
 
-	c := counter.CounterRedSync{
+	c := suite.incrementParallelRedSync(rs)
+
+	suite.Equal(int64(1000), c.GetNum())
+}
+
+func (suite *counterTestSuite) incrementParallelRedSync(rs *redsync.Redsync) *counter.CounterRedSync {
+	defer util.Timer()("incrementParallelRedSync")
+
+	c := &counter.CounterRedSync{
 		Num:   0,
 		Mutex: rs.NewMutex("engine"),
 	}
@@ -114,6 +138,5 @@ func (suite *counterTestSuite) TestCounterRedSync() {
 	}
 
 	wg.Wait() // 모든 고루틴이 종료될 때 까지 대기
-
-	suite.Equal(int64(1000), c.GetNum())
+	return c
 }
