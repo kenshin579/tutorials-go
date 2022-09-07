@@ -66,7 +66,6 @@ func (suite *counterTestSuite) TestCounterMutex() {
 	suite.Equal(int64(1000), c.GetNum())
 }
 
-// todo: 동기화가 꺠짐
 func (suite *counterTestSuite) TestCounterRedisLock() {
 	// 모든 CPU를 사용하도록 함
 	runtime.GOMAXPROCS(runtime.NumCPU())
