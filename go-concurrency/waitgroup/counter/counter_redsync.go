@@ -1,26 +1,25 @@
 package counter
 
 import (
-	"context"
 	"fmt"
-	"time"
 
-	"github.com/bsm/redislock"
+	"github.com/go-redsync/redsync/v4"
 )
 
 type CounterRedSync struct {
-	Num int64
+	Num   int64
+	Mutex *redsync.Mutex
 }
 
 func (c *CounterRedSync) Increment() {
-	ctx := context.TODO()
-	lock, err := c.Locker.Obtain(ctx, "counter", 100*time.Millisecond, &redislock.Options{
-		RetryStrategy: redislock.LimitRetry(redislock.LinearBackoff(100*time.Millisecond), 3),
-	})
-	fmt.Println(err)
+	if err := c.Mutex.Lock(); err != nil {
+		fmt.Println(err)
+	}
+
 	c.Num += 1 // 공유데이터 변경
-	//c.Mutex.Unlock() // Num 값 변경 완료 후 뮤텍스 잠금 해제
-	lock.Release(ctx)
+	if ok, err := c.Mutex.Unlock(); !ok || err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (c *CounterRedSync) Display() {

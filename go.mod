@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.4.1
-	github.com/go-redis/redis/v8 v8.9.0
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -50,6 +50,7 @@ require (
 	github.com/bsm/redislock v0.8.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
+	github.com/go-redsync/redsync/v4 v4.5.1
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
 	github.com/testcontainers/testcontainers-go v0.13.0
@@ -122,9 +123,6 @@ require (
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opencensus.io v0.22.4 // indirect
-	go.opentelemetry.io/otel v0.20.0 // indirect
-	go.opentelemetry.io/otel/metric v0.20.0 // indirect
-	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/dig v1.10.0 // indirect
 	go.uber.org/multierr v1.5.0 // indirect

@@ -3,18 +3,31 @@ package localdb
 import (
 	"context"
 
-	"github.com/go-redis/redis/v9"
+	redislib_v8 "github.com/go-redis/redis/v8"
+	redislib_v9 "github.com/go-redis/redis/v9"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func NewRedisClient() *redis.Client {
+func NewRedisV8Client() *redislib_v8.Client {
 	endPoint, err := createMysqlTestContainer()
 	if err != nil {
 		panic(err)
 	}
 
-	client := redis.NewClient(&redis.Options{
+	client := redislib_v8.NewClient(&redislib_v8.Options{
+		Addr: endPoint,
+	})
+	return client
+}
+
+func NewRedisV9Client() *redislib_v9.Client {
+	endPoint, err := createMysqlTestContainer()
+	if err != nil {
+		panic(err)
+	}
+
+	client := redislib_v9.NewClient(&redislib_v9.Options{
 		Addr: endPoint,
 	})
 

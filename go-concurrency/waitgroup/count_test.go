@@ -8,7 +8,10 @@ import (
 	"testing"
 
 	"github.com/bsm/redislock"
-	"github.com/go-redis/redis/v9"
+	redislib_v8 "github.com/go-redis/redis/v8"
+	redislib_v9 "github.com/go-redis/redis/v9"
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"github.com/kenshin579/tutorials-go/go-concurrency/waitgroup/counter"
 	"github.com/kenshin579/tutorials-go/test/localdb"
 	"github.com/stretchr/testify/suite"
@@ -17,8 +20,9 @@ import (
 type counterTestSuite struct {
 	suite.Suite
 
-	redisClient *redis.Client
-	ctx         context.Context
+	redisV8Client *redislib_v8.Client
+	redisV9Client *redislib_v9.Client
+	ctx           context.Context
 }
 
 func TestCounterTestSuite(t *testing.T) {
@@ -28,14 +32,17 @@ func TestCounterTestSuite(t *testing.T) {
 func (suite *counterTestSuite) SetupSuite() {
 	fmt.Println("counterTestSuite started")
 
-	redisClient := localdb.NewRedisClient()
+	redisV8Client := localdb.NewRedisV8Client()
+	redisV9Client := localdb.NewRedisV9Client()
 	suite.ctx = context.TODO()
-	suite.redisClient = redisClient
+	suite.redisV8Client = redisV8Client
+	suite.redisV9Client = redisV9Client
 
 }
 
 func (suite *counterTestSuite) TearDownTest() {
-	suite.NoError(suite.redisClient.FlushAll(suite.ctx).Err())
+	suite.NoError(suite.redisV8Client.FlushAll(suite.ctx).Err())
+	suite.NoError(suite.redisV9Client.FlushAll(suite.ctx).Err())
 }
 
 func (suite *counterTestSuite) TestCounterMutex() {
@@ -66,7 +73,7 @@ func (suite *counterTestSuite) TestCounterRedisLock() {
 
 	c := counter.CounterRedisLock{
 		Num:    0,
-		Locker: redislock.New(suite.redisClient),
+		Locker: redislock.New(suite.redisV9Client),
 	} // 카운터 생성
 	wg := sync.WaitGroup{} // WaitGroup 생성
 
@@ -88,9 +95,12 @@ func (suite *counterTestSuite) TestCounterRedSync() {
 	// 모든 CPU를 사용하도록 함
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
+	pool := goredis.NewPool(suite.redisV8Client)
+	rs := redsync.New(pool)
+
 	c := counter.CounterRedSync{
-		Num:    0,
-		Locker: redislock.New(suite.redisClient),
+		Num:   0,
+		Mutex: rs.NewMutex("engine"),
 	}
 
 	wg := sync.WaitGroup{} // WaitGroup 생성
