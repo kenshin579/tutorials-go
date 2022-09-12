@@ -16,8 +16,9 @@ type CounterRedisLock struct {
 // CounterMutex 값을 1씩 증가시킴
 func (c *CounterRedisLock) Increment() {
 	ctx := context.TODO()
-	lock, _ := c.Locker.Obtain(ctx, "counter_lock_redislock", 30*time.Second, &redislock.Options{
+	lock, _ := c.Locker.Obtain(ctx, "counter_lock_redislock", 5*time.Second, &redislock.Options{
 		RetryStrategy: redislock.LimitRetry(redislock.LinearBackoff(100*time.Millisecond), 100),
+		//RetryStrategy: redislock.LimitRetry(redislock.ExponentialBackoff(100*time.Millisecond, 300*time.Millisecond), 100),
 	})
 
 	//if err != nil {

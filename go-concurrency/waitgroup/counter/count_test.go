@@ -78,7 +78,7 @@ func (suite *counterTestSuite) TestCounterRedisLock() {
 	// 모든 CPU를 사용하도록 함
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	c := suite.incrementParallelMutex()
+	c := suite.incrementParallelRedislock()
 
 	suite.Equal(int64(1000), c.GetNum())
 }
