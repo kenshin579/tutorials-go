@@ -1,4 +1,4 @@
-package waitgroup
+package counter
 
 import (
 	"context"
@@ -13,7 +13,6 @@ import (
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"github.com/kenshin579/tutorials-go/common/util"
-	"github.com/kenshin579/tutorials-go/go-concurrency/waitgroup/counter"
 	"github.com/kenshin579/tutorials-go/test/localdb"
 	"github.com/stretchr/testify/suite"
 )
@@ -55,11 +54,11 @@ func (suite *counterTestSuite) TestCounterMutex() {
 	suite.Equal(int64(1000), c.GetNum())
 }
 
-func (suite *counterTestSuite) incrementParallelMutex() *counter.CounterMutex {
+func (suite *counterTestSuite) incrementParallelMutex() *CounterMutex {
 	defer util.Timer()("incrementParallelMutex")
 
-	c := &counter.CounterMutex{Num: 0} // 카운터 생성
-	wg := sync.WaitGroup{}             // WaitGroup 생성
+	c := &CounterMutex{Num: 0} // 카운터 생성
+	wg := sync.WaitGroup{}     // WaitGroup 생성
 
 	// c.increment()를 실행하는 1000개의 고루틴 실행
 	for i := 0; i < 1000; i++ {
@@ -84,10 +83,10 @@ func (suite *counterTestSuite) TestCounterRedisLock() {
 	suite.Equal(int64(1000), c.GetNum())
 }
 
-func (suite *counterTestSuite) incrementParallelRedislock() *counter.CounterRedisLock {
+func (suite *counterTestSuite) incrementParallelRedislock() *CounterRedisLock {
 	defer util.Timer()("incrementParallelRedislock")
 
-	c := &counter.CounterRedisLock{
+	c := &CounterRedisLock{
 		Num:    0,
 		Locker: redislock.New(suite.redisV9Client),
 	} // 카운터 생성
@@ -118,10 +117,10 @@ func (suite *counterTestSuite) TestCounterRedSync() {
 	suite.Equal(int64(1000), c.GetNum())
 }
 
-func (suite *counterTestSuite) incrementParallelRedSync(rs *redsync.Redsync) *counter.CounterRedSync {
+func (suite *counterTestSuite) incrementParallelRedSync(rs *redsync.Redsync) *CounterRedSync {
 	defer util.Timer()("incrementParallelRedSync")
 
-	c := &counter.CounterRedSync{
+	c := &CounterRedSync{
 		Num:   0,
 		Mutex: rs.NewMutex("engine"),
 	}
