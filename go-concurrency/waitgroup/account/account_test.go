@@ -132,7 +132,7 @@ func (suite *accountTestSuite) updateBalanceRedSync(rs *redsync.Redsync) *Accoun
 	defer util.Timer()("updateBalanceRedSync")
 
 	a := &AccountRedSync{
-		Mutex:           rs.NewMutex("redsync_lock"),
+		Mutex:           rs.NewMutex("account_lock_redsync"),
 		CustomerBalance: map[string]int{"frank": 0, "angela": 0},
 	}
 

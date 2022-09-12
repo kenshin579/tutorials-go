@@ -122,7 +122,7 @@ func (suite *counterTestSuite) incrementParallelRedSync(rs *redsync.Redsync) *Co
 
 	c := &CounterRedSync{
 		Num:   0,
-		Mutex: rs.NewMutex("engine"),
+		Mutex: rs.NewMutex("counter_lock_redsync"),
 	}
 
 	wg := sync.WaitGroup{} // WaitGroup 생성
