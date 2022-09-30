@@ -10,8 +10,6 @@ import (
 
 	"github.com/kenshin579/tutorials-go/go-json/model"
 
-	"github.com/labstack/gommon/log"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -97,7 +95,7 @@ func Test(t *testing.T) {
 	assert.Equal(t, len(response2.StudentList), 1)
 }
 
-//https://stackoverflow.com/questions/58434023/how-to-parse-http-response-body-to-json-format-in-golang
+// https://stackoverflow.com/questions/58434023/how-to-parse-http-response-body-to-json-format-in-golang
 func TestGet의_Response_값이_Json_Array인_경우_sliceOfMap으로_decode하는_방법(t *testing.T) {
 	url := "https://skishore.github.com/inkstone/all.json"
 
@@ -115,19 +113,29 @@ func TestGet의_Response_값이_Json_Array인_경우_sliceOfMap으로_decode하�
 	fmt.Println("first item", keys[0])
 }
 
-//https://coderwall.com/p/4c2zig/decode-top-level-json-array-into-a-slice-of-structs-in-golang
+// https://coderwall.com/p/4c2zig/decode-top-level-json-array-into-a-slice-of-structs-in-golang
 func TestJson_Array를_sliceOfMap로_decode하는_방법(t *testing.T) {
 	keysBody := []byte(`[{"id": 1,"key": "-"},{"id": 2,"key": "-"},{"id": 3,"key": "-"}]`)
 	keys := make([]map[string]interface{}, 0)
 	err := json.Unmarshal(keysBody, &keys)
-	if err != nil {
-		log.Error(err)
-	}
-	fmt.Printf("%#v\n", keys)
-	fmt.Println("first item", keys[0]["id"])
+	assert.NoError(t, err)
+	assert.Equal(t, float64(1), keys[0]["id"])
 }
 
-//Dto에서 필요한 속성만 정의해서 사용하면 된다
+type idKey struct {
+	ID  float64
+	Key string
+}
+
+func TestJson_Unmarshal_ListOfStruct(t *testing.T) {
+	keysBody := []byte(`[{"id": 1,"key": "-"},{"id": 2,"key": "-"},{"id": 3,"key": "-"}]`)
+	keys := make([]idKey, 0)
+	err := json.Unmarshal(keysBody, &keys)
+	assert.NoError(t, err)
+	assert.Equal(t, float64(1), keys[0].ID)
+}
+
+// Dto에서 필요한 속성만 정의해서 사용하면 된다
 func TestJsonArray를_sliceOfStruct로_decode하는_방법(t *testing.T) {
 	courseList := getScenarioNodeFromTestJsonFile("data/array.json")
 
