@@ -55,6 +55,7 @@ require (
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
 	github.com/testcontainers/testcontainers-go v0.13.0
 	github.com/tryvium-travels/memongo v0.6.1
+	golang.org/x/exp v0.0.0-20220929160808-de9c53c655b9
 )
 
 require (
@@ -127,7 +128,6 @@ require (
 	go.uber.org/dig v1.10.0 // indirect
 	go.uber.org/multierr v1.5.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
-	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a // indirect
