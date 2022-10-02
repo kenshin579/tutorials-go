@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-//https://golangbyexample.com/channel-function-argument-go/
+// https://golangbyexample.com/channel-function-argument-go/
 func Test_Bidirectional_Channel(t *testing.T) {
 	ch := make(chan int, 3)
 	readAndWriteToChannel(ch)
@@ -23,7 +23,7 @@ func Test_Only_Write_Channel(t *testing.T) {
 	fmt.Println(<-ch)
 }
 
-func writeToChannel(ch chan<- int) {
+func writeToChannel(ch chan<- int) { // write 채널만 가능하도록 채널 방향 설정 : chan<- int
 	ch <- 2
 	//s := <-ch //reading을 할 수 없음
 }
