@@ -2,6 +2,7 @@ package go_type_assertions
 
 import (
 	"fmt"
+	"testing"
 )
 
 func Example_TypeAssertion_Empty_Interface() {
@@ -81,7 +82,7 @@ func Example_TypeAssertion_다른_인터페이스로_값을_가져온다() {
 	//1111
 }
 
-//타입 T가 인터페이스를 구현하고 있지 않기 때문에 컴파일 에러가 발생한다
+// 타입 T가 인터페이스를 구현하고 있지 않기 때문에 컴파일 에러가 발생한다
 func Example_TypeAssertion_인터페이스가_타입_T의_동적_값을_소유하지_않을_경우_컴파일_에러가_발생한다() {
 	//var p Person = Student{"Frank", 13, "1111"}
 	//value := p.(string) //impossible type assertion: string does not implement person (missing getName method)
@@ -108,4 +109,24 @@ func Example_TypeAssertion_다른_인터페이스가_타입_T를_구현하지_�
 
 	//Output:
 	//(<nil>, <nil>) false
+}
+
+type ListStudent []Student
+
+func TestTypeConversion이_안되는_케이스(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("The code did not panic")
+		}
+	}()
+
+	var studentList interface{} = []Student{
+		{
+			name: "name-1",
+			age:  10,
+		},
+	}
+
+	result := studentList.(ListStudent) //panic: interface conversion: interface {} is []go_type_assertions.Student, not go_type_assertions.ListStudent
+	fmt.Printf("result:%+v", result)
 }
