@@ -1,3 +1,4 @@
+-- https://ksqldb.io/quickstart.html
 
 -- 4. Create a stream
 CREATE STREAM riderLocations (profileId VARCHAR, latitude DOUBLE, longitude DOUBLE)
@@ -36,3 +37,6 @@ INSERT INTO riderLocations (profileId, latitude, longitude) VALUES ('4ab5cbad', 
 INSERT INTO riderLocations (profileId, latitude, longitude) VALUES ('8b6eae59', 37.3944, -122.0813);
 INSERT INTO riderLocations (profileId, latitude, longitude) VALUES ('4a7c7b41', 37.4049, -122.0822);
 INSERT INTO riderLocations (profileId, latitude, longitude) VALUES ('4ddad000', 37.7857, -122.4011);
+
+-- 9. Run a Pull query against the materialized view
+SELECT * from ridersNearMountainView WHERE distanceInMiles <= 10;
