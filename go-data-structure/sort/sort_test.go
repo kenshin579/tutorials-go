@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/kenshin579/tutorials-go/go-data-structure/sort/model"
+	"golang.org/x/exp/slices"
 )
 
 func Example_Sort_Int_Primitive_Type() {
@@ -56,14 +57,35 @@ func Example_Sort_Struct_With_Custom_Comparator() {
 	//[{David 2} {Eve 2} {Alice 23} {Bob 25}]
 }
 
-func Example_Sort_Any_Collection_By_Implementing_Sort_Interface() {
-	family := []model.Employee{
+/*
+SortFunc is generic 함수로 func 에서 index로 받지 않고 실제 객체를 인자로 받음
+- SortFunc은 1.18부터 추가됨
+*/
+func Example_SortFunc() {
+	employees := []model.Employee{
 		{"Alice", 23},
 		{"Eve", 2},
 		{"Bob", 25},
 	}
-	sort.Sort(model.ByAge(family))
-	fmt.Println(family)
+
+	slices.SortFunc(employees, func(x, y model.Employee) bool {
+		return x.Age < y.Age
+	})
+	fmt.Println(employees)
+
+	//Output:
+	//[{Eve 2} {Alice 23} {Bob 25}]
+
+}
+
+func Example_Sort_Any_Collection_By_Implementing_Sort_Interface() {
+	employees := []model.Employee{
+		{"Alice", 23},
+		{"Eve", 2},
+		{"Bob", 25},
+	}
+	sort.Sort(model.ByAge(employees))
+	fmt.Println(employees)
 	//Output:
 	//[{Eve 2} {Alice 23} {Bob 25}]
 }
