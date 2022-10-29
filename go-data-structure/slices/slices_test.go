@@ -112,10 +112,12 @@ func Example_Slice_Index() {
 	fmt.Println(a[:])  //전체 [A B C D E]
 	fmt.Println(a[2:]) //[C D E]
 	fmt.Println(a[:2]) //[A B]
+	fmt.Println(a[5:]) //[]
 	fmt.Println()
 
 	//Output:
 	//[A B C D E]
 	//[C D E]
 	//[A B]
+	//[]
 }
