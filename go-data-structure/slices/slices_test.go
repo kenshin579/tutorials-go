@@ -73,7 +73,7 @@ func isPersonIDFound(people []model.Person, deletedPersonID int) bool {
 	return false
 }
 
-//https://yourbasic.org/golang/delete-element-slice/
+// https://yourbasic.org/golang/delete-element-slice/
 func Example_Delete_Item_From_Slice_Fast_Version_Changes_Order() {
 	a := []string{"A", "B", "C", "D", "E"}
 	i := 2
@@ -106,10 +106,16 @@ func Example_Delete_Item_From_Slice_Slow_Version_Maintains_Order() {
 	//[A B D E]
 }
 
-func Example_Slice_전체() {
+// [inclusive:exclusive]
+func Example_Slice_Index() {
 	a := []string{"A", "B", "C", "D", "E"}
-	fmt.Println(a[:])
+	fmt.Println(a[:])  //전체 [A B C D E]
+	fmt.Println(a[2:]) //[C D E]
+	fmt.Println(a[:2]) //[A B]
+	fmt.Println()
 
 	//Output:
 	//[A B C D E]
+	//[C D E]
+	//[A B]
 }
