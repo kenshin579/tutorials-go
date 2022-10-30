@@ -21,6 +21,49 @@ func Example_Switch() {
 	//n is  2
 }
 
+func Example_Switch_Case_조건문에_여러_값이_있는_경우() {
+	str := "blue"
+
+	switch str {
+	case "red":
+		fmt.Println("Stop")
+	case "yellow":
+		fmt.Println("caution")
+	case "green", "blue": //OR 역할을 한다
+		fmt.Println("Go")
+	default:
+		fmt.Println("wrong")
+	}
+
+	//Output:
+	//Go
+}
+
+type Status string
+
+const (
+	StatusReady = "Ready"
+	StatusDone  = "Done"
+)
+
+func Example_Switch_Case에_() {
+	status1 := StatusReady
+	status2 := StatusDone
+
+	//if-else 처럼 사용한다
+	switch {
+	case status1 == StatusReady && status2 == StatusDone:
+		fmt.Println("ready and done")
+	case status1 == StatusReady:
+		fmt.Println("ready only")
+	default:
+		fmt.Println("no match")
+	}
+
+	//Output:
+	//ready and done
+}
+
 /*
 Fallthrough 사용하면 자바에서 break 없이 작성하는 것처럼 동작한다
 - 그냥 아래 case를 실행한다
