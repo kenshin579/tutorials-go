@@ -109,15 +109,18 @@ func Example_Delete_Item_From_Slice_Slow_Version_Maintains_Order() {
 // [inclusive:exclusive]
 func Example_Slice_Index() {
 	a := []string{"A", "B", "C", "D", "E"}
+	b := []string{"A"}
 	fmt.Println(a[:])  //전체 [A B C D E]
 	fmt.Println(a[2:]) //[C D E]
 	fmt.Println(a[:2]) //[A B]
 	fmt.Println(a[5:]) //[]
+	fmt.Println(b[1:]) //[]
 	fmt.Println()
 
 	//Output:
 	//[A B C D E]
 	//[C D E]
 	//[A B]
+	//[]
 	//[]
 }
