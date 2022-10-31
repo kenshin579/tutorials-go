@@ -1,6 +1,11 @@
 package go_switch
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 /*
 golang에서는 case 구문에 break를 넣지 않아도 된다
@@ -113,4 +118,44 @@ func Example_Fallthrough2() {
 
 	//Output:
 	//300
+}
+
+func Example() {
+	cmdTypes := []string{"type1", "type2", "type3"}
+
+	switch {
+	case containAllTypes(cmdTypes, "type1", "type2"):
+		fmt.Println("type1 & type2")
+	case containAllTypes(cmdTypes, "type1"):
+		fmt.Println("type1")
+	default:
+		fmt.Println("unknown")
+	}
+
+	//Output:
+	//type1 & type2
+}
+
+/*
+https://www.cloudhadoop.com/golang-map-type-tutorial-examples/
+*/
+func containAllTypes(cmdTypes []string, containTypes ...string) bool {
+	count := 0
+
+	typeMap := make(map[string]bool)
+	for _, x := range cmdTypes {
+		typeMap[x] = true
+	}
+
+	for _, cmdType := range containTypes {
+		if _, found := typeMap[cmdType]; found {
+			count++
+		}
+	}
+	return count == len(containTypes)
+}
+
+func Test_containAllTypes(t *testing.T) {
+	types := containAllTypes([]string{"type1", "type2", "type3"}, "type1", "type2")
+	assert.True(t, types)
 }
