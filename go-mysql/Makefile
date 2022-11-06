@@ -1,8 +1,8 @@
-DB_CONTAINER_NAME := mysql-test
-DB_NAME := mysql-test
+DB_CONTAINER_NAME := go-mysql
+DB_NAME := gomysql
 DB_USER_NAME := root
-DB_PASSWORD := mysql12
-MYSQL_VERSION=8.0.28
+DB_PASSWORD := go-mysql
+MYSQL_VERSION=8.0.31
 
 mysql-create:
 	@docker run --name $(DB_CONTAINER_NAME) \
