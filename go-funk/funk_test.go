@@ -9,7 +9,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-//https://pkg.go.dev/github.com/thoas/go-funk#Every
+// https://pkg.go.dev/github.com/thoas/go-funk#Every
 type Account struct {
 	ID       int
 	Password string
@@ -39,7 +39,8 @@ type Foo struct {
 	ZeroIntPtrValue *int
 }
 
-/**
+/*
+*
 Returns true if an element is present in a iteratee (slice, map, string).
 */
 func TestContains(t *testing.T) {
@@ -47,7 +48,8 @@ func TestContains(t *testing.T) {
 	assert.True(t, funk.ContainsInt([]int{1, 2}, 1))
 }
 
-/**
+/*
+*
 ContainsString returns true if a string is present in a iteratee.
 */
 func TestContainString(t *testing.T) {
@@ -58,7 +60,8 @@ func TestContainString(t *testing.T) {
 	assert.False(t, result)
 }
 
-/**
+/*
+*
 Every returns true if every element is present in a iteratee.
 */
 func TestEvery(t *testing.T) {
@@ -68,7 +71,8 @@ func TestEvery(t *testing.T) {
 	assert.False(t, funk.Every(strArr, "php", "c++"))
 }
 
-/**
+/*
+*
 Some returns true if atleast one element is present in an iteratee.
 */
 func TestSome(t *testing.T) {
@@ -78,7 +82,8 @@ func TestSome(t *testing.T) {
 	assert.False(t, funk.Every(strArr, "php", "c++"))
 }
 
-/**
+/*
+*
 함수 조건이 참인 값만 필터링한다
 */
 func TestFilter(t *testing.T) {
@@ -88,7 +93,8 @@ func TestFilter(t *testing.T) {
 	fmt.Println(filter)
 }
 
-/**
+/*
+*
 중복된 값은 제거하고 uniq 한 값을 반한환다
 */
 func TestUniq(t *testing.T) {
@@ -96,7 +102,8 @@ func TestUniq(t *testing.T) {
 	assert.Equal(t, []int{0, 1, 2, 3, 12}, uniq)
 }
 
-/**
+/*
+*
 2 collection에서 Interaction 값을 반환한다
 */
 func TestIntersectString(t *testing.T) {
@@ -104,14 +111,16 @@ func TestIntersectString(t *testing.T) {
 	assert.Equal(t, []string{"foo", "bar"}, result)
 }
 
-/**
+/*
+*
 맨 앞에 있는 값을 반환한다
 */
 func TestHead(t *testing.T) {
 	assert.Equal(t, 1, funk.Head([]int{1, 2, 3, 4}))
 }
 
-/**
+/*
+*
 Creates an array/slice with n elements dropped from the beginning.
 - collection에서 첫 N은 drop하고 나머지를 반환한다
 */
@@ -120,7 +129,8 @@ func TestDrop(t *testing.T) {
 	assert.Equal(t, []int{2, 3, 0, 0, 12}, drop)
 }
 
-/**
+/*
+*
 함수 조건이 참이 요소를 찾는다
 */
 func TestFind(t *testing.T) {
@@ -130,7 +140,8 @@ func TestFind(t *testing.T) {
 	assert.Equal(t, 2, find)
 }
 
-/**
+/*
+*
 Range over an iteratee (map, slice).
 */
 func TestForEach(t *testing.T) {
@@ -139,7 +150,8 @@ func TestForEach(t *testing.T) {
 	})
 }
 
-/**
+/*
+*
 Manipulates an iteratee (map, slice) and transforms it to another type:
 
 - map -> slice
@@ -180,10 +192,7 @@ func TestMap(t *testing.T) {
 
 }
 
-/**
-
- */
-func TestToMap(t *testing.T) {
+func TestToMapOfStruct(t *testing.T) {
 	f1 := Foo{
 		ID:        1,
 		FirstName: "Dark",
@@ -216,7 +225,19 @@ func TestToMap(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, result.FirstName, item.FirstName)
 	}
+}
 
+func TestMap_Chunk(t *testing.T) {
+	var elements = []string{"abc", "def", "fgi", "adi"}
+
+	elementsMap := funk.Map(
+		funk.Chunk(elements, 2),
+		func(x []string) (string, string) { // Slice to Map
+			return x[0], x[1]
+		},
+	)
+
+	fmt.Println(elementsMap)
 }
 
 func TestGet(t *testing.T) {
