@@ -1,13 +1,20 @@
+###
+GET http://localhost:8080/debug/pprof/heap
+Accept: application/json
+
+###
+GET http://localhost:8080/debug/pprof/profile
+Accept: application/json
 
 
 ###
-POST http://localhost:8080/profiles/memory
+POST http://localhost:8080/stress/memory
 Content-Type: application/json
 
 { "repeatCount": 3}
 
 ###
-POST http://localhost:8080/profiles/cpu
+POST http://localhost:8080/stress/cpu
 Content-Type: application/json
 
 { "repeatCount": 10000000}
