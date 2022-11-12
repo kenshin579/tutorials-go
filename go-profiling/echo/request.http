@@ -1,0 +1,20 @@
+
+
+###
+POST http://localhost:8080/profiles/memory
+Content-Type: application/json
+
+{ "repeatCount": 3}
+
+###
+POST http://localhost:8080/profiles/cpu
+Content-Type: application/json
+
+{ "repeatCount": 10000000}
+
+###
+GET http://localhost:8080/hello
+Accept: application/json
+
+###
+
