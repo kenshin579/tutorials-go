@@ -254,3 +254,18 @@ func TestIndexOf(t *testing.T) {
 	assert.Equal(t, 0, funk.IndexOf([]string{"hello", "world"}, "hello"))
 	assert.Equal(t, -1, funk.IndexOf([]string{"hello", "world"}, "Account"))
 }
+
+func Test_Chain(t *testing.T) {
+	ints := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	values := funk.Chain(ints).
+		Filter(func(x int) bool {
+			return x%2 == 0
+		}).
+		Map(func(x int) int {
+			return x * 2
+		}).
+		Drop(2).Value()
+
+	assert.Equal(t, []int{8, 12, 16}, values)
+}
