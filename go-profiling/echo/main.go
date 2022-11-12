@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	echopprof "github.com/sevenNt/echo-pprof"
 )
 
 type messageRequest struct {
@@ -22,9 +23,11 @@ type memoryRequest struct {
 
 func main() {
 	e := echo.New()
+	echopprof.Wrap(e)
+
 	e.GET("/hello", helloHandler)
-	e.POST("/profiles/cpu", cpuHandler)
-	e.POST("/profiles/memory", memoryHandler)
+	e.POST("/stress/cpu", cpuHandler)
+	e.POST("/stress/memory", memoryHandler)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
