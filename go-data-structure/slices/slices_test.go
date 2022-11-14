@@ -141,6 +141,7 @@ func Example_Slice_Insert_Item_At_Index_V1() {
 
 func Example_Slice_Insert_Item_At_Index_V2() {
 	a := []int{1, 3, 4, 5}
+	b := []int{1, 3, 4, 5}
 
 	index := 2
 	value := 9
@@ -149,6 +150,14 @@ func Example_Slice_Insert_Item_At_Index_V2() {
 
 	fmt.Println(a)
 
+	result := insert(b, 8, 2)
+	fmt.Println(result)
+
 	//Output:
 	//[1 3 9 4 5]
+	//[1 3 8 4 5]
+}
+
+func insert(a []int, c int, i int) []int {
+	return append(a[:i], append([]int{c}, a[i:]...)...)
 }
