@@ -124,3 +124,31 @@ func Example_Slice_Index() {
 	//[]
 	//[]
 }
+
+func Example_Slice_Insert_Item_At_Index_V1() {
+	array1 := []int{1, 3, 4, 5}
+	array2 := []int{2, 4, 6, 8}
+
+	array1 = append(array1, 0)   // Step 1
+	copy(array1[2:], array1[1:]) // Step 2
+	array1[1] = array2[2]        // Step 3
+
+	fmt.Println(array1)
+
+	//Output:
+	// [1 6 3 4 5]
+}
+
+func Example_Slice_Insert_Item_At_Index_V2() {
+	a := []int{1, 3, 4, 5}
+
+	index := 2
+	value := 9
+	a = append(a[:index+1], a[index:]...)
+	a[index] = value
+
+	fmt.Println(a)
+
+	//Output:
+	//[1 3 9 4 5]
+}
