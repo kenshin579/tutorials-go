@@ -90,7 +90,7 @@ func TestFilter(t *testing.T) {
 	filter := funk.Filter([]int{1, 2, 3, 4}, func(x int) bool {
 		return x%2 == 0
 	})
-	fmt.Println(filter)
+	assert.Equal(t, []int{2, 4}, filter)
 }
 
 /*
