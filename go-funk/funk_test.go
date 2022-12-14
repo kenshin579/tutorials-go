@@ -138,6 +138,12 @@ func TestFind(t *testing.T) {
 		return x%2 == 0
 	})
 	assert.Equal(t, 2, find)
+
+	//list에 없는 경우 nil을 반환한다
+	find = funk.Find([]int{1, 2, 3, 4}, func(x int) bool {
+		return x == 5
+	})
+	assert.Equal(t, nil, find)
 }
 
 /*
