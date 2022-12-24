@@ -1,0 +1,8 @@
+# &variable: &선언용
+# *variable: *참고하려는 값에 *를 사용하면 됨
+colors:
+  - &color1 "yellow"
+  - &color2 "green"
+
+fg_color: *color1
+bg_color: *color2
