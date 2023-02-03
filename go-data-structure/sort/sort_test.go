@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func Example_Sort_Int_Primitive_Type() {
+func Example_sortInts_Primitive_Type() {
 	list := []int{4, 2, 3, 1}
 	sort.Ints(list)
 	fmt.Println(list)
@@ -18,7 +18,7 @@ func Example_Sort_Int_Primitive_Type() {
 	// [1 2 3 4]
 }
 
-func Example_Sort_String_Primitive_Type() {
+func Example_sortStrings_Primitive_Type() {
 	list := []string{"d", "f", "a", "y", "e"}
 	sort.Strings(list)
 	fmt.Println(list)
@@ -27,7 +27,7 @@ func Example_Sort_String_Primitive_Type() {
 	// [a d e f y]
 }
 
-func Example_Sort_Floats_Primitive_Type() {
+func Example_sortFloat64s_Primitive_Type() {
 	list := []float64{3, 2, 8, 5, 4}
 	sort.Float64s(list)
 	fmt.Println(list)
@@ -36,7 +36,7 @@ func Example_Sort_Floats_Primitive_Type() {
 	// [2 3 4 5 8]
 }
 
-func Example_Sort_Struct_With_Custom_Comparator() {
+func Example_sortSliceStable_Struct_With_Custom_Comparator() {
 	employee := []struct {
 		Name string
 		Age  int
@@ -61,7 +61,7 @@ func Example_Sort_Struct_With_Custom_Comparator() {
 SortFunc is generic 함수로 func 에서 index로 받지 않고 실제 객체를 인자로 받음
 - SortFunc은 1.18부터 추가됨
 */
-func Example_SortFunc() {
+func Example_slicesSortFunc() {
 	employees := []model.Employee{
 		{"Alice", 23},
 		{"Eve", 2},
@@ -78,7 +78,7 @@ func Example_SortFunc() {
 
 }
 
-func Example_Sort_Any_Collection_By_Implementing_Sort_Interface() {
+func Example_sortSort_Any_Collection_By_Implementing_Sort_Interface() {
 	employees := []model.Employee{
 		{"Alice", 23},
 		{"Eve", 2},
@@ -90,7 +90,39 @@ func Example_Sort_Any_Collection_By_Implementing_Sort_Interface() {
 	//[{Eve 2} {Alice 23} {Bob 25}]
 }
 
-func Example_Sort_Map_By_Key_or_Value() {
+func Example_sortInts_ReverseIntSlice() {
+	numbers := []int{4, 3, 2, 1, 0, 4, 7, 5}
+
+	// sort ints ascending
+	sort.Ints(numbers)
+	fmt.Println(numbers)
+
+	// sort ints descending
+	sort.Sort(sort.Reverse(sort.IntSlice(numbers)))
+	fmt.Println(numbers)
+
+	//Output:
+	//[0 1 2 3 4 4 5 7]
+	//[7 5 4 4 3 2 1 0]
+}
+
+func Example_SliceStable_Reverse_Sort_Collection_Based_On_Index() {
+	employees := []model.Employee{
+		{"Alice", 23},
+		{"Eve", 2},
+		{"Bob", 25},
+	}
+
+	sort.SliceStable(employees, func(i, j int) bool {
+		return i > j
+	})
+	fmt.Println(employees)
+
+	//Output:
+	//[{Bob 25} {Eve 2} {Alice 23}]
+}
+
+func Example_sortStrings_Sort_Map_By_Key_or_Value() {
 	m := map[string]int{
 		"Alice": 2,
 		"Cecil": 1,
@@ -116,7 +148,7 @@ func Example_Sort_Map_By_Key_or_Value() {
 	//Cecil 1
 }
 
-func Example_Sort_Map_By_Key_or_Value2() {
+func Example_sortSliceStable_Map_By_Key_or_Value2() {
 	m := map[string]int{
 		"1100::1111": 2,
 		"1000::2222": 1,
