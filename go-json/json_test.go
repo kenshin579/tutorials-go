@@ -30,8 +30,8 @@ func ExampleJsonMarshal_Struct_To_Json_구조체_다_값이_있는_경우() {
 	jsonResponse, _ := json.MarshalIndent(response, "", "\t")
 	fmt.Println("jsonResponse", string(jsonResponse))
 
-	//Output:
-	//jsonResponse {
+	// Output:
+	// jsonResponse {
 	//	"data": 3,
 	//	"message": "this is a message",
 	//	"messageList": [
@@ -49,7 +49,7 @@ func ExampleJsonMarshal_Struct_To_Json_구조체_다_값이_있는_경우() {
 	//			"Name": "Frank1"
 	//		}
 	//	]
-	//}
+	// }
 }
 
 func ExampleJsonMarshal_Struct_To_Json_구조체_값이_다_없는_경우() {
@@ -57,12 +57,12 @@ func ExampleJsonMarshal_Struct_To_Json_구조체_값이_다_없는_경우() {
 	jsonResponse, _ := json.MarshalIndent(response, "", "\t")
 	fmt.Println("jsonResponse", string(jsonResponse))
 
-	//Output:
-	//jsonResponse {
+	// Output:
+	// jsonResponse {
 	//	"student": {
 	//		"Name": ""
 	//	}
-	//}
+	// }
 }
 
 type Student2 struct {
@@ -83,14 +83,15 @@ func ExampleJsonMarshal_Struct_To_Json_구조체_값이_다_없는_경우_구조
 	jsonResponse, _ := json.MarshalIndent(response, "", "\t")
 	fmt.Println("jsonResponse", string(jsonResponse))
 
-	//Output:
-	//jsonResponse {}
+	// Output:
+	// jsonResponse {}
 }
 
-func Test(t *testing.T) {
+func Test_Unmarshal_RawString(t *testing.T) {
 	jsonStr := `{"data": 1, "studentList": [{"Name": "Frank"}]}`
 	response2 := Response2{}
-	json.Unmarshal([]byte(jsonStr), &response2)
+	err := json.Unmarshal([]byte(jsonStr), &response2)
+	assert.NoError(t, err)
 
 	assert.Equal(t, len(response2.StudentList), 1)
 }
