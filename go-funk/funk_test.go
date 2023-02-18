@@ -139,7 +139,7 @@ func TestFind(t *testing.T) {
 	})
 	assert.Equal(t, 2, find)
 
-	//list에 없는 경우 nil을 반환한다
+	// list에 없는 경우 nil을 반환한다
 	find = funk.Find([]int{1, 2, 3, 4}, func(x int) bool {
 		return x == 5
 	})
@@ -274,4 +274,10 @@ func Test_Chain(t *testing.T) {
 		Drop(2).Value()
 
 	assert.Equal(t, []int{8, 12, 16}, values)
+}
+
+func Test_Last(t *testing.T) {
+	ints := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	assert.Equal(t, 9, funk.Last(ints))
 }
