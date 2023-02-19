@@ -1,8 +1,10 @@
 
 .PHONY: clean
-clean:
-	-rm go.sum
+	go clean
+	rm -rf bin
+
 
 .PHONY: package
-package: clean
-	go mod download
+package:
+	go mod tidy
+
