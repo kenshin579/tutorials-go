@@ -46,11 +46,13 @@ require (
 
 require (
 	github.com/Shopify/sarama v1.36.0
+	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/bsm/redislock v0.8.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/go-redsync/redsync/v4 v4.5.1
+	github.com/gomodule/redigo v1.8.2
 	github.com/itchyny/gojq v0.12.11
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
@@ -65,6 +67,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.17 // indirect
 	github.com/Microsoft/hcsshim v0.8.23 // indirect
 	github.com/acobaugh/osrelease v0.0.0-20181218015638-a93a0a55a249 // indirect
+	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -126,6 +129,7 @@ require (
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
+	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64 // indirect
 	go.opencensus.io v0.22.4 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/dig v1.10.0 // indirect
