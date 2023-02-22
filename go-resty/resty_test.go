@@ -1,6 +1,7 @@
 package go_resty
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -61,6 +62,30 @@ func Test_Execute(t *testing.T) {
 		Execute(resty.MethodPost, server.URL)
 	assert.NoError(t, err)
 	assert.Contains(t, string(resp.Body()), "message")
+}
+
+func Test_Context(t *testing.T) {
+	server := mockHttpServer(t)
+	defer server.Close()
+
+	client := resty.New()
+	client.SetBaseURL(server.URL)
+	client.OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
+		ctx := request.Context()
+		value := ctx.Value("foo").(string)
+		if value == "bar" {
+			request.SetHeader("foo", "bar")
+		}
+		return nil
+	})
+
+	ctx := context.WithValue(context.Background(), "foo", "bar")
+	resp, err := client.R().SetContext(ctx).Get("/employees")
+
+	assert.NoError(t, err)
+	assert.Contains(t, string(resp.Body()), "message")
+	assert.Equal(t, "bar", resp.Request.Header.Get("foo"))
+
 }
 
 func Test_BaseUrl(t *testing.T) {
