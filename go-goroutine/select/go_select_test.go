@@ -19,7 +19,7 @@ func Test_Select(t *testing.T) {
 	go func() {
 		for i := 0; i < 10; i++ {
 			time.Sleep(100 * time.Millisecond)
-			fmt.Println(<-c) //받을 떄까지 block
+			fmt.Println(<-c) // 받을 떄까지 block
 		}
 		quit <- 0
 	}()
@@ -30,7 +30,7 @@ func fibonacci(c, quit chan int) {
 	x, y := 0, 1
 	for {
 		select {
-		case c <- x: //channel로 데이터를 보냄
+		case c <- x: // channel로 데이터를 보냄
 			x, y = y, x+y
 		case <-quit:
 			fmt.Println("quit")
@@ -59,7 +59,7 @@ func Test_Default_Select(t *testing.T) {
 	}
 }
 
-//https://hamait.tistory.com/1017
+// https://hamait.tistory.com/1017
 func Test_Select2(t *testing.T) {
 	c1 := make(chan string)
 	c2 := make(chan string)
@@ -81,7 +81,7 @@ func Test_Select2(t *testing.T) {
 	for {
 		fmt.Println("start select-----------------")
 
-		//처널에 값이 들어올 때까지 select문에서 블록된다
+		// 처널에 값이 들어올 때까지 select문에서 블록된다
 		select {
 		case msg1 := <-c1:
 			fmt.Println("received", msg1)
@@ -89,5 +89,28 @@ func Test_Select2(t *testing.T) {
 			fmt.Println("received", msg2)
 		}
 		fmt.Println("end select-----------------")
+	}
+}
+
+// todo: 왜 deadlock이 발생하는 건가?
+func Test(t *testing.T) {
+	c1 := make(chan string)
+	c2 := make(chan string)
+
+	go func() {
+		c1 <- "Hello"
+	}()
+
+	go func() {
+		c2 <- "World"
+	}()
+
+	for {
+		select {
+		case msg1 := <-c1:
+			fmt.Println(msg1)
+		case msg2 := <-c2:
+			fmt.Println(msg2)
+		}
 	}
 }
