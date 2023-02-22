@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -69,6 +70,27 @@ func Test_BaseUrl(t *testing.T) {
 	client := resty.New()
 	fmt.Println("server.URL", server.URL)
 	client.SetBaseURL(server.URL)
+
+	resp, err := client.R().Get("/employees")
+	assert.NoError(t, err)
+	assert.Contains(t, string(resp.Body()), "message")
+}
+
+func Test_Middleware(t *testing.T) {
+	server := mockHttpServer(t)
+	defer server.Close()
+
+	client := resty.New()
+	client.SetBaseURL(server.URL)
+	client.OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
+		log.Infof("resty.OnBeforeRequest(). url:%s, body:%s", request.URL, request.Body)
+		return nil
+	})
+
+	client.OnAfterResponse(func(client *resty.Client, response *resty.Response) error {
+		log.Infof("resty.OnAfterResponse(). url:%s, body:%s", response.Request.URL, response.Body())
+		return nil
+	})
 
 	resp, err := client.R().Get("/employees")
 	assert.NoError(t, err)
