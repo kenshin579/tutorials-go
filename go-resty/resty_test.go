@@ -3,7 +3,7 @@ package go_resty
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,7 +17,7 @@ func Test_Get(t *testing.T) {
 	defer server.Close()
 
 	client := resty.New()
-	resp, err := client.R().Get(server.URL)
+	resp, err := client.R().Get(server.URL + "/employees")
 	assert.NoError(t, err)
 	assert.Contains(t, string(resp.Body()), "message")
 }
@@ -39,7 +39,7 @@ func Test_Post(t *testing.T) {
 	client := resty.New()
 	resp, err := client.R().
 		SetBody(jsonUser).
-		Post(server.URL)
+		Post(server.URL + "/users")
 	assert.NoError(t, err)
 	assert.Contains(t, string(resp.Body()), "message")
 }
@@ -62,6 +62,19 @@ func Test_Execute(t *testing.T) {
 	assert.Contains(t, string(resp.Body()), "message")
 }
 
+func Test_BaseUrl(t *testing.T) {
+	server := mockHttpServer(t)
+	defer server.Close()
+
+	client := resty.New()
+	fmt.Println("server.URL", server.URL)
+	client.SetBaseURL(server.URL)
+
+	resp, err := client.R().Get("/employees")
+	assert.NoError(t, err)
+	assert.Contains(t, string(resp.Body()), "message")
+}
+
 func mockHttpServer(t *testing.T) *httptest.Server {
 	// Create a mock HTTP server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -69,30 +82,38 @@ func mockHttpServer(t *testing.T) *httptest.Server {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 
-		if r.Method == http.MethodGet {
-			// Write the response body
-			response := `{"message": "Hello, world!"}`
-			w.Write([]byte(response))
-		} else if r.Method == http.MethodPost {
-			// Read the request body
-			requestBody, err := ioutil.ReadAll(r.Body)
-			fmt.Println("requestBody", string(requestBody))
+		fmt.Printf("request: %+v\n", r)
 
-			if err != nil {
-				t.Fatalf("Failed to read request body: %v", err)
+		switch r.URL.Path {
+		case "/employees":
+			if r.Method == http.MethodGet {
+				// Write the response body
+				response := `{"message": "Hello, world!"}`
+				w.Write([]byte(response))
 			}
+		case "/users":
+			if r.Method == http.MethodPost {
+				// Read the request body
+				requestBody, err := io.ReadAll(r.Body)
+				fmt.Println("requestBody", string(requestBody))
 
-			// Parse the request body as JSON
-			var requestBodyData map[string]interface{}
-			err = json.Unmarshal(requestBody, &requestBodyData)
-			if err != nil {
-				t.Fatalf("Failed to parse request body as JSON: %v", err)
+				if err != nil {
+					t.Fatalf("Failed to read request body: %v", err)
+				}
+
+				// Parse the request body as JSON
+				var requestBodyData map[string]interface{}
+				err = json.Unmarshal(requestBody, &requestBodyData)
+				if err != nil {
+					t.Fatalf("Failed to parse request body as JSON: %v", err)
+				}
+
+				// Write the response body
+				response := `{"message": "User created successfully"}`
+				w.Write([]byte(response))
 			}
-
-			// Write the response body
-			response := `{"message": "User created successfully"}`
-			w.Write([]byte(response))
 		}
+
 	}))
 
 	return server
