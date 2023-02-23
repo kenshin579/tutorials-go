@@ -122,11 +122,23 @@ func Test_Middleware(t *testing.T) {
 	assert.Contains(t, string(resp.Body()), "message")
 }
 
+func Test_400Error(t *testing.T) {
+	server := mockHttpServer(t)
+	defer server.Close()
+
+	client := resty.New()
+	fmt.Println("server.URL", server.URL)
+	client.SetBaseURL(server.URL)
+
+	resp, err := client.R().Get("/bad-request")
+	assert.NoError(t, err) // status 값이 BadRequest, InternalServerError이더라도 resty에서는 err를 반환하지 않음 (네트워크 오류가 발생할 때만 err를 반환하자는게 아닌가 싶음)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode())
+}
+
 func mockHttpServer(t *testing.T) *httptest.Server {
 	// Create a mock HTTP server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set the response status code and headers
-		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 
 		fmt.Printf("request: %+v\n", r)
@@ -138,6 +150,7 @@ func mockHttpServer(t *testing.T) *httptest.Server {
 				response := `{"message": "Hello, world!"}`
 				w.Write([]byte(response))
 			}
+			w.WriteHeader(http.StatusOK)
 		case "/users":
 			if r.Method == http.MethodPost {
 				// Read the request body
@@ -158,6 +171,11 @@ func mockHttpServer(t *testing.T) *httptest.Server {
 				// Write the response body
 				response := `{"message": "User created successfully"}`
 				w.Write([]byte(response))
+			}
+			w.WriteHeader(http.StatusOK)
+		case "/bad-request":
+			if r.Method == http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
 			}
 		}
 
