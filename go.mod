@@ -52,8 +52,9 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/go-redsync/redsync/v4 v4.5.1
-	github.com/gomodule/redigo v1.8.2
+	github.com/gomodule/redigo v1.8.3
 	github.com/itchyny/gojq v0.12.11
+	github.com/nitishm/go-rejson/v4 v4.1.0
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
 	github.com/testcontainers/testcontainers-go v0.13.0
