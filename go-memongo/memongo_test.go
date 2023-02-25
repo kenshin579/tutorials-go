@@ -24,7 +24,7 @@ func TestMongoTestSuite(t *testing.T) {
 }
 
 func (suite *MongoTestSuite) SetupSuite() {
-	//create mongodb
+	// create mongodb
 	suite.db = db.NewInMemoryMongoDB()
 	suite.rating = suite.db.Collection("coll_rating")
 	suite.ctx = context.TODO()
@@ -38,14 +38,6 @@ func (suite *MongoTestSuite) SetupSuite() {
 	}
 	_, err := suite.rating.InsertMany(suite.ctx, docs)
 	require.NoError(suite.T(), err)
-}
-
-func (suite *MongoTestSuite) SetupTest() {
-	fmt.Println("SetupTest")
-}
-
-func (suite *MongoTestSuite) TearDownSuite() {
-	fmt.Println("TearDownSuite")
 }
 
 func (suite *MongoTestSuite) TestQuery() {
