@@ -135,6 +135,21 @@ func Test_400Error(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode())
 }
 
+func Test_SetPathParams(t *testing.T) {
+	server := mockHttpServer(t)
+	defer server.Close()
+
+	client := resty.New().SetBaseURL(server.URL)
+
+	resp, err := client.R().
+		SetPathParams(map[string]string{
+			"employeeNo": "1",
+		}).
+		Get("/employees/{employeeNo}")
+	assert.NoError(t, err)
+	assert.Contains(t, string(resp.Body()), "Frank")
+}
+
 func mockHttpServer(t *testing.T) *httptest.Server {
 	// Create a mock HTTP server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -144,6 +159,12 @@ func mockHttpServer(t *testing.T) *httptest.Server {
 		fmt.Printf("request: %+v\n", r)
 
 		switch r.URL.Path {
+		case "/employees/1":
+			if r.Method == http.MethodGet {
+				response := `{"empNo": 1, "name":"Frank"}`
+				w.Write([]byte(response))
+			}
+			w.WriteHeader(http.StatusOK)
 		case "/employees":
 			if r.Method == http.MethodGet {
 				// Write the response body
