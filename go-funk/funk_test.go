@@ -144,6 +144,16 @@ func TestFind(t *testing.T) {
 		return x == 5
 	})
 	assert.Equal(t, nil, find)
+
+	// ok로 체크하지 않으면 interface conversion 오류 발생함
+	if account, ok := funk.Find([]Account{}, func(account Account) bool {
+		if account.ID == '3' {
+			return true
+		}
+		return false
+	}).(Account); !ok {
+		fmt.Println(account)
+	}
 }
 
 /*
