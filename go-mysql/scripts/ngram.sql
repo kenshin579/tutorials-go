@@ -16,24 +16,6 @@ SHOW GLOBAL VARIABLES LIKE '%stop%';
 # ngram token size
 SHOW GLOBAL VARIABLES LIKE 'ngram_token_size';
 
-########################################## STOPWORDS ##########################################
-# default STOPWORD 목록 보기
-SELECT *
-FROM INFORMATION_SCHEMA.INNODB_FT_DEFAULT_STOPWORD;
-
-# ngram stopword table 생성하기
-CREATE TABLE ngram_stopwords
-(
-    value VARCHAR(30)
-) ENGINE = INNODB;
-
-# INSERT INTO ngram_stopwords VALUE ('a');
-
-SELECT *
-FROM ngram_stopwords;
-
-SET GLOBAL innodb_ft_server_stopword_table = 'gomysql/ngram_stopwords';
-
 ########################################## NGRAM PARSER - NGRAM_TOKEN_SIZE=2 ##########################################
 DROP TABLE IF EXISTS articles;
 CREATE TABLE articles
@@ -139,6 +121,25 @@ WHERE MATCH(title) AGAINST('abc def');
 # index 다시 생성하기
 alter table articles
     engine = innodb;
+
+
+########################################## STOPWORDS ##########################################
+# default STOPWORD 목록 보기
+SELECT *
+FROM INFORMATION_SCHEMA.INNODB_FT_DEFAULT_STOPWORD;
+
+# ngram stopword table 생성하기
+CREATE TABLE ngram_stopwords
+(
+    value VARCHAR(30)
+) ENGINE = INNODB;
+
+# INSERT INTO ngram_stopwords VALUE ('a');
+
+SELECT *
+FROM ngram_stopwords;
+
+SET GLOBAL innodb_ft_server_stopword_table = 'gomysql/ngram_stopwords';
 
 # 참고
 # https://gywn.net/2017/04/mysql_57-ngram-ft-se/
