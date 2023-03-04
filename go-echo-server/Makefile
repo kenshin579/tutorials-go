@@ -1,6 +1,6 @@
 REGISTRY 	:= kenshin579
-APP    		:= advenoh
-TAG         := go-echo-server
+APP    		:= go-echo-server
+TAG         := v0.1
 IMAGE       := $(REGISTRY)/$(APP):$(TAG)
 
 
@@ -11,3 +11,18 @@ docker-build:
 .PHONY: docker-push
 docker-push: docker-build
 	@docker push $(IMAGE)
+
+.PHONY: clean
+	go clean
+	rm -rf bin
+
+.PHONY: package
+package:
+	go mod tidy
+
+.PHONY: swagger
+swagger:
+	@go get -d github.com/swaggo/swag/cmd/swag@v1.8.7
+	@go install github.com/swaggo/swag/cmd/swag@v1.8.7
+	@swag i --parseDepth=3 --parseDependency -g cmd/server/main.go
+	@go mod tidy
