@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kenshin579/tutorials-go/go-funk/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/thoas/go-funk"
 )
@@ -287,4 +288,40 @@ func Test_Last(t *testing.T) {
 	ints := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	assert.Equal(t, 9, funk.Last(ints))
+}
+
+func Test_Conversion_안되는_케이스(t *testing.T) {
+	nodes := []domain.Node{
+		{
+			ID:         "node-1",
+			IsOccupied: false,
+		},
+		{
+			ID:         "node-2",
+			IsOccupied: true,
+		},
+		{
+			ID:         "node-3",
+			IsOccupied: true,
+		},
+	}
+
+	filterNodes1 := funk.Filter(nodes, func(node domain.Node) bool {
+		return node.IsOccupied
+	}).([]domain.Node)
+
+	// panic: interface conversion: interface {} is []domain.Node, not domain.DomainNodes
+	// filterNodes2 := funk.Filter(nodes, func(node domain.Node) bool {
+	// 	return node.IsOccupied
+	// }).(domain.DomainNodes)
+
+	// panic: interface conversion: interface {} is []domain.Node, not model.ModelNodes
+	// filterNodes3 := funk.Filter(nodes, func(node domain.Node) bool {
+	// 	return node.IsOccupied
+	// }).(model.ModelNodes)
+
+	fmt.Println(filterNodes1)
+	// fmt.Println(filterNodes2)
+	// fmt.Println(filterNodes3)
+
 }
