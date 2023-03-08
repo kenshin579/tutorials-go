@@ -53,11 +53,8 @@ func TestContains(t *testing.T) {
 ContainsString returns true if a string is present in a iteratee.
 */
 func TestContainString(t *testing.T) {
-	result := funk.ContainsString([]string{"flo", "gilles"}, "flo")
-	assert.True(t, result)
-
-	result = funk.ContainsString([]string{"flo", "gilles"}, "alex")
-	assert.False(t, result)
+	assert.True(t, funk.ContainsString([]string{"flo", "gilles"}, "flo"))
+	assert.False(t, funk.ContainsString([]string{"flo", "gilles"}, "alex"))
 }
 
 /*
