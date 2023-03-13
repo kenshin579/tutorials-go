@@ -1,4 +1,4 @@
-package localdb
+package testcontainers
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 func NewRedisV8Client() *redislib_v8.Client {
-	endPoint, err := createMysqlTestContainer()
+	endPoint, err := startRedisContainer()
 	if err != nil {
 		panic(err)
 	}
@@ -22,7 +22,7 @@ func NewRedisV8Client() *redislib_v8.Client {
 }
 
 func NewRedisV9Client() *redislib_v9.Client {
-	endPoint, err := createMysqlTestContainer()
+	endPoint, err := startRedisContainer()
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +34,7 @@ func NewRedisV9Client() *redislib_v9.Client {
 	return client
 }
 
-func createMysqlTestContainer() (string, error) {
+func startRedisContainer() (string, error) {
 	ctx := context.Background()
 	req := testcontainers.ContainerRequest{
 		Image:        "redis:6",

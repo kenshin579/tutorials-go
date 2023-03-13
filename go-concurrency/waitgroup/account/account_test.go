@@ -13,7 +13,7 @@ import (
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"github.com/kenshin579/tutorials-go/common/util"
-	"github.com/kenshin579/tutorials-go/test/localdb"
+	"github.com/kenshin579/tutorials-go/test/testcontainers"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -32,8 +32,8 @@ func TestCounterTestSuite(t *testing.T) {
 func (suite *accountTestSuite) SetupSuite() {
 	fmt.Println("accountTestSuite started")
 
-	redisV8Client := localdb.NewRedisV8Client()
-	redisV9Client := localdb.NewRedisV9Client()
+	redisV8Client := testcontainers.NewRedisV8Client()
+	redisV9Client := testcontainers.NewRedisV9Client()
 	suite.ctx = context.TODO()
 	suite.redisV8Client = redisV8Client
 	suite.redisV9Client = redisV9Client
