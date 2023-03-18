@@ -21,6 +21,7 @@ func setup() {
 }
 
 func teardown() {
+	// client.FlushAll(context.Background())
 	client.Close()
 }
 

@@ -34,6 +34,7 @@ func getOption() *memongo.Options {
 	return opts
 }
 
+// getM1Option 옵션으로 실행할 수 있지만, background에 mongodb를 띄우고
 func getM1Option() *memongo.Options {
 	opts := &memongo.Options{
 		ShouldUseReplica: true,
