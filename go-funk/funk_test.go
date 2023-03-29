@@ -323,7 +323,6 @@ func Test_Conversion_안되는_케이스(t *testing.T) {
 	fmt.Println(filterNodes1)
 	// fmt.Println(filterNodes2)
 	// fmt.Println(filterNodes3)
-
 }
 
 func Test_Subtract_String(t *testing.T) {
