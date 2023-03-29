@@ -325,3 +325,7 @@ func Test_Conversion_안되는_케이스(t *testing.T) {
 	// fmt.Println(filterNodes3)
 
 }
+
+func Test_Subtract_String(t *testing.T) {
+	assert.Equal(t, []string{"2"}, funk.SubtractString([]string{"1", "2", "4"}, []string{"1", "3", "4"}))
+}
