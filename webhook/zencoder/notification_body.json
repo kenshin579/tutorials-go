@@ -1,0 +1,56 @@
+{
+  "job": {
+    "id": 1223480896,
+    "state": "finished",
+    "created_at": "2023-04-06T14:00:24.217Z",
+    "updated_at": "2023-04-06T14:00:35.867Z",
+    "submitted_at": "2023-04-06T14:00:24.217Z",
+    "pass_through": null,
+    "test": true
+  },
+  "outputs": [
+    {
+      "id": 4741912294,
+      "url": "https://zencoder-temp-storage-us-east-1.s3.amazonaws.com/o/20230406/3978e20b68174d340d12ff2bee61560a/8a773517765254b7543bbafd805b646d.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAI456JQ76GBU7FECA%2F20230406%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230406T140036Z&X-Amz-Expires=86399&X-Amz-SignedHeaders=host&X-Amz-Signature=e59e73f9c8ea38057b31e2cada6021f6bfed70e277ffd58f5fd47e974a7f302b",
+      "label": null,
+      "state": "finished",
+      "format": "mpeg4",
+      "type": "standard",
+      "frame_rate": 30.0,
+      "duration_in_ms": 5000,
+      "audio_sample_rate": 44100,
+      "audio_bitrate_in_kbps": 90,
+      "audio_codec": "aac",
+      "height": 720,
+      "width": 1280,
+      "file_size_in_bytes": 975327,
+      "video_codec": "h264",
+      "total_bitrate_in_kbps": 1535,
+      "channels": "2",
+      "video_bitrate_in_kbps": 1445,
+      "fragment_duration_in_ms": null,
+      "rfc_6381_video_codec": "avc1.42001f",
+      "rfc_6381_audio_codec": "mp4a.40.2",
+      "md5_checksum": null,
+      "hdr_video_range": "SDR"
+    }
+  ],
+  "input": {
+    "id": 1223438816,
+    "format": "mpeg4",
+    "frame_rate": 30.0,
+    "duration_in_ms": 5067,
+    "audio_sample_rate": 44100,
+    "audio_bitrate_in_kbps": 50,
+    "audio_codec": "aac",
+    "height": 720,
+    "width": 1280,
+    "file_size_in_bytes": 922620,
+    "video_codec": "h264",
+    "total_bitrate_in_kbps": 1452,
+    "channels": "2",
+    "video_bitrate_in_kbps": 1402,
+    "state": "finished",
+    "md5_checksum": null
+  }
+}
