@@ -1,4 +1,4 @@
-package localdb
+package testcontainers
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 func NewMongoClient() *mongo.Client {
-	endPoint, _ := createMongoTestContainer()
+	endPoint, _ := startMongoContainer()
 
 	uri := fmt.Sprintf("mongodb://%s", endPoint)
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
@@ -22,15 +22,15 @@ func NewMongoClient() *mongo.Client {
 
 }
 
-func createMongoTestContainer() (string, error) {
+func startMongoContainer() (string, error) {
 	ctx := context.Background()
 	req := testcontainers.ContainerRequest{
 		Image:        "mongo:4.4.4-bionic",
 		ExposedPorts: []string{"27017/tcp", "27018/tcp"},
-		//Env: map[string]string{
+		// Env: map[string]string{
 		//	"MONGO_INITDB_ROOT_USERNAME": "root",
 		//	"MONGO_INITDB_ROOT_PASSWORD": "example",
-		//},
+		// },
 	}
 
 	mongodbC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
