@@ -46,6 +46,7 @@ require (
 
 require (
 	github.com/Shopify/sarama v1.36.0
+	github.com/Shopify/toxiproxy/v2 v2.4.0
 	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/bsm/redislock v0.8.0
@@ -54,7 +55,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/go-redsync/redsync/v4 v4.5.1
 	github.com/gocolly/colly v1.2.0
-	github.com/gomodule/redigo v1.8.2
+	github.com/google/go-github/v42 v42.0.0
 	github.com/itchyny/gojq v0.12.11
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/redis/go-redis/v9 v9.0.2
@@ -62,6 +63,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.13.0
 	github.com/tryvium-travels/memongo v0.6.1
 	golang.org/x/exp v0.0.0-20220929160808-de9c53c655b9
+	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -94,6 +96,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
@@ -146,7 +149,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
-	google.golang.org/appengine v1.6.6 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
 )
