@@ -57,6 +57,7 @@ require (
 	github.com/gocolly/colly v1.2.0
 	github.com/google/go-github/v42 v42.0.0
 	github.com/itchyny/gojq v0.12.11
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
