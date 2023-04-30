@@ -11,7 +11,7 @@ import (
 )
 
 func Test_String_Search(t *testing.T) {
-	//Search (Contains, Prefix/Suffix, Index)
+	// Search (Contains, Prefix/Suffix, Index)
 	assert.True(t, strings.Contains("test", "st"))
 	assert.True(t, strings.ContainsAny("test", "s"))
 	assert.True(t, strings.HasPrefix("test", "te"))
@@ -21,7 +21,7 @@ func Test_String_Search(t *testing.T) {
 }
 
 func Test_String_Replace(t *testing.T) {
-	//Replace (Uppercase/Lowercase, Trim)
+	// Replace (Uppercase/Lowercase, Trim)
 	assert.Equal(t, "f00", strings.Replace("foo", "o", "0", -1))
 	assert.Equal(t, "test", strings.ToLower("TEST"))
 	assert.Equal(t, "TEST", strings.ToUpper("test"))
@@ -33,14 +33,29 @@ func Test_String_Replace(t *testing.T) {
 	assert.Equal(t, "bc", strings.Map(f, "ab"))
 }
 
+func Test_ReplaceAll(t *testing.T) {
+	str := "Hello, World!"
+	removeChars := " ,!" // characters to remove
+
+	// result := strings.ReplaceAll(str, removeChars, "") //note: this does not work
+
+	result := strings.Map(func(r rune) rune {
+		if strings.ContainsRune(removeChars, r) {
+			return -1
+		}
+		return r
+	}, str)
+	assert.Equal(t, "HelloWorld", result)
+}
+
 func Test_String_Split(t *testing.T) {
-	//Split (split, fields)
+	// Split (split, fields)
 	assert.Equal(t, []string{"a", "b", "c"}, strings.Split("a,b,c", ","))
 	assert.Equal(t, []string{"t", "e", "s", "t"}, strings.Fields("t\t   e s t"))
 }
 
 func Test_String_Concatenate(t *testing.T) {
-	//Concatenate (+, Sprintf, builder)
+	// Concatenate (+, Sprintf, builder)
 	assert.Equal(t, "hello world", "hello"+" world")
 	assert.Equal(t, "data: 123", fmt.Sprintf("%s %d", "data:", 123))
 	assert.Equal(t, "3.1416", fmt.Sprintf("%.4f", math.Pi))
@@ -54,13 +69,13 @@ func Test_String_Concatenate(t *testing.T) {
 }
 
 func Test_String_Join(t *testing.T) {
-	//Join (Join, Repeat)
+	// Join (Join, Repeat)
 	assert.Equal(t, "a-b", strings.Join([]string{"a", "b"}, "-"))
 	assert.Equal(t, "AAAAA", strings.Repeat("A", 5))
 }
 
 func Test_String_Format(t *testing.T) {
-	//Format, Convert (strconv)
+	// Format, Convert (strconv)
 	assert.Equal(t, "23", strconv.Itoa(23))
 	assert.Equal(t, "ff", strconv.FormatInt(255, 16))
 
