@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kenshin579/tutorials-go/go-data-structure/sort/model"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,20 +21,27 @@ func Test_cache(t *testing.T) {
 	c.Set("test3", "value3", 5*time.Second)
 	c.Set("test4", "value4", cache.NoExpiration)
 	c.Set("test5", "value5", cache.NoExpiration)
+	c.Set("test6", model.Employee{Name: "frank", Age: 20}, cache.NoExpiration)
 
-	sleepInSec(11)
+	sleepInSec(12)
 
 	// Set the value of the key "baz" to 42, with no expiration time
 	// (the item won't be removed until it is re-set, or removed using
 	c.Delete("test4")
 
 	// Get the string associated with the key "foo" from the cache
+	_, found := c.Get("test2")
+	assert.False(t, found)
+
 	value5, found := c.Get("test5")
 	assert.True(t, found)
 	assert.Equal(t, "value5", value5)
 
-	_, found = c.Get("test2")
-	assert.False(t, found)
+	value6, found := c.Get("test6")
+	assert.True(t, found)
+	employee := value6.(model.Employee)
+	assert.Equal(t, employee.Name, "frank")
+	assert.Equal(t, employee.Age, 20)
 }
 
 func sleepInSec(sleepTime int) {
