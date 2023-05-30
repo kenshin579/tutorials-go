@@ -66,6 +66,7 @@ require (
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
 	github.com/testcontainers/testcontainers-go v0.13.0
 	github.com/tryvium-travels/memongo v0.6.1
+	github.com/wI2L/jettison v0.7.4
 	golang.org/x/exp v0.0.0-20220929160808-de9c53c655b9
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	gopkg.in/yaml.v2 v2.4.0
