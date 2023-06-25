@@ -328,3 +328,11 @@ func Test_Conversion_안되는_케이스(t *testing.T) {
 func Test_Subtract_String(t *testing.T) {
 	assert.Equal(t, []string{"2"}, funk.SubtractString([]string{"1", "2", "4"}, []string{"1", "3", "4"}))
 }
+
+func Test_Merge_Slices_With_Duplicates(t *testing.T) {
+	arr1 := []string{"a", "b"}
+	arr2 := []string{"a", "c"}
+
+	result := funk.Uniq(append(arr1, arr2...)).([]string)
+	assert.Equal(t, []string{"a", "b", "c"}, result)
+}
