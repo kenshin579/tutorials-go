@@ -43,7 +43,7 @@ func getUser(c echo.Context) error {
 func main() {
 	ringOpt := &redis.RingOptions{
 		Addrs: map[string]string{
-			"stock-api.advenoh.pe.kr": ":16379",
+			"localhost": ":16379",
 		},
 	}
 
