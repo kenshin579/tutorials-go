@@ -1,4 +1,4 @@
-package inmemory
+package test
 
 import (
 	"github.com/alicebob/miniredis/v2"

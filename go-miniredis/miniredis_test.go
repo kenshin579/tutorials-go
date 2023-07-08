@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/kenshin579/tutorials-go/test/inmemory"
+	"github.com/kenshin579/tutorials-go/test"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -26,7 +26,7 @@ func TestMiniRedisTestSuite(t *testing.T) {
 func (suite *miniRedisTestSuite) SetupSuite() {
 	suite.ctx = context.Background()
 
-	server, client := inmemory.NewRedisDB()
+	server, client := test.NewRedisDB()
 	suite.rediServer = server
 	suite.redisClient = client
 
