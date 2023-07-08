@@ -48,6 +48,7 @@ require github.com/akamensky/argparse v1.3.1
 
 require (
 	github.com/Shopify/sarama v1.36.0
+	github.com/SporkHubr/echo-http-cache v0.0.0-20200706100054-1d7ae9f38029
 	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/bsm/redislock v0.8.0

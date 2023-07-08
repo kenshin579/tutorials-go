@@ -15,15 +15,27 @@ type Object struct {
 	Num int
 }
 
+func ExampleNewClient() {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	pong, err := rdb.Ping(context.Background()).Result()
+	fmt.Println(pong, err)
+	// Output: PONG <nil>
+}
+
 func Example_basicUsage() {
-	ring := redis.NewRing(&redis.RingOptions{
-		Addrs: map[string]string{
-			"localhost": ":6379",
-		},
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
 	})
 
 	mycache := cache.New(&cache.Options{
-		Redis:      ring,
+		Redis:      rdb,
 		LocalCache: cache.NewTinyLFU(10, time.Minute),
 	})
 
@@ -52,14 +64,14 @@ func Example_basicUsage() {
 }
 
 func Example_advancedUsage() {
-	ring := redis.NewRing(&redis.RingOptions{
-		Addrs: map[string]string{
-			"localhost": ":6379",
-		},
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
 	})
 
 	mycache := cache.New(&cache.Options{
-		Redis:      ring,
+		Redis:      rdb,
 		LocalCache: cache.NewTinyLFU(10, time.Minute),
 	})
 
