@@ -2,10 +2,13 @@ package go_cache_redis
 
 import (
 	"context"
-	"fmt"
+	"testing"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
+	"github.com/kenshin579/tutorials-go/test"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/go-redis/cache/v8"
 )
@@ -15,81 +18,98 @@ type Object struct {
 	Num int
 }
 
-func ExampleNewClient() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
-
-	pong, err := rdb.Ping(context.Background()).Result()
-	fmt.Println(pong, err)
-	// Output: PONG <nil>
+type cacheRedisTestSuite struct {
+	suite.Suite
+	ctx       context.Context
+	miniredis *miniredis.Miniredis
 }
 
-func Example_basicUsage() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
-
-	mycache := cache.New(&cache.Options{
-		Redis:      rdb,
-		LocalCache: cache.NewTinyLFU(10, time.Minute),
-	})
-
-	ctx := context.TODO()
-	key := "mykey"
-	obj := &Object{
-		Str: "mystring",
-		Num: 42,
-	}
-
-	if err := mycache.Set(&cache.Item{
-		Ctx:   ctx,
-		Key:   key,
-		Value: obj,
-		TTL:   time.Hour,
-	}); err != nil {
-		panic(err)
-	}
-
-	var wanted Object
-	if err := mycache.Get(ctx, key, &wanted); err == nil {
-		fmt.Println(wanted)
-	}
-
-	// Output: {mystring 42}
+func TestRedisStoreSuite(t *testing.T) {
+	suite.Run(t, new(cacheRedisTestSuite))
+}
+func (suite *cacheRedisTestSuite) SetupSuite() {
+	suite.ctx = context.Background()
+	db, _ := test.NewRedisDB()
+	suite.miniredis = db
 }
 
-func Example_advancedUsage() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+func (suite *cacheRedisTestSuite) TearDownSuite() {
+	suite.miniredis.Close()
+}
+
+func (suite *cacheRedisTestSuite) Test() {
+	suite.Run("Ping", func() {
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     suite.miniredis.Addr(),
+			Password: "",
+			DB:       0,
+		})
+
+		pong, err := rdb.Ping(suite.ctx).Result()
+		suite.NoError(err)
+		suite.Equal("PONG", pong)
 	})
 
-	mycache := cache.New(&cache.Options{
-		Redis:      rdb,
-		LocalCache: cache.NewTinyLFU(10, time.Minute),
+	suite.Run("Basic Usage", func() {
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     suite.miniredis.Addr(),
+			Password: "",
+			DB:       0,
+		})
+
+		mycache := cache.New(&cache.Options{
+			Redis:      rdb,
+			LocalCache: cache.NewTinyLFU(10, time.Minute),
+		})
+
+		ctx := context.TODO()
+		key := "mykey"
+		obj := &Object{
+			Str: "mystring",
+			Num: 42,
+		}
+
+		if err := mycache.Set(&cache.Item{
+			Ctx:   ctx,
+			Key:   key,
+			Value: obj,
+			TTL:   time.Hour,
+		}); err != nil {
+			panic(err)
+		}
+
+		var wanted Object
+		err := mycache.Get(ctx, key, &wanted)
+		suite.NoError(err)
+		suite.Equal(Object{Str: "mystring", Num: 42}, wanted)
+
 	})
 
-	obj := new(Object)
-	err := mycache.Once(&cache.Item{
-		Key:   "mykey",
-		Value: obj, // destination
-		Do: func(*cache.Item) (interface{}, error) {
-			return &Object{
-				Str: "mystring",
-				Num: 42,
-			}, nil
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(obj)
+	suite.Run("Advanced Usage", func() {
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     suite.miniredis.Addr(),
+			Password: "",
+			DB:       0,
+		})
 
-	// Output: &{mystring 42}
+		mycache := cache.New(&cache.Options{
+			Redis:      rdb,
+			LocalCache: cache.NewTinyLFU(10, time.Minute),
+		})
+
+		obj := new(Object)
+		err := mycache.Once(&cache.Item{
+			Key:   "mykey",
+			Value: obj, // destination
+			Do: func(*cache.Item) (interface{}, error) {
+				return &Object{
+					Str: "mystring",
+					Num: 42,
+				}, nil
+			},
+		})
+		suite.NoError(err)
+
+		suite.Equal(&Object{Str: "mystring", Num: 42}, obj)
+	})
 }
