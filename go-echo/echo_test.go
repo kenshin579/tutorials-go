@@ -1,6 +1,7 @@
 package go_echo
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -62,6 +63,50 @@ func TestEchoServeHTTPPathEncoding(t *testing.T) {
 			assert.Equal(t, tc.expectURL, rec.Body.String())
 		})
 	}
+}
+
+func Test_Echo_Middleware(t *testing.T) {
+	e := echo.New()
+	buf := new(bytes.Buffer)
+
+	e.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			assert.Empty(t, c.Path())
+			buf.WriteString("-1")
+			return next(c)
+		}
+	})
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			buf.WriteString("1")
+			return next(c)
+		}
+	})
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			buf.WriteString("2")
+			return next(c)
+		}
+	})
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			buf.WriteString("3")
+			return next(c)
+		}
+	})
+
+	// Route
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "OK")
+	})
+
+	c, b := request(http.MethodGet, "/", e)
+	assert.Equal(t, "-1123", buf.String())
+	assert.Equal(t, http.StatusOK, c)
+	assert.Equal(t, "OK", b)
 }
 
 func request(method, path string, e *echo.Echo) (int, string) {
