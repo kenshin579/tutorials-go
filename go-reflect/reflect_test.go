@@ -2,6 +2,7 @@ package go_reflect
 
 import (
 	"container/list"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -246,7 +247,7 @@ func LoopObjectField(object interface{}) {
 	}
 }
 
-func Test_ValidateEmptyStruct(t *testing.T) {
+func Test_isAllFieldEmptyForStruct(t *testing.T) {
 	type person struct {
 		Name    string `json:"name"`
 		Age     int    `json:"age"`
@@ -281,6 +282,10 @@ func Test_ValidateEmptyStruct(t *testing.T) {
 	assert.False(t, isAllFieldEmpty(p1))
 	assert.True(t, isAllFieldEmpty(p2))
 	assert.True(t, isAllFieldEmpty(p3))
+	assert.False(t, isAllFieldEmpty([]byte(`{"a":"","b":"","c":1}`)))
+	assert.False(t, isAllFieldEmpty([]byte(`{"a":"","b":"b","c":0}`)))
+	assert.True(t, isAllFieldEmpty([]byte(`{"a":"","b":"","c":0}`)))
+	assert.True(t, isAllFieldEmpty([]byte(`{"a":"","b":"","c":0.0}`)))
 }
 
 func isAllFieldEmpty(inter any) bool {
@@ -289,16 +294,49 @@ func isAllFieldEmpty(inter any) bool {
 		return true
 	}
 
-	if val.Kind() != reflect.Struct {
-		return false
-	}
-
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		if !field.IsZero() {
+	switch val.Kind() {
+	case reflect.Struct:
+		for i := 0; i < val.NumField(); i++ {
+			field := val.Field(i)
+			zeroValue := reflect.Zero(field.Type())
+			if reflect.DeepEqual(field.Interface(), zeroValue.Interface()) {
+				continue
+			}
 			return false
 		}
+	case reflect.Slice:
+		var dataMap map[string]any
+
+		if err := json.Unmarshal(inter.([]byte), &dataMap); err != nil {
+			fmt.Printf("fail to unmarshal json. err:%v\n", err)
+			return false
+		}
+		return isMapEmpty(dataMap)
 	}
 
+	return true
+}
+
+func isMapEmpty(m map[string]any) bool {
+	for _, v := range m {
+		switch val := v.(type) {
+		case string:
+			if val != "" {
+				return false
+			}
+		case int:
+			if val != 0 {
+				return false
+			}
+		case float64:
+			if val != 0 {
+				return false
+			}
+		case bool:
+			if val == false {
+				return false
+			}
+		}
+	}
 	return true
 }
