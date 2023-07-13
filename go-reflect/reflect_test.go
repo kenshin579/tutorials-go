@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kenshin579/tutorials-go/go-reflect/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func Example_Type_Value_정보_확인() {
@@ -28,11 +29,11 @@ func Example_Type_Value_정보_확인() {
 	fmt.Printf("y: %v(%v)\n", reflect.ValueOf(foo.y).Float(), reflect.TypeOf(foo.y))
 	fmt.Printf("z: %v(%v)\n", reflect.ValueOf(foo.z).String(), reflect.TypeOf(foo.z))
 
-	//Output:
-	//foo: {1 1 str}(go_reflect.Foo)
-	//x: 1(int)
-	//y: 1(float64)
-	//z: str(string)
+	// Output:
+	// foo: {1 1 str}(go_reflect.Foo)
+	// x: 1(int)
+	// y: 1(float64)
+	// z: str(string)
 }
 
 func Example_Struct_Type_Value_메타_정보_확인() {
@@ -54,52 +55,52 @@ func Example_Struct_Type_Value_메타_정보_확인() {
 		fmt.Println(fId.Type, fId.Name, fId.Tag)
 	}
 
-	//Output:
-	//string Title json:"title" validate:"required"
-	//string Body json:"body" validate:"required"
+	// Output:
+	// string Title json:"title" validate:"required"
+	// string Body json:"body" validate:"required"
 }
 
 func Example_Value_변경() {
 	languages := []string{"golang", "java", "c++"}
 	sliceValue := reflect.ValueOf(languages)
 	value := sliceValue.Index(1)
-	value.SetString("ruby") //값 변경을 함
+	value.SetString("ruby") // 값 변경을 함
 	fmt.Println(languages)
 
 	x := 1
-	if v := reflect.ValueOf(x); v.CanSet() { //CanSet으로 변경 가능한 값인지 확인함
+	if v := reflect.ValueOf(x); v.CanSet() { // CanSet으로 변경 가능한 값인지 확인함
 		v.SetInt(2) // 호출되지 않음
 	}
 
 	fmt.Println(x) // 1
 
-	v := reflect.ValueOf(&x) //pointer
-	p := v.Elem()            //Elem() 메서드를 사용하여 값의 주소레 접근하여 다른 값으로 변경함
+	v := reflect.ValueOf(&x) // pointer
+	p := v.Elem()            // Elem() 메서드를 사용하여 값의 주소레 접근하여 다른 값으로 변경함
 	p.SetInt(3)
 	fmt.Println(x)
 
-	//Output:
-	//[golang ruby c++]
-	//1
-	//3
+	// Output:
+	// [golang ruby c++]
+	// 1
+	// 3
 
 }
 
 func Example_Method_동적_호출() {
 	caption := "go is an open source programming language"
-	//1. TitleCase를 바로 호출
+	// 1. TitleCase를 바로 호출
 	title := TitleCase(caption)
 	fmt.Println(title)
 
-	//2. TitleCase를 동적으로 호출
+	// 2. TitleCase를 동적으로 호출
 	titleFuncValue := reflect.ValueOf(TitleCase)
 	values := titleFuncValue.Call([]reflect.Value{reflect.ValueOf(caption)})
 	title = values[0].String()
 	fmt.Println(title)
 
-	//Output:
-	//Go Is An Open Source Programming Language
-	//Go Is An Open Source Programming Language
+	// Output:
+	// Go Is An Open Source Programming Language
+	// Go Is An Open Source Programming Language
 }
 
 func TitleCase(s string) string {
@@ -117,8 +118,8 @@ func Example_Len() {
 
 	fmt.Println(Len(list1), Len(list2), Len(mapStringInt), Len(str), Len(sliceInt))
 
-	//Output:
-	//0 1 2 3 4
+	// Output:
+	// 0 1 2 3 4
 }
 
 func Len(x interface{}) int {
@@ -128,7 +129,7 @@ func Len(x interface{}) int {
 		return value.Len()
 	default:
 		if method := value.MethodByName("Len"); method.IsValid() {
-			values := method.Call(nil) //Len 메서드를 동적으로 호출함
+			values := method.Call(nil) // Len 메서드를 동적으로 호출함
 			return int(values[0].Int())
 		}
 	}
@@ -143,19 +144,19 @@ func Example_구조체_필드_순회하기() {
 	}
 	IterateStructField(cat)
 
-	//Output:
-	//Name: Name / Type: string / Value: nabi / Tag: name
-	//Name: Age / Type: int / Value: 5 / Tag: age
-	//Name: Child / Type: []string / Value: [nyang kong] / Tag: child
+	// Output:
+	// Name: Name / Type: string / Value: nabi / Tag: name
+	// Name: Age / Type: int / Value: 5 / Tag: age
+	// Name: Child / Type: []string / Value: [nyang kong] / Tag: child
 }
 
 func IterateStructField(object interface{}) {
 	elem := reflect.ValueOf(object).Elem()
 	fieldNum := elem.NumField()
 	for i := 0; i < fieldNum; i++ {
-		field := elem.Field(i)            //field
-		fieldType := elem.Type().Field(i) //field type
-		fieldValue := field.Interface()   //field value 값
+		field := elem.Field(i)            // field
+		fieldType := elem.Type().Field(i) // field type
+		fieldValue := field.Interface()   // field value 값
 		tag := fieldType.Tag.Get("custom")
 
 		fmt.Printf("Name: %s / Type: %s / Value: %v / Tag: %s\n",
@@ -163,7 +164,7 @@ func IterateStructField(object interface{}) {
 	}
 }
 
-//todo: 여기서 부터 다시 하면 됨
+// todo: 여기서 부터 다시 하면 됨
 func Test_타입을_통해_구조체_생성(t *testing.T) {
 	cat := model.Cat{
 		Name:  "nabi",
@@ -185,7 +186,7 @@ func createStructFromType(object interface{}) interface{} {
 	return reflect.New(e).Elem().Interface()
 }
 
-//http://pyrasis.com/book/GoForTheReallyImpatient/Unit36
+// http://pyrasis.com/book/GoForTheReallyImpatient/Unit36
 func Test_Reflect_Method에_대한_설명(t *testing.T) {
 	var f float64 = 1.3
 	typ := reflect.TypeOf(f)  // f의 타입 정보를 typ에 저장
@@ -208,7 +209,7 @@ func Test_Reflect_Method에_대한_설명(t *testing.T) {
 	fmt.Println(val.Float()) // 1.3: 값을 실수형으로 출력
 }
 
-//https://cjwoov.tistory.com/16
+// https://cjwoov.tistory.com/16
 type Cat struct {
 	Name  string   `custom:"name"`
 	Age   int      `custom:"age"`
@@ -243,4 +244,61 @@ func LoopObjectField(object interface{}) {
 			fmt.Printf("childStr:%v\n", childStr)
 		}
 	}
+}
+
+func Test_ValidateEmptyStruct(t *testing.T) {
+	type person struct {
+		Name    string `json:"name"`
+		Age     int    `json:"age"`
+		Address struct {
+			City string `json:"city"`
+			Zip  int    `json:"zip"`
+		} `json:"address"`
+	}
+
+	p1 := person{
+		Address: struct {
+			City string `json:"city"`
+			Zip  int    `json:"zip"`
+		}{
+			City: "seoul",
+		},
+	}
+
+	p2 := person{}
+	p3 := person{
+		Name: "",
+		Age:  0,
+		Address: struct {
+			City string `json:"city"`
+			Zip  int    `json:"zip"`
+		}{
+			City: "",
+			Zip:  0,
+		},
+	}
+
+	assert.False(t, isAllFieldEmpty(p1))
+	assert.True(t, isAllFieldEmpty(p2))
+	assert.True(t, isAllFieldEmpty(p3))
+}
+
+func isAllFieldEmpty(inter any) bool {
+	val := reflect.ValueOf(inter)
+	if val.IsZero() {
+		return true
+	}
+
+	if val.Kind() != reflect.Struct {
+		return false
+	}
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		if !field.IsZero() {
+			return false
+		}
+	}
+
+	return true
 }
