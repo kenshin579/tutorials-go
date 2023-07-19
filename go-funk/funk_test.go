@@ -65,6 +65,7 @@ Every returns true if every element is present in a iteratee.
 func TestEvery(t *testing.T) {
 	strArr := []string{"go", "java", "c", "python"}
 	assert.True(t, funk.Every(strArr, "go", "c"))
+	assert.True(t, funk.Every(strArr, "go", "c"))
 	assert.False(t, funk.Every(strArr, "php", "go"))
 	assert.False(t, funk.Every(strArr, "php", "c++"))
 }
@@ -335,4 +336,10 @@ func Test_Merge_Slices_With_Duplicates(t *testing.T) {
 
 	result := funk.Uniq(append(arr1, arr2...)).([]string)
 	assert.Equal(t, []string{"a", "b", "c"}, result)
+}
+
+func Test_Subset(t *testing.T) {
+	assert.True(t, funk.Subset([]int{1, 2, 4}, []int{1, 2, 3, 4, 5}))
+
+	assert.False(t, funk.Subset([]int{1, 2, 3, 4, 5}, []int{1, 2, 4}))
 }
