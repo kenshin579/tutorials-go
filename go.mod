@@ -48,7 +48,6 @@ require github.com/akamensky/argparse v1.3.1
 
 require (
 	github.com/Shopify/sarama v1.36.0
-	github.com/SporkHubr/echo-http-cache v0.0.0-20200706100054-1d7ae9f38029
 	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/bsm/redislock v0.8.0
@@ -67,6 +66,7 @@ require (
 	github.com/square/mongo-lock v0.0.0-20220601164918-701ecf357cd7
 	github.com/testcontainers/testcontainers-go v0.13.0
 	github.com/tryvium-travels/memongo v0.6.1
+	github.com/wI2L/jettison v0.7.4
 	golang.org/x/exp v0.0.0-20220929160808-de9c53c655b9
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	gopkg.in/yaml.v2 v2.4.0
