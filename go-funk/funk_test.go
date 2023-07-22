@@ -65,7 +65,6 @@ Every returns true if every element is present in a iteratee.
 func TestEvery(t *testing.T) {
 	strArr := []string{"go", "java", "c", "python"}
 	assert.True(t, funk.Every(strArr, "go", "c"))
-	assert.True(t, funk.Every(strArr, "go", "c"))
 	assert.False(t, funk.Every(strArr, "php", "go"))
 	assert.False(t, funk.Every(strArr, "php", "c++"))
 }
