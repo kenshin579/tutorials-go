@@ -7,7 +7,7 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
-	"github.com/kenshin579/tutorials-go/test"
+	"github.com/kenshin579/tutorials-go/test/inmemory"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/go-redis/cache/v8"
@@ -29,7 +29,7 @@ func TestRedisStoreSuite(t *testing.T) {
 }
 func (suite *cacheRedisTestSuite) SetupSuite() {
 	suite.ctx = context.Background()
-	db, _ := test.NewRedisDB()
+	db, _ := inmemory.NewRedisDB()
 	suite.miniredis = db
 }
 

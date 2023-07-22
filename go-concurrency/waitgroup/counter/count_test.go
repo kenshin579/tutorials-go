@@ -13,7 +13,7 @@ import (
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"github.com/kenshin579/tutorials-go/common/util"
-	"github.com/kenshin579/tutorials-go/test"
+	"github.com/kenshin579/tutorials-go/test/testcontainers"
 	lock "github.com/square/mongo-lock"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,9 +36,9 @@ func TestCounterTestSuite(t *testing.T) {
 func (suite *counterTestSuite) SetupSuite() {
 	fmt.Println("counterTestSuite started")
 
-	redisV8Client := test.NewRedisV8Client()
-	redisV9Client := test.NewRedisV9Client()
-	mongoClient := test.NewMongoClient()
+	redisV8Client := testcontainers.NewRedisV8Client()
+	redisV9Client := testcontainers.NewRedisV9Client()
+	mongoClient := testcontainers.NewMongoClient()
 
 	suite.ctx = context.TODO()
 	suite.redisV8Client = redisV8Client

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	redislib_v9 "github.com/go-redis/redis/v9"
-	"github.com/kenshin579/tutorials-go/test"
+	"github.com/kenshin579/tutorials-go/test/testcontainers"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -21,7 +21,7 @@ func TestRedisTestSuite(t *testing.T) {
 }
 
 func (suite *redisTestContainerTestSuite) SetupSuite() {
-	redisV9Client := test.NewRedisV9Client()
+	redisV9Client := testcontainers.NewRedisV9Client()
 	suite.ctx = context.Background()
 	suite.redisV9Client = redisV9Client
 
