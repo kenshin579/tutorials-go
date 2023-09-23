@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 	"github.com/stretchr/testify/suite"
 )
@@ -62,8 +63,40 @@ func (suite *chromedpTestSuite) Test_Chromedp() {
 			fmt.Printf("node: %s | href = %s\n", n.LocalName, u)
 		}
 	})
-}
 
-func Test_Tag_Checks(t *testing.T) {
+	suite.Run("Tag Exists", func() {
+		// Create a new tab
+		taskCtx, taskCancel := chromedp.NewContext(suite.ctx)
+		defer taskCancel()
 
+		selector := `"#js-category-content > div.js-symbol-page-tab-overview-root > div > section > div:nth-child(3) > div.content-gdSWdaJr > div.container-GRoarMHL > div:nth-child(1) > div.wrapper-GgmpMpKr > a > div"`
+		pageURL := "https://www.tradingview.com/symbols/KRX-069620/"
+
+		const expr = `(function(d, sel) {
+		var element = d.querySelector(sel);
+        return !!element;
+	})(document, %s);`
+
+		err := chromedp.Run(taskCtx, chromedp.Tasks{
+			chromedp.Navigate(pageURL),
+			chromedp.WaitReady("body"),
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				s := fmt.Sprintf(expr, selector)
+				result, exp, err := runtime.Evaluate(s).Do(ctx)
+				fmt.Printf("result:%s, exp:%v, err:%v\n", result.Value, exp, err)
+				if err != nil {
+					return err
+				}
+
+				if exp != nil {
+					return exp
+				}
+				return nil
+			}),
+		})
+		if err != nil {
+			suite.T().Fatal(err)
+		}
+
+	})
 }
