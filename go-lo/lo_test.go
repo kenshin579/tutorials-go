@@ -104,6 +104,20 @@ func Test_Supported_helpers_for_slices(t *testing.T) {
 
 		assert.Equal(t, map[string]int{"apple": 1, "banana": 2}, aMap)
 	})
+
+	t.Run("SliceToMap", func(t *testing.T) {
+		type foo struct {
+			baz string
+			bar int
+		}
+		in := []*foo{{baz: "apple", bar: 1}, {baz: "banana", bar: 2}}
+
+		aMap := lo.SliceToMap(in, func(f *foo) (string, int) {
+			return f.baz, f.bar
+		})
+
+		assert.Equal(t, map[string]int{"apple": 1, "banana": 2}, aMap)
+	})
 }
 
 func Test_Supported_helpers_for_intersection(t *testing.T) {
