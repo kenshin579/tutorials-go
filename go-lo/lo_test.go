@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"testing"
 
 	"github.com/samber/lo"
 	lop "github.com/samber/lo/parallel"
 	"github.com/stretchr/testify/assert"
-
-	"testing"
 )
 
 // https://github.com/samber/lo
@@ -196,6 +195,19 @@ func Test_Searching_helpers(t *testing.T) {
 		assert.False(t, ok)
 	})
 
+}
+
+func Test_MaxBy(t *testing.T) {
+	type foo struct {
+		id    int
+		value int
+	}
+
+	result := lo.MaxBy([]foo{{id: 1, value: 10}, {id: 3, value: 30}, {id: 2, value: 20}}, func(item foo, max foo) bool {
+		return item.value > max.value
+	})
+
+	assert.Equal(t, 30, result.value)
 }
 
 func Test_Supported_helpers_for_maps(t *testing.T) {
