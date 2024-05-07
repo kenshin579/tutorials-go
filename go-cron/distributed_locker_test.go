@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const lockKey = "gocron:redislock:%s"
+const lockKey = "gocron:lock:%s"
 
 var (
 	ErrFailedToObtainLock  = errors.New("gocron: failed to obtain lock")
