@@ -26,7 +26,7 @@ type RedisLocker struct {
 }
 
 func (r *RedisLocker) Lock(ctx context.Context, key string) (gocron.Lock, error) {
-	fmt.Printf("[FRANK] Lock. key:%s\n", key)
+	fmt.Printf("Lock. key:%s\n", key)
 
 	redisKey := fmt.Sprintf(lockKey, key)
 	lock, err := r.client.Obtain(ctx, redisKey, 100*time.Millisecond, &redislock.Options{
@@ -44,7 +44,7 @@ type RedisLock struct {
 }
 
 func (r *RedisLock) Unlock(ctx context.Context) error {
-	fmt.Printf("[FRANK] Unlock\n")
+	fmt.Printf("Unlock\n")
 	if err := r.lock.Release(ctx); err != nil {
 		return ErrFailedToReleaseLock
 	}
@@ -94,7 +94,7 @@ func Test_DistributedLockerWithRedis(t *testing.T) {
 			)
 
 			assert.NoError(t, err)
-			fmt.Printf("%d.job: %v\n", i, job.Name())
+			fmt.Printf("%d. jobName: %v\n", i, job.Name())
 
 			scheduler.Start()
 			schedulers = append(schedulers, scheduler)
