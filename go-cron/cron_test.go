@@ -138,7 +138,7 @@ func Test_CronJob(t *testing.T) {
 		),
 		gocron.NewTask(
 			func() {
-				fmt.Println("running job")
+				fmt.Println("running job1")
 			},
 		),
 	)
@@ -147,6 +147,16 @@ func Test_CronJob(t *testing.T) {
 	scheduler.Start()
 	nextRun, _ := job.NextRun()
 	fmt.Printf("id:%s, name:%s, nextTime:%v\n", job.ID(), job.Name(), nextRun)
+
+	// scheduler가 시작된 이후에 job을 추가해도 정상적으로 동작함
+	newJob, err := scheduler.NewJob(
+		gocron.DurationJob(time.Second),
+		gocron.NewTask(func() {
+			fmt.Println("running job2")
+		}),
+	)
+	assert.NoError(t, err)
+	fmt.Println(newJob.ID())
 
 	// block until you are ready to shut down
 	select {
