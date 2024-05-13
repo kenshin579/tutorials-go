@@ -205,6 +205,34 @@ func Test_OneTimeJob(t *testing.T) {
 	_ = scheduler.StopJobs()
 }
 
+// SingletonMode에 의해서 딱 2개의 job만 실행이 되었음
+func Test_SingletonMode(t *testing.T) {
+	scheduler, _ := gocron.NewScheduler()
+	defer func() { _ = scheduler.Shutdown() }()
+
+	_, _ = scheduler.NewJob(
+		gocron.DurationJob(
+			time.Second*1,
+		),
+		gocron.NewTask(
+			func() {
+				fmt.Printf("START(%s) ", time.Now().Format(time.TimeOnly))
+				time.Sleep(time.Second * 5)
+				fmt.Printf("END(%s)\n", time.Now().Format(time.TimeOnly))
+			},
+		),
+		gocron.WithSingletonMode(gocron.LimitModeReschedule),
+	)
+
+	scheduler.Start()
+
+	select {
+	case <-time.After(10 * time.Second):
+	}
+
+	scheduler.StopJobs()
+}
+
 func Test_RemoveByTags(t *testing.T) {
 	scheduler, _ := gocron.NewScheduler()
 	defer func() { _ = scheduler.Shutdown() }()
