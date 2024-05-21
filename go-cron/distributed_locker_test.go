@@ -30,7 +30,7 @@ func (r *RedisLocker) Lock(ctx context.Context, key string) (gocron.Lock, error)
 	fmt.Printf("Lock(%s) key:%s\n", time.Now().Format(time.TimeOnly), key)
 
 	redisKey := fmt.Sprintf(lockKey, key)
-	lock, err := r.client.Obtain(ctx, redisKey, 6*time.Second, &redislock.Options{ // 여러 스케줄러에서 하나만 실행하기를 원하면 함수의 실행 시간 만큼만 설정하는 게 좋아보임
+	lock, err := r.client.Obtain(ctx, redisKey, 30*time.Second, &redislock.Options{ // 여러 스케줄러에서 하나만 실행하기를 원하면 함수의 실행 시간 만큼만 설정하는 게 좋아보임
 		RetryStrategy: redislock.LimitRetry(redislock.LinearBackoff(100*time.Millisecond), 50),
 	})
 	if err != nil {
@@ -99,11 +99,12 @@ func Test_DistributedLockerWithRedis(t *testing.T) {
 				gocron.WithDistributedLocker(locker),
 			)
 
-			_, err := scheduler.NewJob(
+			job, err := scheduler.NewJob(
 				gocron.DurationJob(
 					4*time.Second, // 이 값은 함수 실행 시간 주기로 설정하면 됨 (너무 짧게 설정하면 task를 실행하기 위해 lock을 계속 시도하게 됨)
 				),
-				gocron.NewTask(fn1, "job1", i),
+				gocron.NewTask(fn1, "para1", i),
+				gocron.WithName("job1"),
 				// gocron.WithEventListeners(
 				// 	gocron.BeforeJobRuns(
 				// 		func(jobID uuid.UUID, jobName string) {
@@ -120,6 +121,7 @@ func Test_DistributedLockerWithRedis(t *testing.T) {
 
 			assert.NoError(t, err)
 			// fmt.Printf("%d. jobName: %v\n", i, job.Name())
+			assert.Equal(t, "job1", job.Name())
 
 			scheduler.Start()
 			schedulers = append(schedulers, scheduler)
