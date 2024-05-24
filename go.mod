@@ -1,6 +1,8 @@
 module github.com/kenshin579/tutorials-go
 
-go 1.19
+go 1.21.3
+
+toolchain go1.22.3
 
 require (
 	github.com/Masterminds/squirrel v1.5.0
@@ -59,6 +61,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/go-redsync/redsync/v4 v4.5.1
+	github.com/gochore/dcron v1.4.0
 	github.com/gocolly/colly v1.2.0
 	github.com/google/go-github/v42 v42.0.0
 	github.com/itchyny/gojq v0.12.11
