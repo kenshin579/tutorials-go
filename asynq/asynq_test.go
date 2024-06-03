@@ -27,14 +27,14 @@ func Test_Async_Client2(t *testing.T) {
 	}
 
 	// Process the task immediately.
-	info, err := client.Enqueue(t1, asynq.Retention(24*time.Hour))
+	info, err := client.Enqueue(t1, asynq.Retention(5*time.Second), asynq.Retention(24*time.Hour))
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf(" [*] Successfully enqueued task: %+v", info)
 
 	// Process the task 24 hours later.
-	info, err = client.Enqueue(t2, asynq.ProcessIn(1*time.Second), asynq.Retention(24*time.Hour))
+	info, err = client.Enqueue(t2, asynq.ProcessIn(2*time.Second), asynq.Retention(24*time.Hour))
 	if err != nil {
 		log.Fatal(err)
 	}
