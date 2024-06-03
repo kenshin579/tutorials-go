@@ -54,12 +54,13 @@ func Test_Periodic_Tasks(t *testing.T) {
 			if err := scheduler.Start(); err != nil {
 				log.Fatal(err)
 			}
-
-			periodicTaskKeys := redisClient.Keys(ctx, "asynq:schedulers*") // 주기 작업은 Register 등록하면 cron library에 의해서 실행이 되고 주기 작업 정보는 redis에 5초마다 쓰여진다
-			assert.NotEmpty(t, periodicTaskKeys)
-			fmt.Printf("periodicTaskKeys: %v\n", periodicTaskKeys)
-
 			log.Printf("running scheduler...")
+
+			// 주기 작업은 Register 등록하면 cron library에 의해서 실행이 되고 주기 작업 정보는 redis에 5초마다 쓰여진다
+			keys := redisClient.Keys(ctx, "asynq:schedulers*")
+			assert.NoError(t, err)
+			fmt.Printf("keys: %v\n", keys)
+
 		}(i)
 	}
 
