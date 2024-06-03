@@ -2,6 +2,7 @@ package asynq
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"testing"
@@ -42,7 +43,7 @@ func Test_Periodic_Tasks(t *testing.T) {
 			// instance 2개: 이렇게 하면 실제로 2초마다 실행되지 않고 4촘마다 실행이 됨
 			// entryID, err := scheduler.Register("@every 2s", loggingTask, asynq.TaskID("job1"), asynq.Retention(2*time.Second))
 			// instance 2개: trigger도 잘되는 거 확인함
-			entryID, err := scheduler.Register("@every 2s", loggingTask, asynq.Unique(2*time.Second), asynq.Retention(5*time.Minute)) // todo: 레디스에 언제 어떻게 저장이 되나?
+			entryID, err := scheduler.Register("@every 2s", loggingTask, asynq.Unique(2*time.Second), asynq.Retention(5*time.Minute))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -54,8 +55,9 @@ func Test_Periodic_Tasks(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			periodicTaskKeys := redisClient.Keys(ctx, "asynq:schedulers") // 주기 작업은 Register 등록하면 cron library에 의해서 실행이 되고 주기 작업 정보는 redis에 5초마다 쓰여진다
+			periodicTaskKeys := redisClient.Keys(ctx, "asynq:schedulers*") // 주기 작업은 Register 등록하면 cron library에 의해서 실행이 되고 주기 작업 정보는 redis에 5초마다 쓰여진다
 			assert.NotEmpty(t, periodicTaskKeys)
+			fmt.Printf("periodicTaskKeys: %v\n", periodicTaskKeys)
 
 			log.Printf("running scheduler...")
 		}(i)
@@ -64,7 +66,7 @@ func Test_Periodic_Tasks(t *testing.T) {
 	time.Sleep(60 * time.Second)
 
 	for _, schedulerInfo := range schedulerInfoMap {
-		// assert.NoError(t, schedulerInfo.scheduler.Unregister(schedulerInfo.entryID))
+		assert.NoError(t, schedulerInfo.scheduler.Unregister(schedulerInfo.entryID))
 		schedulerInfo.scheduler.Shutdown()
 	}
 
