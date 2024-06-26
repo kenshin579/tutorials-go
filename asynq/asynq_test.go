@@ -13,7 +13,7 @@ const (
 	redisAddr = "127.0.0.1:6379"
 )
 
-func Test_Async_Client2(t *testing.T) {
+func Test_Async_Client(t *testing.T) {
 	client := asynq.NewClient(asynq.RedisClientOpt{Addr: "localhost:6379"})
 
 	t1, err := tasks.NewWelcomeEmailTask(42)
@@ -41,6 +41,7 @@ func Test_Async_Client2(t *testing.T) {
 	log.Printf(" [*] Successfully enqueued task: %+v", info)
 }
 
+// 실제로 2개의 worker가 동시에 실행되는 것을 확인하기 위해서 별도로 작성함 - goroutine에서 실행하면 같은 화면에 로그가 찍혀서 확인이 어려움
 func Test_Workers2a(t *testing.T) {
 	srv := asynq.NewServer(
 		asynq.RedisClientOpt{Addr: "localhost:6379"},

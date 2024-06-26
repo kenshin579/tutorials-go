@@ -76,7 +76,7 @@ func Test_Periodic_Tasks(t *testing.T) {
 
 var cfgs []*asynq.PeriodicTaskConfig
 
-// Periodic Task manager로 실행을 해도 Scheduler Entries에 추가되는 건 중복을 들어간다
+// Periodic Task manager로 실행을 해도 Scheduler Entries에 추가되는 건 중복으로 들어간다
 func Test_Periodic_Task_Manager(t *testing.T) {
 	redisOpt := asynq.RedisClientOpt{Addr: redisAddr}
 
