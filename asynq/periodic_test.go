@@ -22,7 +22,7 @@ func Test_Periodic_Tasks(t *testing.T) {
 		redisClient.Close()
 	}()
 
-	maxGoroutine := 1
+	maxGoroutine := 2
 
 	type schedulerInfo struct {
 		scheduler *asynq.Scheduler
