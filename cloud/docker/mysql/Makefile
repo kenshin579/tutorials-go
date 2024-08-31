@@ -1,7 +1,7 @@
 DB_CONTAINER_NAME := go-mysql
 DB_NAME := gomysql
 DB_USER_NAME := root
-DB_PASSWORD := go-mysql
+DB_PASSWORD := password
 MYSQL_VERSION=8.0.31
 
 mysql-create:
