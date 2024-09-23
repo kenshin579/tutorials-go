@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/1_init.sql
+  - include:
+      file: db/changelog/2_insert.sql
+  - include:
+      file: db/changelog/3_update.sql
