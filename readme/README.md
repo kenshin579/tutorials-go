@@ -17,6 +17,8 @@
 
 Some introduction text.
 
+Some introduction $\textsf{\color{#f5750e}{text.}}$
+
 ### $\textsf{\color{#f48522}{Phase 1.}}$
 
 Some phase 1 text.
@@ -29,6 +31,8 @@ Some section a text.
 <p style='color:red'>This is some red text.</p>
 <font color="red">This is some text!</font>
 These are <b style='color:red'>red words</b>.
+
+<span style="color:red;">your text here in red</span>
 
 ## Note Hightlight
 > [!NOTE]
@@ -46,3 +50,4 @@ These are <b style='color:red'>red words</b>.
 > [!CAUTION]
 > Negative potential consequences of an action.
 
+text in red
