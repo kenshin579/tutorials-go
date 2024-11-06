@@ -13,7 +13,7 @@ DOCKER_REGISTRY_SRC_ADDR="docker.io"
 DOCKER_REGISTRY_DST_ADDR="demo.goharbor.io"
 
 # download dockker image
-docker pull --platform=linux $DOCKER_REGISTRY_SRC_ADDR/library/mariadb:latest
+docker pull --platform=linux/x86-64 $DOCKER_REGISTRY_SRC_ADDR/library/mariadb:latest
 
 # tag docker image
 docker tag $DOCKER_REGISTRY_SRC_ADDR/library/mariadb:latest $DOCKER_REGISTRY_DST_ADDR/library/mariadb:latest
