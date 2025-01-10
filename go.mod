@@ -49,6 +49,7 @@ require (
 require github.com/akamensky/argparse v1.3.1
 
 require (
+	github.com/MicahParks/jwkset v0.8.0
 	github.com/Shopify/sarama v1.36.0
 	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
@@ -178,7 +179,7 @@ require (
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
+	golang.org/x/time v0.9.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
