@@ -3,6 +3,7 @@ package jwk
 import (
 	"context"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"os"
@@ -36,6 +37,16 @@ func (suite *jwksTestSuite) SetupSuite() {
 func (suite *jwksTestSuite) Test_GenerateJWKS() {
 	suite.Run("JWKS의 값으로 Public Key와 같은지 확인한다", func() {
 		jwks, err := suite.generateJWKS()
+		suite.NoError(err)
+
+		// Write jwks as json file
+		file, err := os.Create("jwks.json")
+		suite.NoError(err)
+		defer file.Close()
+
+		encoder := json.NewEncoder(file)
+		encoder.SetIndent("", "  ")
+		err = encoder.Encode(jwks)
 		suite.NoError(err)
 
 		suite.Equal(jwkset.UseSig, jwks.Keys[0].USE)
