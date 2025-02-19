@@ -223,6 +223,11 @@ func Test_Supported_helpers_for_maps(t *testing.T) {
 		assert.Equal(t, []int{1, 2}, values)
 	})
 
+	t.Run("create slice from map", func(t *testing.T) {
+		assert.Equal(t, []string{"error1", "error2"}, lo.Values(map[string]string{"err1": "error1", "err2": "error2"}))
+		assert.Equal(t, []string{}, lo.Values(map[string]string{}))
+	})
+
 	// Returns the value of the given key or the fallback value if the key is not present.
 	t.Run("ValueOr", func(t *testing.T) {
 		value := lo.ValueOr[string, int](map[string]int{"foo": 1, "bar": 2}, "foo", 42)
