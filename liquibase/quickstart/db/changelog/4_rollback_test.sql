@@ -9,26 +9,22 @@ create table employee
     city     varchar(30)
 );
 
---rollback DROP TABLE employee
-
 INSERT INTO liquibase_quickstart.employee (id, name, address1, address2, city)
 VALUES (1, 'John Doe', '123 Main St', 'Apt 1', 'Beverly Hills');
 
 INSERT INTO liquibase_quickstart.employee (id, name, address1, address2, city)
 VALUES (2, 'John Doe2', '123 Main St', 'Apt 1', 'Beverly Hills');
 
---rollback DELETE FROM liquibase_quickstart.employee WHERE id = 2;
---rollback DELETE FROM liquibase_quickstart.employee WHERE id = 1;
-
--- add column email to employee table
 ALTER TABLE liquibase_quickstart.employee ADD COLUMN email VARCHAR(50);
-
---rollback ALTER TABLE liquibase_quickstart.employee DROP COLUMN email;
 
 UPDATE liquibase_quickstart.employee SET email = 'user1@naver.com' WHERE id = 1;
 UPDATE liquibase_quickstart.employee SET email = 'user2@naver.com' WHERE id = 2;
 
+
+--comment rollback 실행하면 아래 전체가 한번에 실행이 된다. rollback 하는 단위는 changeset 단위로 되는 듯하다
 --rollback UPDATE liquibase_quickstart.employee SET email = NULL WHERE id = 2;
 --rollback UPDATE liquibase_quickstart.employee SET email = NULL WHERE id = 1;
-
-
+--rollback ALTER TABLE liquibase_quickstart.employee DROP COLUMN email;
+--rollback DELETE FROM liquibase_quickstart.employee WHERE id = 2;
+--rollback DELETE FROM liquibase_quickstart.employee WHERE id = 1;
+--rollback DROP TABLE employee;
