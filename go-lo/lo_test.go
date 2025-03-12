@@ -140,6 +140,17 @@ func Test_Supported_helpers_for_intersection(t *testing.T) {
 		assert.False(t, ok)
 	})
 
+	t.Run("Some", func(t *testing.T) {
+		ok := lo.Some([]int{0, 1, 2, 3, 4, 5}, []int{0, 2})
+		assert.True(t, ok)
+
+		ok = lo.Some([]int{0, 1, 2, 3, 4, 5}, []int{0, 6})
+		assert.True(t, ok)
+
+		ok = lo.Some([]int{0, 1, 2, 3, 4, 5}, []int{8, 6})
+		assert.False(t, ok)
+	})
+
 	t.Run("Intersect", func(t *testing.T) {
 		result := lo.Intersect([]int{0, 1, 2, 3, 4, 5}, []int{0, 2})
 		assert.Equal(t, []int{0, 2}, result)
