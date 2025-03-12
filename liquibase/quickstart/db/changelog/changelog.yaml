@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/2_insert.sql
   - include:
       file: db/changelog/3_update.sql
+  - include:
+      file: db/changelog/4_rollback_test.sql
