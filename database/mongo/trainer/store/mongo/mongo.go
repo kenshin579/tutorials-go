@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/adapter/mongodb"
+	"github.com/kenshin579/tutorials-go/database/mongo/adapter/mongodb"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/domain"
+	"github.com/kenshin579/tutorials-go/database/mongo/domain"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -72,9 +72,9 @@ func (m *mongoStore) InsertMany(ctx context.Context, trainerList []domain.Traine
 
 func (m *mongoStore) FindAll(ctx context.Context, findOptions *options.FindOptions) ([]*domain.Trainer, error) {
 	dbCollection := m.db.Collection(domain.CollectionName)
-	//findOptions을 주지 않고 검색하면 limit없이 검색이 된다
-	//findOptions := options.Find()
-	////findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
+	// findOptions을 주지 않고 검색하면 limit없이 검색이 된다
+	// findOptions := options.Find()
+	// //findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
 
 	var result []*domain.Trainer
 

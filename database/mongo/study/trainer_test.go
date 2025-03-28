@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/chidiwilliams/flatbson"
-	"github.com/kenshin579/tutorials-go/go-mongo/config"
-	"github.com/kenshin579/tutorials-go/go-mongo/domain"
-	"github.com/kenshin579/tutorials-go/go-mongo/test/mongodb"
+	"github.com/kenshin579/tutorials-go/database/mongo/config"
+	"github.com/kenshin579/tutorials-go/database/mongo/domain"
+	"github.com/kenshin579/tutorials-go/database/mongo/test/mongodb"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -38,14 +38,14 @@ func (suite *trainerTestSuite) SetupSuite() {
 
 func (suite *trainerTestSuite) TestTrainer_Create() {
 	suite.Run("create trainer", func() {
-		//GIVEN
+		// GIVEN
 		sample := domain.CreateTrainerSample(1)
 
-		//WHEN
+		// WHEN
 		result, err := suite.createTrainer(suite.ctx, sample)
 		defer suite.deleteTrainer(suite.ctx, sample.ID)
 
-		//THEN
+		// THEN
 		suite.NoError(err)
 		suite.Equal(sample.ID, result.ID)
 
@@ -54,16 +54,16 @@ func (suite *trainerTestSuite) TestTrainer_Create() {
 
 func (suite *trainerTestSuite) TestTrainer_Get() {
 	suite.Run("create trainer", func() {
-		//GIVEN
+		// GIVEN
 		sample := domain.CreateTrainerSample(1)
 		_, err := suite.createTrainer(suite.ctx, sample)
 		suite.NoError(err)
 		defer suite.deleteTrainer(suite.ctx, sample.ID)
 
-		//WHEN
+		// WHEN
 		result, err := suite.getTrainer(suite.ctx, sample.ID)
 
-		//THEN
+		// THEN
 		suite.NoError(err)
 		suite.Equal(sample.ID, result.ID)
 	})
@@ -71,7 +71,7 @@ func (suite *trainerTestSuite) TestTrainer_Get() {
 
 func (suite *trainerTestSuite) TestTrainer_Update() {
 	suite.Run("create trainer", func() {
-		//GIVEN
+		// GIVEN
 		sample := domain.CreateTrainerSample(1)
 		suite.createTrainer(suite.ctx, sample)
 		defer suite.deleteTrainer(suite.ctx, sample.ID)
@@ -80,10 +80,10 @@ func (suite *trainerTestSuite) TestTrainer_Update() {
 			Name: "Frank",
 		}
 
-		//WHEN
+		// WHEN
 		result, err := suite.updateTrainer(suite.ctx, updateRequest)
 
-		//THEN
+		// THEN
 		suite.NoError(err)
 		suite.Equal(sample.ID, result.ID)
 		suite.Equal(updateRequest.Name, result.Name)
@@ -92,15 +92,15 @@ func (suite *trainerTestSuite) TestTrainer_Update() {
 
 func (suite *trainerTestSuite) TestTrainer_Delete() {
 	suite.Run("create trainer", func() {
-		//GIVEN
+		// GIVEN
 		sample := domain.CreateTrainerSample(1)
 		_, err := suite.createTrainer(suite.ctx, sample)
 		suite.NoError(err)
 
-		//WHEN
+		// WHEN
 		err = suite.deleteTrainer(suite.ctx, sample.ID)
 
-		//THEN
+		// THEN
 		suite.NoError(err)
 		_, err = suite.getTrainer(suite.ctx, sample.ID)
 		suite.Error(err, "mongo: no documents in result")

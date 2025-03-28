@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/adapter/mongodb"
-	"github.com/kenshin579/tutorials-go/go-mongo/config"
+	"github.com/kenshin579/tutorials-go/database/mongo/adapter/mongodb"
+	"github.com/kenshin579/tutorials-go/database/mongo/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/domain"
+	"github.com/kenshin579/tutorials-go/database/mongo/domain"
 )
 
 var (
@@ -85,7 +85,7 @@ func TestInsertMany_FindAll(t *testing.T) {
 	err := store.InsertMany(ctx, trainerList)
 	assert.NoError(t, err)
 	findOptions := options.Find()
-	//findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
+	// findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
 
 	list, err := store.FindAll(ctx, findOptions)
 	assert.NoError(t, err)
@@ -121,7 +121,7 @@ func TestDeleteMany(t *testing.T) {
 	err = store.Delete(ctx, bson.D{{"name", "Ash"}})
 	assert.NoError(t, err)
 	findOptions := options.Find()
-	//findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
+	// findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
 
 	list, err := store.FindAll(ctx, findOptions)
 	assert.Equal(t, len(trainerList)-1, len(list))
