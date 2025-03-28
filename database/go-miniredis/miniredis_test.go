@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/kenshin579/tutorials-go/test/inmemory"
+	"github.com/kenshin579/tutorials-go/database/go-miniredis/inmemory"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"

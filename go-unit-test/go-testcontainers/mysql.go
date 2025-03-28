@@ -1,4 +1,4 @@
-package testcontainers
+package go_testcontainers
 
 import (
 	"context"
