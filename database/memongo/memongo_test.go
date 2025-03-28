@@ -1,11 +1,11 @@
-package go_memongo
+package memongo
 
 import (
 	"context"
 	"fmt"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-memongo/db"
+	"github.com/kenshin579/tutorials-go/database/memongo/db"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,7 +24,7 @@ func TestMongoTestSuite(t *testing.T) {
 }
 
 func (suite *MongoTestSuite) SetupSuite() {
-	//create mongodb
+	// create mongodb
 	suite.db = db.NewInMemoryMongoDB()
 	suite.rating = suite.db.Collection("coll_rating")
 	suite.ctx = context.TODO()

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/config"
+	"github.com/kenshin579/tutorials-go/database/mongo/config"
 )
 
 var (

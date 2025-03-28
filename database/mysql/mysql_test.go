@@ -1,4 +1,4 @@
-package go_mysql
+package mysql
 
 import (
 	"fmt"
