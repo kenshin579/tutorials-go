@@ -1,0 +1,11 @@
+# kind-config.yaml
+# kind는 기본적으로 외부에서 직접 접근할 수 없어.
+# 따라서 NodePort 또는 Ingress를 활용해야 해.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080  # 외부에서 접근할 포트
+        hostPort: 80
+        protocol: TCP

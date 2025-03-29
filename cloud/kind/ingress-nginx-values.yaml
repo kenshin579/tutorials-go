@@ -1,0 +1,33 @@
+controller:
+  replicaCount: 2  # Ingress Controller Pod 개수 설정
+
+  nodeSelector: {}
+  tolerations: {}
+
+  service:
+    type: LoadBalancer  # 기본적으로 ClusterIP이지만 외부에서 접근하려면 LoadBalancer 사용
+    externalTrafficPolicy: Local  # 클라이언트 IP 유지
+
+  ingressClassResource:
+    name: nginx
+    enabled: true
+    default: true  # 기본 IngressClass로 설정
+
+  config:
+    enable-real-ip: "true"  # 실제 클라이언트 IP 확인 가능하도록 설정
+    proxy-body-size: "100m"  # 최대 요청 크기 (예: 파일 업로드 크기 제한)
+    use-forwarded-headers: "true"  # X-Forwarded-For, X-Real-IP 헤더 사용
+
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+
+  admissionWebhooks:
+    enabled: false  # 기본적으로 Webhook 기능 비활성화 (선택 사항)
+
+defaultBackend:
+  enabled: true  # 기본 백엔드 404 페이지 활성화
+
+rbac:
+  create: true  # Role-Based Access Control (RBAC) 활성화
