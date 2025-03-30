@@ -7,5 +7,5 @@ nodes:
   - role: control-plane
     extraPortMappings:
       - containerPort: 30080  # 외부에서 접근할 포트
-        hostPort: 80
+        hostPort: 30080
         protocol: TCP
