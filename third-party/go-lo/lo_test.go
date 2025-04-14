@@ -269,3 +269,56 @@ func Test_Supported_helpers_for_maps(t *testing.T) {
 		assert.Equal(t, []int{}, lo.Range(0))
 	})
 }
+
+// lo.EveryBy 함수는 주어진 조건에 따라 슬라이스의 모든 요소가 조건을 만족하는지 확인하는 함수
+func Test_EveryBy(t *testing.T) {
+	t.Run("모든 요소가 조건을 만족하는 경우", func(t *testing.T) {
+		result := lo.EveryBy([]int{2, 4, 6, 8}, func(x int) bool {
+			return x%2 == 0
+		})
+		assert.True(t, result)
+	})
+
+	t.Run("일부 요소가 조건을 만족하지 않는 경우", func(t *testing.T) {
+		result := lo.EveryBy([]int{2, 4, 5, 8}, func(x int) bool {
+			return x%2 == 0
+		})
+		assert.False(t, result)
+	})
+
+	t.Run("빈 슬라이스인 경우", func(t *testing.T) {
+		result := lo.EveryBy([]int{}, func(x int) bool {
+			return x%2 == 0
+		})
+		assert.True(t, result) // 빈 슬라이스는 항상 true 반환
+	})
+
+	t.Run("구조체 슬라이스 테스트", func(t *testing.T) {
+		type user struct {
+			name  string
+			age   int
+			admin bool
+		}
+
+		users := []user{
+			{"Alice", 25, true},
+			{"Bob", 30, true},
+			{"Charlie", 35, true},
+		}
+
+		allAdmins := lo.EveryBy(users, func(u user) bool {
+			return u.admin
+		})
+		assert.True(t, allAdmins)
+
+		allOver18 := lo.EveryBy(users, func(u user) bool {
+			return u.age > 18
+		})
+		assert.True(t, allOver18)
+
+		allOver30 := lo.EveryBy(users, func(u user) bool {
+			return u.age > 30
+		})
+		assert.False(t, allOver30)
+	})
+}
