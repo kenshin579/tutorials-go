@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/5_insert_label.sql
   - include:
       file: db/changelog/6_insert_label.sql
+  - include:
+      file: db/changelog/7_insert_label.sql
