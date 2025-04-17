@@ -7,3 +7,7 @@ databaseChangeLog:
       file: db/changelog/3_update.sql
   - include:
       file: db/changelog/4_rollback_test.sql
+  - include:
+      file: db/changelog/5_insert_label.sql
+  - include:
+      file: db/changelog/6_insert_label.sql
