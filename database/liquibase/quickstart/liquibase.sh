@@ -8,24 +8,26 @@ fi
 COMMAND=$1
 LIQUIBASE_PROPERTY=liquibase.properties
 
-#echo "COMMAND: $COMMAND | LIQUIBASE_PROPERTY: $LIQUIBASE_PROPERTY"
+shift 1
+EXTRA_ARGS="$@"
+echo "COMMAND: $COMMAND | LIQUIBASE_PROPERTY: $LIQUIBASE_PROPERTY | EXTRA_ARGS: $EXTRA_ARGS"
 
 # Liquibase 실행
 case $COMMAND in
   update-one)
-    liquibase --defaults-file=$PROPERTY_FILE update-count --count 1
+    liquibase --defaults-file=$PROPERTY_FILE update-count --count 1 $EXTRA_ARGS
     ;;
   update-all)
-    liquibase --defaults-file=$PROPERTY_FILE update
+    liquibase --defaults-file=$PROPERTY_FILE update $EXTRA_ARGS
     ;;
   rollback-one)
-    liquibase --defaults-file=$PROPERTY_FILE rollback-count --count 1
+    liquibase --defaults-file=$PROPERTY_FILE rollback-count --count 1 $EXTRA_ARGS
     ;;
   status)
-    liquibase --defaults-file=$PROPERTY_FILE status
+    liquibase --defaults-file=$PROPERTY_FILE status $EXTRA_ARGS
     ;;
   history)
-    liquibase --defaults-file=$PROPERTY_FILE history
+    liquibase --defaults-file=$PROPERTY_FILE history $EXTRA_ARGS
     ;;
   *)
     echo "unknown sub command"
