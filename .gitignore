@@ -15,3 +15,8 @@
 # vendor/
 
 .idea/
+
+# terraform
+.terraform/
+.terraform.*
+terraform*
