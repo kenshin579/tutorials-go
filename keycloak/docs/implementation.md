@@ -33,7 +33,11 @@
 - **Client Protocol**: `openid-connect`
 - **Access Type**: `confidential`
 - **Service Accounts Enabled**: `ON`
-- **Valid Redirect URIs**: `http://localhost:8081/*`
+- **Valid Redirect URIs**: 
+  - `http://localhost:8081/api/*`
+  - `http://localhost:8081/api`
+- **Web Origins**: 
+  - `http://localhost:3000` (프론트엔드에서 API 호출)
 
 ### 1.3 Realm 설정
 - **Realm Name**: `myrealm`
@@ -49,14 +53,14 @@
 ```bash
 mkdir -p keycloak/backend/{cmd/server,internal/{domain,usecase,repository,handler},pkg/middleware}
 cd keycloak/backend
-go mod init keycloak-backend
+go mod init github.com/kenshin579/tutorials-go/keycloak/backend
 ```
 
 ### 2.2 의존성 설치
 
 ```bash
 # Go 1.24.5 사용
-go mod init keycloak-backend
+go mod init github.com/kenshin579/tutorials-go/keycloak/backend
 go mod tidy
 
 # 필요한 의존성들
@@ -131,7 +135,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"keycloak-backend/internal/domain"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/domain"
 )
 
 type KeycloakRepository struct {
@@ -331,7 +335,7 @@ package usecase
 
 import (
 	"context"
-	"keycloak-backend/internal/domain"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/domain"
 )
 
 type UserUseCaseImpl struct {
@@ -363,7 +367,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
-	"keycloak-backend/internal/domain"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/domain"
 	"github.com/labstack/echo/v4"
 )
 
@@ -431,7 +435,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
-	"keycloak-backend/internal/domain"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/domain"
 	"github.com/labstack/echo/v4"
 )
 
@@ -519,12 +523,12 @@ package main
 import (
 	"log"
 	"net/http"
-	"keycloak-backend/internal/domain"
-	"keycloak-backend/internal/handler"
-	"keycloak-backend/internal/repository"
-	"keycloak-backend/internal/usecase"
-	"keycloak-backend/pkg/config"
-	"keycloak-backend/pkg/middleware"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/domain"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/handler"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/repository"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/internal/usecase"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/pkg/config"
+	"github.com/kenshin579/tutorials-go/keycloak/backend/pkg/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
