@@ -2,6 +2,16 @@
 
 > 참고: 본 저장소는 샘플 구현 목적입니다. 배포 및 운영(프로덕션 환경 구성, 모니터링, CI/CD 등) 관련 작업은 현재 범위에 포함되지 않습니다. 모든 체크리스트는 로컬 개발/학습 환경 기준이며, Keycloak은 `infra/docker_run.sh`로 로컬 실행하는 것을 가정합니다.
 
+## ▶ Next Actions (다음 작업)
+- Phase 1.1: Keycloak 서버 실행 및 상태 확인 (infra/docker_run.sh 실행, http://localhost:8080 접속)
+- Phase 1.2: Realm/클라이언트 설정
+  - Realm: myrealm 생성/확인
+  - myclient (React) redirect URIs/Web Origins 설정
+  - mybackend (백엔드) confidential + Service Accounts ON, client secret 확인
+- backend/pkg/config/config.go의 ClientSecret 값을 Keycloak의 실제 시크릿으로 교체
+- 백엔드 서버 실행: cd keycloak/backend && go run cmd/server/main.go
+- 프론트엔드 Phase 3 시작: React 앱 생성 및 keycloak-js 연동
+
 ## 📋 Phase별 구현 계획
 
 ### 🚀 Phase 1: Keycloak 인프라 설정 및 기본 설정
@@ -50,50 +60,50 @@
 **목표**: Go 백엔드 서버의 기본 구조 및 인증 로직 구현
 
 #### 2.1 프로젝트 구조 생성
-- [ ] 디렉토리 구조 생성
+- [x] 디렉토리 구조 생성
   ```bash
   mkdir -p keycloak/backend/{cmd/server,internal/{domain,usecase,repository,handler},pkg/{middleware,config}}
   ```
-- [ ] Go 모듈 초기화
+- [x] Go 모듈 초기화
   ```bash
   cd keycloak/backend
   go mod init github.com/kenshin579/tutorials-go/keycloak/backend
   ```
-- [ ] 의존성 설치
+- [x] 의존성 설치
   ```bash
-  go get github.com/labstack/echo/v4@latest
-  go get github.com/golang-jwt/jwt/v5@latest
+  go get github.com/labstack/echo/v4@v4.13.4
+  go get github.com/golang-jwt/jwt/v5@v5.3.0
   ```
 
 **테스트 항목**:
-- [ ] 모든 디렉토리가 정상적으로 생성되었는지 확인
-- [ ] `go mod init` 명령이 성공적으로 실행되는지 확인
-- [ ] 의존성 설치 시 에러가 없는지 확인
-- [ ] `go mod tidy` 실행 시 문제가 없는지 확인
+- [x] 모든 디렉토리가 정상적으로 생성되었는지 확인
+- [x] `go mod init` 명령이 성공적으로 실행되는지 확인
+- [x] 의존성 설치 시 에러가 없는지 확인
+- [x] `go mod tidy` 실행 시 문제가 없는지 확인
 
 #### 2.2 Domain Layer 구현
-- [ ] `internal/domain/user.go` 작성
-  - [ ] User 구조체 정의
-  - [ ] UserRepository 인터페이스 정의
-  - [ ] UserUseCase 인터페이스 정의
-- [ ] `internal/domain/auth.go` 작성
-  - [ ] AuthRequest 구조체 정의
-  - [ ] AuthResponse 구조체 정의
-  - [ ] AuthRepository 인터페이스 정의
+- [x] `internal/domain/user.go` 작성
+  - [x] User 구조체 정의
+  - [x] UserRepository 인터페이스 정의
+  - [x] UserUseCase 인터페이스 정의
+- [x] `internal/domain/auth.go` 작성
+  - [x] AuthRequest 구조체 정의
+  - [x] AuthResponse 구조체 정의
+  - [x] AuthRepository 인터페이스 정의
 
 **테스트 항목**:
-- [ ] Go 컴파일 에러가 없는지 확인
-- [ ] 구조체 필드 타입이 올바른지 확인
-- [ ] 인터페이스 메서드 시그니처가 일치하는지 확인
+- [x] Go 컴파일 에러가 없는지 확인
+- [x] 구조체 필드 타입이 올바른지 확인
+- [x] 인터페이스 메서드 시그니처가 일치하는지 확인
 
 #### 2.3 Repository Layer 구현
-- [ ] `internal/repository/keycloak_repository.go` 작성
-  - [ ] KeycloakRepository 구조체 정의
-  - [ ] NewKeycloakRepository 함수 구현
-  - [ ] GetUserInfo 메서드 구현 (UserInfo 엔드포인트 호출)
-  - [ ] ValidateToken 메서드 구현 (Token Introspection 엔드포인트 호출)
-  - [ ] GetUserByID 메서드 구현 (Admin API 호출)
-  - [ ] getAdminToken 메서드 구현
+- [x] `internal/repository/keycloak_repository.go` 작성
+  - [x] KeycloakRepository 구조체 정의
+  - [x] NewKeycloakRepository 함수 구현
+  - [x] GetUserInfo 메서드 구현 (UserInfo 엔드포인트 호출)
+  - [x] ValidateToken 메서드 구현 (Token Introspection 엔드포인트 호출)
+  - [x] GetUserByID 메서드 구현 (Admin API 호출)
+  - [x] getAdminToken 메서드 구현
 
 **테스트 항목**:
 - [ ] Keycloak API 연결 테스트
@@ -103,11 +113,11 @@
 - [ ] getAdminToken 메서드가 유효한 관리자 토큰을 반환하는지 확인
 
 #### 2.4 UseCase Layer 구현
-- [ ] `internal/usecase/user_usecase.go` 작성
-  - [ ] UserUseCaseImpl 구조체 정의
-  - [ ] NewUserUseCase 함수 구현
-  - [ ] GetUserInfo 메서드 구현
-  - [ ] ValidateToken 메서드 구현
+- [x] `internal/usecase/user_usecase.go` 작성
+  - [x] UserUseCaseImpl 구조체 정의
+  - [x] NewUserUseCase 함수 구현
+  - [x] GetUserInfo 메서드 구현
+  - [x] ValidateToken 메서드 구현
 
 **테스트 항목**:
 - [ ] UseCase 메서드들이 Repository를 올바르게 호출하는지 확인
@@ -115,12 +125,12 @@
 - [ ] 비즈니스 로직이 올바르게 동작하는지 확인
 
 #### 2.5 Handler Layer 구현
-- [ ] `internal/handler/user_handler.go` 작성
-  - [ ] UserHandler 구조체 정의
-  - [ ] NewUserHandler 함수 구현
-  - [ ] GetUserInfo 핸들러 구현
-  - [ ] ValidateToken 핸들러 구현
-  - [ ] extractToken 헬퍼 함수 구현
+- [x] `internal/handler/user_handler.go` 작성
+  - [x] UserHandler 구조체 정의
+  - [x] NewUserHandler 함수 구현
+  - [x] GetUserInfo 핸들러 구현
+  - [x] ValidateToken 핸들러 구현
+  - [x] extractToken 헬퍼 함수 구현
 
 **테스트 항목**:
 - [ ] HTTP 요청이 올바른 핸들러로 라우팅되는지 확인
@@ -129,9 +139,9 @@
 - [ ] 에러 응답이 적절한 형식으로 반환되는지 확인
 
 #### 2.6 Middleware 구현
-- [ ] `pkg/middleware/auth.go` 작성
-  - [ ] AuthMiddleware 함수 구현
-  - [ ] extractToken 헬퍼 함수 구현
+- [x] `pkg/middleware/auth.go` 작성
+  - [x] AuthMiddleware 함수 구현
+  - [x] extractToken 헬퍼 함수 구현
 
 **테스트 항목**:
 - [ ] 인증되지 않은 요청이 적절히 차단되는지 확인
@@ -139,11 +149,11 @@
 - [ ] 잘못된 토큰이 포함된 요청이 적절히 처리되는지 확인
 
 #### 2.7 Configuration 구현
-- [ ] `pkg/config/config.go` 작성
-  - [ ] Config 구조체 정의
-  - [ ] ServerConfig 구조체 정의
-  - [ ] KeycloakConfig 구조체 정의
-  - [ ] NewConfig 함수 구현
+- [x] `pkg/config/config.go` 작성
+  - [x] Config 구조체 정의
+  - [x] ServerConfig 구조체 정의
+  - [x] KeycloakConfig 구조체 정의
+  - [x] NewConfig 함수 구현
 
 **테스트 항목**:
 - [ ] 설정 파일이 올바르게 로드되는지 확인
@@ -151,13 +161,13 @@
 - [ ] 기본값이 올바르게 설정되는지 확인
 
 #### 2.8 Main Application 구현
-- [ ] `cmd/server/main.go` 작성
-  - [ ] 설정 로드
-  - [ ] Echo 인스턴스 생성
-  - [ ] 미들웨어 설정 (Logger, Recover, CORS)
-  - [ ] Repository, UseCase, Handler 생성
-  - [ ] 라우트 설정
-  - [ ] 서버 시작
+- [x] `cmd/server/main.go` 작성
+  - [x] 설정 로드
+  - [x] Echo 인스턴스 생성
+  - [x] 미들웨어 설정 (Logger, Recover, CORS)
+  - [x] Repository, UseCase, Handler 생성
+  - [x] 라우트 설정
+  - [x] 서버 시작
 
 **테스트 항목**:
 - [ ] 서버가 8081 포트에서 정상적으로 시작되는지 확인

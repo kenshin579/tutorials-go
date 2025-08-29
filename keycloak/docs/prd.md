@@ -124,7 +124,7 @@ keycloak/
 - Axios (HTTP 클라이언트)
 
 ### 백엔드
-- Go 1.21+
+- Go 1.25.0
 - Echo Framework
 - Keycloak Go Client
 - JWT 토큰 검증

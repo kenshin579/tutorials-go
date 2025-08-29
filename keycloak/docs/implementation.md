@@ -61,12 +61,12 @@ go mod init github.com/kenshin579/tutorials-go/keycloak/backend
 ### 2.2 의존성 설치
 
 ```bash
-# Go 1.21+ 사용
+# Go 1.25.0 사용
 go mod tidy
 
 # 필요한 의존성들
-go get github.com/labstack/echo/v4@latest
-go get github.com/golang-jwt/jwt/v5@latest
+go get github.com/labstack/echo/v4@v4.13.4
+go get github.com/golang-jwt/jwt/v5@v5.3.0
 ```
 
 ### 2.3 Domain Layer
