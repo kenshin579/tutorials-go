@@ -6,8 +6,10 @@
 - 로그인 시 페이지에 사용자의 이름을 보여준다
 - 로컬 개발에 맞게 keycloak 설정 필요
 
+> 범위 안내: 본 저장소는 샘플 구현 목적입니다. 배포 및 운영(프로덕션 구성, 모니터링, 장애 대응, CI/CD, 비용/보안 최적화 등) 관련 작업은 현재 범위에 포함하지 않습니다. 문서 및 예시는 로컬 개발 환경 기준이며, Keycloak은 `infra/docker_run.sh`로 로컬에서 실행하는 것을 가정합니다.
+
 ### 현재 keycloak 설정
-도커로 설치이후 아래 처럼 설치를 해둔 상태이다
+도커로 설치 이후 아래처럼 설정해둔 상태이다
 
 - realm: myrealm 
 - client: myclient
@@ -50,7 +52,7 @@
 - CORS 설정
 - 환경 설정 관리
 
-### 4. 개발 환경 요구사항
+### 4. 개발 환경 참고 (선택, 샘플 범위 밖)
 - Docker Compose로 전체 환경 구성
 - 로컬 개발용 설정
 - 환경별 설정 분리 (dev, prod)
@@ -60,11 +62,11 @@
 ```
 keycloak/
 ├── docs/
-│   └── PRD.md
+│   └── prd.md
 ├── infra/
 │   ├── docker_run.sh
-│   ├── docker-compose.yml (새로 생성)
-│   └── keycloak-config/ (새로 생성)
+│   ├── docker-compose.yml (선택, 샘플 범위 밖)
+│   └── keycloak-config/ (선택, 샘플 범위 밖)
 │       ├── realm-export.json
 │       └── client-config.json
 ├── backend/ (새로 생성)
@@ -110,7 +112,7 @@ keycloak/
 1. **Keycloak 설정 개선** (redirect URIs, web origins 설정)
 2. **백엔드 Clean Architecture 구조** 생성
 3. **프론트엔드 React 앱** 생성
-4. **Docker Compose 환경** 구성
+4. (선택) **Docker Compose 환경** 구성
 5. **통합 테스트** 및 검증
 
 ## 기술 스택

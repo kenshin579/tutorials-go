@@ -3,6 +3,8 @@
 ## 개요
 이 문서는 PRD.md의 요구사항에 따라 Keycloak 기반 인증 시스템을 구현하는 상세한 가이드입니다.
 
+> 중요: 본 저장소는 샘플 구현 목적입니다. 배포(Production) 및 운영(모니터링, 장애 대응, CI/CD, 인프라 최적화 등) 관련 작업은 범위에 포함되지 않습니다. 모든 설명과 예시는 로컬 개발/학습 환경을 기준으로 하며, `infra/docker_run.sh`를 통한 로컬 실행만을 가정합니다.
+
 ## 1. Keycloak 설정 개선
 
 ### 1.1 Keycloak 환경 확인
@@ -59,8 +61,7 @@ go mod init github.com/kenshin579/tutorials-go/keycloak/backend
 ### 2.2 의존성 설치
 
 ```bash
-# Go 1.24.5 사용
-go mod init github.com/kenshin579/tutorials-go/keycloak/backend
+# Go 1.21+ 사용
 go mod tidy
 
 # 필요한 의존성들
