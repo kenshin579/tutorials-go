@@ -20,10 +20,12 @@ function App() {
     keycloak.init({ 
       onLoad: 'check-sso',
       checkLoginIframe: false,
-      redirectUri: 'http://localhost:3000/'
+      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+      enableLogging: true
     })
       .then((authenticated: boolean) => {
         console.log('Keycloak initialized. Authenticated:', authenticated);
+        console.log('Current URL:', window.location.href);
         setKeycloakInitialized(true);
         setIsAuthenticated(authenticated);
       })
@@ -39,9 +41,10 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (keycloak.authenticated !== isAuthenticated) {
+        console.log('Authentication status changed:', keycloak.authenticated);
         setIsAuthenticated(keycloak.authenticated === true);
       }
-    }, 1000);
+    }, 500);
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);

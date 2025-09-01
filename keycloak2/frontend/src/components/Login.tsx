@@ -1,23 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import keycloak from '../services/keycloak';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const handleLogin = () => {
     keycloak.login({
-      redirectUri: 'http://localhost:3000/'
+      redirectUri: window.location.origin + '/profile'
     });
   };
 
   useEffect(() => {
-    if (keycloak.authenticated === true) {
-      navigate('/profile');
-    }
+    // Check authentication status periodically
+    const checkAuth = () => {
+      if (keycloak.authenticated === true) {
+        console.log('User is authenticated, redirecting to profile...');
+        setIsRedirecting(true);
+        setTimeout(() => {
+          navigate('/profile', { replace: true });
+        }, 100);
+      }
+    };
+
+    // Check immediately
+    checkAuth();
+
+    // Set up interval to check authentication status
+    const interval = setInterval(checkAuth, 500);
+
+    return () => clearInterval(interval);
   }, [navigate]);
 
-  if (keycloak.authenticated === true) {
+  if (keycloak.authenticated === true || isRedirecting) {
     return (
       <div style={{ 
         display: 'flex', 
