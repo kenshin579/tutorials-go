@@ -1,134 +1,54 @@
 # 목적
-- keycloak 를 인증 서버로 사용해서 FE, BE 개발을 하고 싶다
+
+- keycloak을 이용해 로그인/로그아웃 샘플 페이지를 만들어 테스트해보고 싶다
 
 ## 요구사항
-- keycloak 기반으로 로그인, 로그아웃 기능을 개발한다
-- 로그인 시 페이지에 사용자의 이름을 보여준다
-- 로컬 개발에 맞게 keycloak 설정 필요
 
-### 현재 keycloak 설정
-도커로 설치이후 아래 처럼 설치를 해둔 상태이다
+### 기능적 요구사항
+- 인증 서버로 keycloak 를 사용한다
+- 로그인 시 사용자의 정보(이름, 이메일)를 보여주는 페이지가 있어야 한다
+- 로그아웃도 가능해야 한다
+- 로그인 실패 시 에러 메시지 표시
+- 세션 만료 시 자동 로그아웃
 
-- realm: myrealm 
-- client: myclient
-  - authentication flow: standard flow
-  - valid redirect URIs: 미설정
-  - web origins: 미설정
-- 사용자: frank
-
-## 구현 지침
-- FE react를 사용해줘
-- BE는 golang, echo 로 개발을 해줘
-  - 구조는 clean architecture 사용해줘
-
-## 요구사항 분석
-
-### 1. Keycloak 설정 개선 필요사항
-- `valid redirect URIs` 설정 필요
-  - React 앱 URL: `http://localhost:3000/*`
-  - 로그인 후 리다이렉트 URL 설정
-- `web origins` 설정 필요
-  - React 앱: `http://localhost:3000`
-  - CORS 설정을 위한 origin 허용
-- 로컬 개발 환경에 맞는 CORS 설정
-
-### 2. 프론트엔드 (React) 요구사항
-- Keycloak JavaScript Adapter 사용
-- 로그인/로그아웃 기능 구현
-- 사용자 정보 표시 (이름)
-- 토큰 관리 및 갱신
-- 보호된 라우트 구현
-
-### 3. 백엔드 (Golang + Echo) 요구사항
-- Clean Architecture 구조 적용
-  - Domain Layer: 핵심 비즈니스 로직
-  - UseCase Layer: 애플리케이션 서비스
-  - Repository Layer: 데이터 접근
-  - Handler Layer: HTTP 요청 처리
-- Keycloak 토큰 검증 미들웨어
-- 사용자 정보 조회 API
-- CORS 설정
-- 환경 설정 관리
-
-### 4. 개발 환경 요구사항
-- Docker Compose로 전체 환경 구성
-- 로컬 개발용 설정
-- 환경별 설정 분리 (dev, prod)
-
-## 프로젝트 구조
-
-```
-keycloak/
-├── docs/
-│   └── PRD.md
-├── infra/
-│   ├── docker_run.sh
-│   ├── docker-compose.yml (새로 생성)
-│   └── keycloak-config/ (새로 생성)
-│       ├── realm-export.json
-│       └── client-config.json
-├── backend/ (새로 생성)
-│   ├── cmd/
-│   │   └── server/
-│   │       └── main.go
-│   ├── internal/
-│   │   ├── domain/
-│   │   │   ├── user.go
-│   │   │   └── auth.go
-│   │   ├── usecase/
-│   │   │   ├── user_usecase.go
-│   │   │   └── auth_usecase.go
-│   │   ├── repository/
-│   │   │   └── keycloak_repository.go
-│   │   └── handler/
-│   │       ├── user_handler.go
-│   │       └── auth_handler.go
-│   ├── pkg/
-│   │   ├── middleware/
-│   │   │   └── auth.go
-│   │   └── config/
-│   │       └── config.go
-│   ├── go.mod
-│   └── go.sum
-└── frontend/ (새로 생성)
-    ├── src/
-    │   ├── components/
-    │   │   ├── Login.js
-    │   │   ├── Logout.js
-    │   │   └── UserInfo.js
-    │   ├── services/
-    │   │   └── keycloak.js
-    │   ├── App.js
-    │   └── index.js
-    ├── public/
-    │   └── index.html
-    └── package.json
-```
-
-## 구현 우선순위
-
-1. **Keycloak 설정 개선** (redirect URIs, web origins 설정)
-2. **백엔드 Clean Architecture 구조** 생성
-3. **프론트엔드 React 앱** 생성
-4. **Docker Compose 환경** 구성
-5. **통합 테스트** 및 검증
+### 비기능적 요구사항
+- 로컬 환경에서만 실행 (HTTP 통신)
+- 최소한의 구현
 
 ## 기술 스택
 
-### 프론트엔드
-- React 18+
-- Keycloak JavaScript Adapter
-- React Router (라우팅)
-- Axios (HTTP 클라이언트)
+### Backend
+- Go 1.25
+- Echo framework
+- Keycloak Go 어댑터 또는 JWT 라이브러리
 
-### 백엔드
-- Go 1.21+
-- Echo Framework
-- Keycloak Go Client
-- JWT 토큰 검증
-- Viper (설정 관리)
+### Frontend
+- React
+- Keycloak JavaScript 어댑터
+- React Router (페이지 보호용)
 
-### 인프라
-- Docker & Docker Compose
-- Keycloak 26.3.2
-- PostgreSQL (Keycloak DB)
+## 개발 환경 구성
+- Keycloak: Docker로 localhost:8080에서 실행
+- Backend (Echo): localhost:8081
+- Frontend (React): localhost:3000
+- 모든 통신은 HTTP로 진행 (로컬 환경)
+
+## API 설계
+- GET /api/user - 인증된 사용자 정보 반환 (이름, 이메일)
+
+## 구현 플로우
+1. Frontend에서 Keycloak JavaScript 어댑터로 로그인 처리
+2. 로그인 성공 시 JWT 토큰을 받아서 Backend API 호출 시 헤더에 포함
+3. Backend(Echo)에서 JWT 토큰을 검증하고 사용자 정보 반환
+4. Frontend에서 사용자 정보 표시 및 로그아웃 기능 제공
+
+## 테스트 시나리오
+- Keycloak 관리자 콘솔에서 테스트 사용자 생성
+- 로그인/로그아웃 플로우 테스트
+- 토큰 만료 시나리오 테스트
+
+## 구현 지침
+- 구현은 최소한으로 한다
+- FE 개발은 react 이용해서 개발하고 frontend 폴더에 작성한다
+- BE 개발은 golang으로 개발하고 backend 폴더에 작성한다
+- library 사용시 최신 코드는 mcp context7 사용해서 최신 코드로 작성한다

@@ -1,939 +1,470 @@
-# Keycloak 기반 인증 시스템 구현 가이드
+# Implementation Guide
 
-## 개요
-이 문서는 PRD.md의 요구사항에 따라 Keycloak 기반 인증 시스템을 구현하는 상세한 가이드입니다.
+## 시스템 아키텍처 다이어그램
 
-## 1. Keycloak 설정 개선
+### 1. 전체 시스템 구조
 
-### 1.1 Keycloak 환경 확인
+```mermaid
+graph TB
+    subgraph "Client Browser"
+        A[React App<br/>localhost:3000]
+        B[Keycloak JS Adapter]
+    end
+    
+    subgraph "Keycloak Server"
+        C[Keycloak<br/>localhost:8080]
+        D[Realm: myrealm]
+        E[Client: myclient]
+        F[User: myuser]
+    end
+    
+    subgraph "Backend Server"
+        G[Go Echo Server<br/>localhost:8081]
+        H[JWT Middleware]
+        I[User API Handler]
+    end
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    
+    A --> G
+    G --> H
+    H --> I
+    
+    B -.->|JWT Token| H
+```
 
-현재 Keycloak이 이미 Docker로 실행 중입니다:
-- **Keycloak URL**: http://localhost:8080
-- **Admin Console**: http://localhost:8080/admin
-- **Admin 계정**: admin / admin
+### 2. 인증 플로우 시퀀스
 
-기존 `infra/docker_run.sh` 스크립트로 실행된 상태입니다.
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant R as React App
+    participant K as Keycloak
+    participant B as Backend API
+    
+    Note over U,B: 1. 초기 접속 및 로그인
+    U->>R: http://localhost:3000 접속
+    R->>K: Keycloak 초기화 (check-sso)
+    K-->>R: 인증 상태 확인 (미인증)
+    R->>U: 로그인 페이지 표시
+    
+    U->>R: "Login with Keycloak" 클릭
+    R->>K: keycloak.login() 호출
+    K->>U: Keycloak 로그인 페이지로 리다이렉트
+    
+    U->>K: 사용자 인증 정보 입력 (myuser/password)
+    K->>K: 사용자 인증 처리
+    K-->>R: JWT 토큰과 함께 리다이렉트
+    
+    Note over U,B: 2. 인증 후 사용자 정보 조회
+    R->>R: 인증 상태 감지 (authenticated = true)
+    R->>U: /profile 페이지로 자동 리다이렉트
+    
+    R->>B: GET /api/user (JWT 토큰 포함)
+    B->>B: JWT 토큰 검증 (Keycloak JWKS)
+    B->>B: 토큰에서 사용자 정보 추출
+    B-->>R: 사용자 정보 반환 (name, email)
+    R->>U: 사용자 프로필 페이지 표시
+    
+    Note over U,B: 3. 로그아웃
+    U->>R: "Logout" 버튼 클릭
+    R->>K: keycloak.logout() 호출
+    K->>K: 세션 종료
+    K-->>R: 로그아웃 완료
+    R->>U: 로그인 페이지로 리다이렉트
+```
 
-### 1.2 Keycloak 클라이언트 설정
+### 3. 컴포넌트 구조
 
-#### 1.2.1 React 클라이언트 설정
-- **Client ID**: `myclient`
-- **Client Protocol**: `openid-connect`
-- **Access Type**: `public`
-- **Standard Flow Enabled**: `ON`
-- **Valid Redirect URIs**: 
-  - `http://localhost:3000/*`
-  - `http://localhost:3000`
-- **Web Origins**: 
-  - `http://localhost:3000`
-  - `+` (모든 origin 허용 - 개발용)
+```mermaid
+graph LR
+    subgraph "Frontend Components"
+        A1[App.tsx<br/>- 라우팅 관리<br/>- 인증 상태 관리]
+        A2[Login.tsx<br/>- 로그인 UI<br/>- Keycloak 로그인 호출]
+        A3[UserProfile.tsx<br/>- 사용자 정보 표시<br/>- API 호출<br/>- 로그아웃 기능]
+        A4[ProtectedRoute.tsx<br/>- 인증 확인<br/>- 접근 제어]
+    end
+    
+    subgraph "Services"
+        B1[keycloak.ts<br/>- Keycloak 인스턴스<br/>- 설정 관리]
+        B2[api.ts<br/>- HTTP 클라이언트<br/>- 토큰 자동 추가<br/>- 에러 처리]
+    end
+    
+    subgraph "Backend Components"
+        C1[main.go<br/>- Echo 서버<br/>- CORS 설정<br/>- 라우팅]
+        C2[auth.go<br/>- JWT 미들웨어<br/>- 토큰 검증<br/>- JWKS 처리]
+        C3[user.go<br/>- 사용자 API<br/>- 토큰 파싱]
+        C4[user.go<br/>- 데이터 모델]
+    end
+    
+    A1 --> A2
+    A1 --> A3
+    A1 --> A4
+    A2 --> B1
+    A3 --> B2
+    A4 --> B1
+    
+    B2 --> C1
+    C1 --> C2
+    C2 --> C3
+    C3 --> C4
+```
 
-#### 1.2.2 백엔드 클라이언트 설정
-- **Client ID**: `mybackend`
-- **Client Protocol**: `openid-connect`
-- **Access Type**: `confidential`
-- **Service Accounts Enabled**: `ON`
-- **Valid Redirect URIs**: `http://localhost:8081/*`
+## 주요 구현 포인트
 
-### 1.3 Realm 설정
-- **Realm Name**: `myrealm`
-- **Login Theme**: `keycloak`
-- **Account Theme**: `keycloak`
-- **Admin Theme**: `keycloak`
-- **Email Theme**: `keycloak`
+### Frontend (React + TypeScript)
+1. **인증 상태 관리**: `useState`와 `useEffect`를 사용하여 실시간 인증 상태 감지
+2. **자동 리다이렉트**: 로그인 성공 시 `/profile`로, 미인증 시 `/login`으로 자동 이동
+3. **토큰 관리**: Axios 인터셉터를 통한 자동 JWT 토큰 추가
+4. **에러 처리**: 401 에러 시 자동 재로그인 처리
 
-## 2. 백엔드 구현 (Golang + Echo + Clean Architecture)
+### Backend (Go + Echo)
+1. **JWT 검증**: Keycloak JWKS 엔드포인트에서 공개키를 가져와 토큰 검증
+2. **미들웨어**: 모든 보호된 API에 JWT 검증 미들웨어 적용
+3. **CORS 설정**: 로컬 개발을 위한 CORS 허용
+4. **사용자 정보 추출**: JWT 클레임에서 사용자 정보 파싱
 
-### 2.1 프로젝트 구조 생성
+### Keycloak 설정
+1. **Realm**: `myrealm` - 독립적인 인증 영역
+2. **Client**: `myclient` - React 앱을 위한 OpenID Connect 클라이언트
+3. **User**: `myuser` - 테스트용 사용자 계정
+4. **Redirect URI**: React 앱의 URL 허용
 
+## 1. Keycloak 설정
+
+### Docker로 Keycloak 실행
 ```bash
-mkdir -p keycloak/backend/{cmd/server,internal/{domain,usecase,repository,handler},pkg/middleware}
-cd keycloak/backend
-go mod init keycloak-backend
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev
 ```
 
-### 2.2 의존성 설치
+### Realm 및 Client 설정
+1. **Realm 생성**
+   - Name: `myrealm`
 
-```bash
-# Go 1.24.5 사용
-go mod init keycloak-backend
-go mod tidy
+2. **Client 생성**
+   - Client ID: `myclient`
+   - Client Type: `OpenID Connect`
+   - Valid redirect URIs: `http://localhost:3000/*`
+   - Web origins: `http://localhost:3000`
 
-# 필요한 의존성들
-go get github.com/labstack/echo/v4@latest
-go get github.com/golang-jwt/jwt/v5@latest
+3. **Test User 생성**
+   - Username: `myuser`
+   - Email: `myuser@example.com`
+   - First Name: `My`
+   - Last Name: `User`
+   - Password: `password`
+
+## 2. Backend 구현 (Go + Echo)
+
+### 프로젝트 구조
+```
+backend/
+├── main.go
+├── handlers/
+│   └── user.go
+├── middleware/
+│   └── auth.go
+├── models/
+│   └── user.go
+└── go.mod
 ```
 
-### 2.3 Domain Layer
-
+### 주요 의존성
 ```go
-// internal/domain/user.go
-package domain
+// go.mod
+module keycloak-tutorial-backend
 
-import "context"
+go 1.25
 
-type User struct {
-	ID        string `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-}
-
-type UserRepository interface {
-	GetUserByID(ctx context.Context, userID string) (*User, error)
-	GetUserInfo(ctx context.Context, token string) (*User, error)
-	ValidateToken(ctx context.Context, token string) (bool, error)
-}
-
-type UserUseCase interface {
-	GetUserInfo(ctx context.Context, token string) (*User, error)
-	ValidateToken(ctx context.Context, token string) (bool, error)
-}
-```
-
-```go
-// internal/domain/auth.go
-package domain
-
-import "context"
-
-type AuthRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type AuthResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-}
-
-type AuthRepository interface {
-	Login(ctx context.Context, username, password string) (*AuthResponse, error)
-	RefreshToken(ctx context.Context, refreshToken string) (*AuthResponse, error)
-	Logout(ctx context.Context, refreshToken string) error
-}
-```
-
-### 2.4 Repository Layer
-
-```go
-// internal/repository/keycloak_repository.go
-package repository
-
-import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"net/url"
-	"strings"
-	"keycloak-backend/internal/domain"
+require (
+    github.com/labstack/echo/v4 v4.12.0
+    github.com/golang-jwt/jwt/v5 v5.2.1
+    github.com/lestrrat-go/jwx/v2 v2.1.3
 )
+```
 
-type KeycloakRepository struct {
-	baseURL      string
-	realm        string
-	clientID     string
-	clientSecret string
-	httpClient   *http.Client
-}
+### 핵심 구현 사항
 
-func NewKeycloakRepository(baseURL, realm, clientID, clientSecret string) *KeycloakRepository {
-	return &KeycloakRepository{
-		baseURL:      baseURL,
-		realm:        realm,
-		clientID:     clientID,
-		clientSecret: clientSecret,
-		httpClient:   &http.Client{},
-	}
-}
-
-// GetUserInfo - Keycloak UserInfo 엔드포인트 호출
-func (r *KeycloakRepository) GetUserInfo(ctx context.Context, token string) (*domain.User, error) {
-	userInfoURL := fmt.Sprintf("%s/realms/%s/protocol/openid-connect/userinfo", r.baseURL, r.realm)
-	
-	req, err := http.NewRequestWithContext(ctx, "GET", userInfoURL, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-	
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-	
-	resp, err := r.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to call userinfo endpoint: %w", err)
-	}
-	defer resp.Body.Close()
-	
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("userinfo endpoint returned status %d: %s", resp.StatusCode, string(body))
-	}
-	
-	var userInfo struct {
-		Sub                string `json:"sub"`
-		PreferredUsername  string `json:"preferred_username"`
-		Email              string `json:"email"`
-		GivenName          string `json:"given_name"`
-		FamilyName         string `json:"family_name"`
-	}
-	
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		return nil, fmt.Errorf("failed to decode userinfo response: %w", err)
-	}
-	
-	return &domain.User{
-		ID:        userInfo.Sub,
-		Username:  userInfo.PreferredUsername,
-		Email:     userInfo.Email,
-		FirstName: userInfo.GivenName,
-		LastName:  userInfo.FamilyName,
-	}, nil
-}
-
-// ValidateToken - Keycloak Token Introspection 엔드포인트 호출
-func (r *KeycloakRepository) ValidateToken(ctx context.Context, token string) (bool, error) {
-	introspectURL := fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token/introspect", r.baseURL, r.realm)
-	
-	data := url.Values{}
-	data.Set("token", token)
-	data.Set("client_id", r.clientID)
-	data.Set("client_secret", r.clientSecret)
-	
-	req, err := http.NewRequestWithContext(ctx, "POST", introspectURL, strings.NewReader(data.Encode()))
-	if err != nil {
-		return false, fmt.Errorf("failed to create request: %w", err)
-	}
-	
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	
-	resp, err := r.httpClient.Do(req)
-	if err != nil {
-		return false, fmt.Errorf("failed to call token introspection endpoint: %w", err)
-	}
-	defer resp.Body.Close()
-	
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return false, fmt.Errorf("token introspection endpoint returned status %d: %s", resp.StatusCode, string(body))
-	}
-	
-	var result struct {
-		Active bool `json:"active"`
-	}
-	
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return false, fmt.Errorf("failed to decode introspection response: %w", err)
-	}
-	
-	return result.Active, nil
-}
-
-// GetUserByID - Keycloak Admin API를 사용하여 사용자 정보 조회
-func (r *KeycloakRepository) GetUserByID(ctx context.Context, userID string) (*domain.User, error) {
-	// Admin 토큰 먼저 획득
-	adminToken, err := r.getAdminToken(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get admin token: %w", err)
-	}
-	
-	userURL := fmt.Sprintf("%s/admin/realms/%s/users/%s", r.baseURL, r.realm, userID)
-	
-	req, err := http.NewRequestWithContext(ctx, "GET", userURL, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-	
-	req.Header.Set("Authorization", "Bearer "+adminToken)
-	req.Header.Set("Content-Type", "application/json")
-	
-	resp, err := r.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to call admin API: %w", err)
-	}
-	defer resp.Body.Close()
-	
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("admin API returned status %d: %s", resp.StatusCode, string(body))
-	}
-	
-	var user struct {
-		ID        string `json:"id"`
-		Username  string `json:"username"`
-		Email     string `json:"email"`
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-	}
-	
-	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-		return nil, fmt.Errorf("failed to decode user response: %w", err)
-	}
-	
-	return &domain.User{
-		ID:        user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-	}, nil
-}
-
-// getAdminToken - Keycloak Admin 토큰 획득
-func (r *KeycloakRepository) getAdminToken(ctx context.Context) (string, error) {
-	tokenURL := fmt.Sprintf("%s/realms/master/protocol/openid-connect/token", r.baseURL)
-	
-	data := url.Values{}
-	data.Set("grant_type", "client_credentials")
-	data.Set("client_id", "admin-cli")
-	data.Set("client_secret", r.clientSecret)
-	
-	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, strings.NewReader(data.Encode()))
-	if err != nil {
-		return "", fmt.Errorf("failed to create admin token request: %w", err)
-	}
-	
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	
-	resp, err := r.httpClient.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to call admin token endpoint: %w", err)
-	}
-	defer resp.Body.Close()
-	
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("admin token endpoint returned status %d: %s", resp.StatusCode, string(body))
-	}
-	
-	var tokenResp struct {
-		AccessToken string `json:"access_token"`
-	}
-	
-	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
-		return "", fmt.Errorf("failed to decode admin token response: %w", err)
-	}
-	
-	return tokenResp.AccessToken, nil
+#### 1. JWT 토큰 검증 미들웨어
+```go
+// middleware/auth.go
+func JWTMiddleware() echo.MiddlewareFunc {
+    return func(next echo.HandlerFunc) echo.HandlerFunc {
+        return func(c echo.Context) error {
+            // Authorization 헤더에서 토큰 추출
+            // Keycloak public key로 토큰 검증
+            // 사용자 정보를 context에 저장
+        }
+    }
 }
 ```
 
-### 2.5 UseCase Layer
-
+#### 2. 사용자 정보 핸들러
 ```go
-// internal/usecase/user_usecase.go
-package usecase
-
-import (
-	"context"
-	"keycloak-backend/internal/domain"
-)
-
-type UserUseCaseImpl struct {
-	userRepo domain.UserRepository
-}
-
-func NewUserUseCase(userRepo domain.UserRepository) domain.UserUseCase {
-	return &UserUseCaseImpl{
-		userRepo: userRepo,
-	}
-}
-
-func (u *UserUseCaseImpl) GetUserInfo(ctx context.Context, token string) (*domain.User, error) {
-	return u.userRepo.GetUserInfo(ctx, token)
-}
-
-func (u *UserUseCaseImpl) ValidateToken(ctx context.Context, token string) (bool, error) {
-	return u.userRepo.ValidateToken(ctx, token)
+// handlers/user.go
+func GetUserInfo(c echo.Context) error {
+    // JWT 토큰에서 사용자 정보 추출
+    // 이름, 이메일 반환
 }
 ```
 
-### 2.6 Handler Layer
-
+#### 3. 메인 서버
 ```go
-// internal/handler/user_handler.go
-package handler
-
-import (
-	"context"
-	"net/http"
-	"strings"
-	"keycloak-backend/internal/domain"
-	"github.com/labstack/echo/v4"
-)
-
-type UserHandler struct {
-	userUseCase domain.UserUseCase
-}
-
-func NewUserHandler(userUseCase domain.UserUseCase) *UserHandler {
-	return &UserHandler{
-		userUseCase: userUseCase,
-	}
-}
-
-func (h *UserHandler) GetUserInfo(c echo.Context) error {
-	token := extractToken(c)
-	if token == "" {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Authorization header required")
-	}
-	
-	ctx := c.Request().Context()
-	user, err := h.userUseCase.GetUserInfo(ctx, token)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
-	}
-	
-	return c.JSON(http.StatusOK, user)
-}
-
-func (h *UserHandler) ValidateToken(c echo.Context) error {
-	token := extractToken(c)
-	if token == "" {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Authorization header required")
-	}
-	
-	ctx := c.Request().Context()
-	valid, err := h.userUseCase.ValidateToken(ctx, token)
-	if err != nil || !valid {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
-	}
-	
-	return c.JSON(http.StatusOK, map[string]bool{"valid": true})
-}
-
-func extractToken(c echo.Context) string {
-	authHeader := c.Request().Header.Get("Authorization")
-	if authHeader == "" {
-		return ""
-	}
-	
-	if strings.HasPrefix(authHeader, "Bearer ") {
-		return strings.TrimPrefix(authHeader, "Bearer ")
-	}
-	
-	return authHeader
-}
-```
-
-### 2.7 Middleware
-
-```go
-// pkg/middleware/auth.go
-package middleware
-
-import (
-	"context"
-	"net/http"
-	"strings"
-	"keycloak-backend/internal/domain"
-	"github.com/labstack/echo/v4"
-)
-
-func AuthMiddleware(userUseCase domain.UserUseCase) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			token := extractToken(c)
-			if token == "" {
-				return echo.NewHTTPError(http.StatusUnauthorized, "Authorization header required")
-			}
-			
-			ctx := c.Request().Context()
-			valid, err := userUseCase.ValidateToken(ctx, token)
-			if err != nil || !valid {
-				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
-			}
-			
-			// 토큰을 컨텍스트에 저장
-			c.Set("token", token)
-			
-			return next(c)
-		}
-	}
-}
-
-func extractToken(c echo.Context) string {
-	authHeader := c.Request().Header.Get("Authorization")
-	if authHeader == "" {
-		return ""
-	}
-	
-	if strings.HasPrefix(authHeader, "Bearer ") {
-		return strings.TrimPrefix(authHeader, "Bearer ")
-	}
-	
-	return authHeader
-}
-```
-
-### 2.8 Configuration
-
-간단한 구현을 위해 하드코딩된 설정을 사용합니다:
-
-```go
-// pkg/config/config.go
-package config
-
-type Config struct {
-	Server   ServerConfig
-	Keycloak KeycloakConfig
-}
-
-type ServerConfig struct {
-	Port string
-}
-
-type KeycloakConfig struct {
-	BaseURL      string
-	Realm        string
-	ClientID     string
-	ClientSecret string
-}
-
-func NewConfig() *Config {
-	return &Config{
-		Server: ServerConfig{
-			Port: "8081",
-		},
-		Keycloak: KeycloakConfig{
-			BaseURL:      "http://localhost:8080",
-			Realm:        "myrealm",
-			ClientID:     "mybackend",
-			ClientSecret: "your-client-secret", // Keycloak에서 생성된 클라이언트 시크릿으로 변경
-		},
-	}
-}
-```
-
-### 2.9 Main Application
-
-```go
-// cmd/server/main.go
-package main
-
-import (
-	"log"
-	"net/http"
-	"keycloak-backend/internal/domain"
-	"keycloak-backend/internal/handler"
-	"keycloak-backend/internal/repository"
-	"keycloak-backend/internal/usecase"
-	"keycloak-backend/pkg/config"
-	"keycloak-backend/pkg/middleware"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-)
-
+// main.go
 func main() {
-	// 설정 로드
-	cfg := config.NewConfig()
-	
-	// Echo 인스턴스 생성
-	e := echo.New()
-	
-	// 미들웨어 설정
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
-	}))
-	
-	// Repository 생성
-	keycloakRepo := repository.NewKeycloakRepository(
-		cfg.Keycloak.BaseURL,
-		cfg.Keycloak.Realm,
-		cfg.Keycloak.ClientID,
-		cfg.Keycloak.ClientSecret,
-	)
-	
-	// UseCase 생성
-	userUseCase := usecase.NewUserUseCase(keycloakRepo)
-	
-	// Handler 생성
-	userHandler := handler.NewUserHandler(userUseCase)
-	
-	// 라우트 설정
-	api := e.Group("/api")
-	
-	// 인증이 필요한 라우트
-	protected := api.Group("/protected")
-	protected.Use(middleware.AuthMiddleware(userUseCase))
-	protected.GET("/user", userHandler.GetUserInfo)
-	
-	// 인증이 필요없는 라우트
-	api.GET("/validate", userHandler.ValidateToken)
-	
-	// 서버 시작
-	log.Printf("Server starting on port %s", cfg.Server.Port)
-	log.Fatal(e.Start(":" + cfg.Server.Port))
+    e := echo.New()
+    
+    // CORS 미들웨어 (로컬 개발용)
+    e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+        AllowOrigins: []string{"http://localhost:3000"},
+        AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
+        AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+    }))
+    
+    // 보호된 라우트
+    protected := e.Group("/api")
+    protected.Use(JWTMiddleware())
+    protected.GET("/user", handlers.GetUserInfo)
+    
+    e.Logger.Fatal(e.Start(":8081"))
 }
 ```
 
-### 2.10 설정
+## 3. Frontend 구현 (React)
 
-설정은 `pkg/config/config.go` 파일에서 하드코딩되어 있습니다.
-
-주요 설정값:
-- **서버 포트**: 8081
-- **Keycloak URL**: http://localhost:8080
-- **Realm**: myrealm
-- **Client ID**: mybackend
-- **Client Secret**: Keycloak에서 생성된 실제 시크릿으로 변경 필요
-
-## 3. 프론트엔드 구현 (React)
-
-### 3.1 프로젝트 생성
-
-```bash
-npx create-react-app keycloak/frontend
-cd keycloak/frontend
-npm install keycloak-js axios react-router-dom
+### 프로젝트 구조
+```
+frontend/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── Login.jsx
+│   │   ├── UserProfile.jsx
+│   │   └── ProtectedRoute.jsx
+│   ├── services/
+│   │   ├── keycloak.js
+│   │   └── api.js
+│   ├── App.js
+│   └── index.js
+├── package.json
+└── README.md
 ```
 
-### 3.2 Keycloak 설정
+### 주요 의존성
+```json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "keycloak-js": "^23.0.0",
+    "axios": "^1.6.0"
+  }
+}
+```
 
+### 핵심 구현 사항
+
+#### 1. Keycloak 설정
 ```javascript
-// src/services/keycloak.js
+// services/keycloak.js
 import Keycloak from 'keycloak-js';
 
-const keycloakConfig = {
+const keycloak = new Keycloak({
   url: 'http://localhost:8080',
   realm: 'myrealm',
   clientId: 'myclient'
-};
-
-const keycloak = new Keycloak(keycloakConfig);
-
-export const initKeycloak = () => {
-  return new Promise((resolve, reject) => {
-    keycloak.init({
-      onLoad: 'check-sso',
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-      pkceMethod: 'S256'
-    })
-    .then((authenticated) => {
-      resolve({ authenticated, keycloak });
-    })
-    .catch((error) => {
-      reject(error);
-    });
-  });
-};
+});
 
 export default keycloak;
 ```
 
-### 3.3 API 서비스
-
+#### 2. API 서비스
 ```javascript
-// src/services/api.js
+// services/api.js
 import axios from 'axios';
 import keycloak from './keycloak';
 
-const API_BASE_URL = 'http://localhost:8081/api';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: 'http://localhost:8081/api'
 });
 
-// 요청 인터셉터 - 토큰 추가
-api.interceptors.request.use(
-  (config) => {
-    if (keycloak.token) {
-      config.headers.Authorization = `Bearer ${keycloak.token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// 요청 인터셉터로 토큰 자동 추가
+api.interceptors.request.use((config) => {
+  if (keycloak.token) {
+    config.headers.Authorization = `Bearer ${keycloak.token}`;
   }
-);
+  return config;
+});
 
-// 응답 인터셉터 - 토큰 갱신
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      try {
-        await keycloak.updateToken(30);
-        error.config.headers.Authorization = `Bearer ${keycloak.token}`;
-        return api.request(error.config);
-      } catch (refreshError) {
-        keycloak.logout();
-        return Promise.reject(refreshError);
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const getUserInfo = () => api.get('/protected/user');
-export const validateToken = () => api.get('/validate');
-
-export default api;
+export const getUserInfo = () => api.get('/user');
 ```
 
-### 3.4 컴포넌트 구현
-
-```jsx
-// src/components/Login.js
-import React from 'react';
+#### 3. 보호된 라우트 컴포넌트
+```javascript
+// components/ProtectedRoute.jsx
+import { Navigate } from 'react-router-dom';
 import keycloak from '../services/keycloak';
 
-const Login = () => {
-  const handleLogin = () => {
-    keycloak.login();
-  };
-
-  return (
-    <div className="login-container">
-      <h2>Welcome to Keycloak Auth Demo</h2>
-      <p>Please login to continue</p>
-      <button onClick={handleLogin} className="login-button">
-        Login with Keycloak
-      </button>
-    </div>
-  );
+const ProtectedRoute = ({ children }) => {
+  return keycloak.authenticated ? children : <Navigate to="/login" />;
 };
-
-export default Login;
 ```
 
-```jsx
-// src/components/Logout.js
-import React from 'react';
-import keycloak from '../services/keycloak';
-
-const Logout = () => {
-  const handleLogout = () => {
-    keycloak.logout();
-  };
-
-  return (
-    <div className="logout-container">
-      <button onClick={handleLogout} className="logout-button">
-        Logout
-      </button>
-    </div>
-  );
-};
-
-export default Logout;
-```
-
-```jsx
-// src/components/UserInfo.js
-import React, { useState, useEffect } from 'react';
+#### 4. 사용자 프로필 컴포넌트
+```javascript
+// components/UserProfile.jsx
+import { useState, useEffect } from 'react';
 import { getUserInfo } from '../services/api';
 import keycloak from '../services/keycloak';
 
-const UserInfo = () => {
+const UserProfile = () => {
   const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+  
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await getUserInfo();
-        setUserInfo(response.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (keycloak.authenticated) {
-      fetchUserInfo();
-    }
+    fetchUserInfo();
   }, []);
-
-  if (loading) return <div>Loading user info...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!userInfo) return <div>No user info available</div>;
-
+  
+  const fetchUserInfo = async () => {
+    try {
+      const response = await getUserInfo();
+      setUserInfo(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+    }
+  };
+  
+  const handleLogout = () => {
+    keycloak.logout();
+  };
+  
   return (
-    <div className="user-info">
-      <h3>User Information</h3>
-      <div className="user-details">
-        <p><strong>Username:</strong> {userInfo.username}</p>
-        <p><strong>Email:</strong> {userInfo.email}</p>
-        <p><strong>First Name:</strong> {userInfo.firstName}</p>
-        <p><strong>Last Name:</strong> {userInfo.lastName}</p>
-        <p><strong>Full Name:</strong> {userInfo.firstName} {userInfo.lastName}</p>
-      </div>
+    <div>
+      <h2>User Profile</h2>
+      {userInfo && (
+        <div>
+          <p>Name: {userInfo.name}</p>
+          <p>Email: {userInfo.email}</p>
+        </div>
+      )}
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 };
-
-export default UserInfo;
 ```
 
-### 3.5 메인 앱 컴포넌트
-
-```jsx
-// src/App.js
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { initKeycloak } from './services/keycloak';
+#### 5. 메인 App 컴포넌트
+```javascript
+// App.js
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import keycloak from './services/keycloak';
 import Login from './components/Login';
-import UserInfo from './components/UserInfo';
-import Logout from './components/Logout';
-import './App.css';
+import UserProfile from './components/UserProfile';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const [keycloak, setKeycloak] = useState(null);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-
+  const [keycloakInitialized, setKeycloakInitialized] = useState(false);
+  
   useEffect(() => {
-    initKeycloak()
-      .then(({ authenticated, keycloak }) => {
-        setKeycloak(keycloak);
-        setAuthenticated(authenticated);
-        setLoading(false);
+    keycloak.init({ onLoad: 'check-sso' })
+      .then((authenticated) => {
+        setKeycloakInitialized(true);
       })
       .catch((error) => {
-        console.error('Keycloak init failed:', error);
-        setLoading(false);
+        console.error('Keycloak initialization failed:', error);
       });
   }, []);
-
-  if (loading) {
+  
+  if (!keycloakInitialized) {
     return <div>Loading...</div>;
   }
-
+  
   return (
     <Router>
       <div className="App">
-        <header className="App-header">
-          <h1>Keycloak Authentication Demo</h1>
-          {authenticated && <Logout />}
-        </header>
-        
-        <main>
-          <Routes>
-            <Route 
-              path="/" 
-              element={
-                authenticated ? (
-                  <div>
-                    <UserInfo />
-                  </div>
-                ) : (
-                  <Login />
-                )
-              } 
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/" element={<Login />} />
+        </Routes>
       </div>
     </Router>
   );
 }
-
-export default App;
 ```
 
-### 3.6 스타일링
+## 4. 환경 설정
 
-```css
-/* src/App.css */
-.App {
-  text-align: center;
-  padding: 20px;
-}
-
-.App-header {
-  background-color: #282c34;
-  padding: 20px;
-  color: white;
-  margin-bottom: 20px;
-}
-
-.login-container, .user-info, .logout-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.login-button, .logout-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.login-button:hover, .logout-button:hover {
-  background-color: #0056b3;
-}
-
-.user-details {
-  text-align: left;
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 5px;
-  margin-top: 20px;
-}
-
-.user-details p {
-  margin: 10px 0;
-}
-```
-
-## 4. 실행 방법
-
-### 4.1 환경 시작
-
+### Backend 환경 변수
 ```bash
-# Keycloak은 이미 실행 중 (localhost:8080)
-
-# 백엔드 시작
-cd keycloak/backend
-go run cmd/server/main.go
-
-# 프론트엔드 시작
-cd ../frontend
-npm start
+# .env
+KEYCLOAK_URL=http://localhost:8080
+KEYCLOAK_REALM=myrealm
+KEYCLOAK_CLIENT_ID=myclient
+SERVER_PORT=8081
 ```
 
-### 4.2 접속 URL
-- **Keycloak Admin Console**: http://localhost:8080
-- **React 앱**: http://localhost:3000
-- **백엔드 API**: http://localhost:8081
+### Frontend 환경 변수
+```bash
+# .env
+REACT_APP_KEYCLOAK_URL=http://localhost:8080
+REACT_APP_KEYCLOAK_REALM=myrealm
+REACT_APP_KEYCLOAK_CLIENT_ID=myclient
+REACT_APP_API_URL=http://localhost:8081/api
+```
 
-### 4.3 테스트 시나리오
-1. React 앱 접속
-2. "Login with Keycloak" 버튼 클릭
-3. Keycloak 로그인 페이지에서 사용자 정보 입력
-4. 로그인 후 사용자 정보 확인
-5. 로그아웃 테스트
+## 5. 실행 순서
 
-## 5. 추가 개선사항
+1. **Keycloak 실행**
+   ```bash
+   docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev
+   ```
 
-### 5.1 보안 강화
-- HTTPS 설정
-- 토큰 만료 시간 조정
+2. **Keycloak 설정** (웹 콘솔에서)
+   - Realm, Client, User 생성
 
-### 5.2 기능 확장
-- 사용자 등록
-- 비밀번호 변경
-- 프로필 관리
+3. **Backend 실행**
+   ```bash
+   cd backend
+   go mod tidy
+   go run main.go
+   ```
 
-### 5.3 모니터링
-- 로그 설정
-- 헬스체크 엔드포인트
+4. **Frontend 실행**
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+   ㅇ
 
-이 구현 가이드를 따라하면 PRD.md의 모든 요구사항을 만족하는 Keycloak 기반 인증 시스템을 구축할 수 있습니다.
+## 6. 테스트 시나리오
+
+### 기본 플로우 테스트
+1. `http://localhost:3000` 접속
+2. 로그인 페이지에서 Keycloak 로그인
+3. 사용자 정보 페이지에서 이름, 이메일 확인
+4. 로그아웃 버튼으로 로그아웃
+
+### 토큰 만료 테스트
+1. 로그인 후 브라우저 개발자 도구에서 토큰 확인
+2. 토큰 만료 시간 대기 또는 수동으로 토큰 삭제
+3. API 호출 시 401 에러 확인
+4. 자동 로그아웃 또는 재로그인 프롬프트 확인
+
+### 에러 처리 테스트
+1. 잘못된 사용자 정보로 로그인 시도
+2. 네트워크 오류 시뮬레이션
+3. Backend 서버 중단 상태에서 API 호출
