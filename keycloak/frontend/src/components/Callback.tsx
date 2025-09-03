@@ -18,10 +18,9 @@ const Callback: React.FC = () => {
         setProcessed(true); // 처리 시작 표시
         
         const code = searchParams.get('code');
-        const state = searchParams.get('state');
         const errorParam = searchParams.get('error');
 
-        console.log('Callback processing:', { code: !!code, state: !!state, error: errorParam });
+        console.log('Callback processing:', { code: !!code, error: errorParam });
 
         if (errorParam) {
           setError(`인증 오류: ${errorParam}`);
@@ -29,8 +28,8 @@ const Callback: React.FC = () => {
           return;
         }
 
-        if (!code || !state) {
-          setError('인증 코드 또는 상태 파라미터가 없습니다.');
+        if (!code) {
+          setError('인증 코드가 없습니다.');
           setStatus('error');
           return;
         }
@@ -44,7 +43,7 @@ const Callback: React.FC = () => {
         }
 
         console.log('Attempting token exchange...');
-        const success = await authService.handleCallback(code, state);
+        const success = await authService.handleCallback(code);
         
         if (success) {
           console.log('Token exchange successful');

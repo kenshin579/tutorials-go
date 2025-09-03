@@ -68,7 +68,7 @@ const Login: React.FC = () => {
             Keycloak 로그인
           </h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: '#666', lineHeight: '1.5' }}>
-            Authorization Code Flow를 사용하여<br/>
+            간단한 OAuth 2.0 플로우로<br/>
             Keycloak 호스팅 페이지에서 로그인합니다
           </p>
           <button 

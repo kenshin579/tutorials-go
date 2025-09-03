@@ -74,19 +74,13 @@ class AuthService {
     return null;
   }
 
-  // Authorization Code Flow 로그인 (PKCE 없음)
+  // Authorization Code Flow 로그인 (최소 구현)
   public initiateLogin(): void {
-    const state = this.generateRandomString();
-    
-    // Store state for later verification
-    sessionStorage.setItem('oauth_state', state);
-    
     const authUrl = new URL(`${this.config.url}/realms/${this.config.realm}/protocol/openid-connect/auth`);
     authUrl.searchParams.append('client_id', this.config.clientId);
     authUrl.searchParams.append('redirect_uri', window.location.origin + '/callback');
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('scope', 'openid profile email');
-    authUrl.searchParams.append('state', state);
     
     window.location.href = authUrl.toString();
   }
@@ -94,19 +88,12 @@ class AuthService {
 
 
   // Authorization Code를 토큰으로 교환
-  public async handleCallback(code: string, state: string): Promise<boolean> {
+  public async handleCallback(code: string): Promise<boolean> {
     try {
       // 이미 인증된 상태라면 성공으로 처리
       if (this.isAuthenticated()) {
         console.log('Already authenticated, skipping token exchange');
         return true;
-      }
-
-      const storedState = sessionStorage.getItem('oauth_state');
-      
-      if (state !== storedState) {
-        console.error('State mismatch:', { received: state, stored: storedState });
-        throw new Error('Invalid state parameter - possible CSRF attack');
       }
 
       console.log('Starting token exchange with code:', code.substring(0, 10) + '...');
@@ -131,8 +118,7 @@ class AuthService {
         const errorText = await response.text();
         console.error('Token exchange failed:', response.status, errorText);
         
-        // Clean up on failure
-        sessionStorage.removeItem('oauth_state');
+        // Log error for debugging
         
         throw new Error(`Token exchange failed: ${response.status} - ${errorText}`);
       }
@@ -141,8 +127,7 @@ class AuthService {
       console.log('Token exchange successful, saving tokens');
       this.saveTokensToStorage(tokenResponse);
       
-      // Clean up
-      sessionStorage.removeItem('oauth_state');
+      // Token exchange successful
       
       return true;
     } catch (error) {
@@ -151,11 +136,7 @@ class AuthService {
     }
   }
 
-  private generateRandomString(): string {
-    const array = new Uint32Array(28);
-    crypto.getRandomValues(array);
-    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-  }
+
 
   public async refreshAccessToken(): Promise<boolean> {
     if (!this.refreshToken) {

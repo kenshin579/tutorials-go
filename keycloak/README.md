@@ -210,8 +210,8 @@ docker logs keycloak-tutorial
 
 **토큰 교환 실패**
 ```
-원인: Authorization Code 만료 또는 State 불일치
-해결: 브라우저 개발자 도구에서 sessionStorage 확인
+원인: Authorization Code 만료 또는 재사용
+해결: 새로 로그인 시도, 브라우저 개발자 도구에서 콘솔 확인
 ```
 
 **CORS 오류**
@@ -240,14 +240,14 @@ REACT_APP_API_URL=http://localhost:8081/api
 
 ## 인증 구현 방식
 
-### Authorization Code Flow
+### 간단한 OAuth 2.0 구현
 
-이 프로젝트는 **Keycloak 라이브러리 대신 REST API**를 사용하여 OAuth 2.0 Authorization Code Flow를 구현합니다.
+이 프로젝트는 **Keycloak 라이브러리 대신 REST API**를 사용하여 최소한의 OAuth 2.0 Authorization Code Flow를 구현합니다.
 
 #### 주요 특징
-- ✅ **간단한 구현**: 최소한의 코드로 OAuth 2.0 구현
+- ✅ **최소 구현**: 핵심 기능만으로 OAuth 2.0 구현
 - ✅ **라이브러리 독립성**: keycloak-js 라이브러리 없이 구현
-- ✅ **표준 준수**: OAuth 2.0 및 OpenID Connect 표준 준수
+- ✅ **학습 친화적**: 복잡한 보안 로직 없이 기본 플로우에 집중
 - ✅ **토큰 관리**: 자동 토큰 갱신 및 만료 처리
 
 #### 인증 플로우
@@ -259,8 +259,7 @@ sequenceDiagram
     participant B as Backend
 
     U->>F: 로그인 버튼 클릭
-    F->>F: State 파라미터 생성
-    F->>K: Authorization 요청 (state)
+    F->>K: Authorization 요청
     K->>U: 로그인 페이지 표시
     U->>K: 사용자 인증
     K->>F: Authorization Code 반환 (/callback)
@@ -274,7 +273,7 @@ sequenceDiagram
 #### 구현된 기능
 
 **AuthService 클래스**
-- `initiateLogin()`: State 파라미터 생성 및 Keycloak 로그인 페이지로 리다이렉트
+- `initiateLogin()`: Keycloak 로그인 페이지로 리다이렉트
 - `handleCallback()`: Authorization Code를 Access Token으로 교환
 - `refreshAccessToken()`: 토큰 자동 갱신
 - `getUserInfo()`: Keycloak UserInfo 엔드포인트 호출
@@ -293,12 +292,12 @@ sequenceDiagram
 
 ## 보안 고려사항
 
-- ✅ **State 파라미터**: CSRF 공격 방지
 - ✅ **토큰 저장**: localStorage 사용 (프로덕션에서는 httpOnly 쿠키 권장)
 - ✅ **토큰 만료**: 자동 갱신 및 만료 처리
 - ⚠️ **HTTP 통신**: 로컬 개발용 (프로덕션에서는 HTTPS 필수)
-- ⚠️ **Public Client**: PKCE 없는 간단한 구현 (학습용)
-- ⚠️ **Direct Access Grants**: 비활성화 (보안상 권장)
+- ⚠️ **최소 보안**: 학습 목적으로 CSRF/PKCE 보호 제거
+- ⚠️ **Public Client**: 간단한 구현 (학습/개발용)
+- ⚠️ **프로덕션 사용 금지**: 실제 서비스에서는 추가 보안 조치 필요
 
 ## 참고 문서
 
