@@ -74,15 +74,12 @@ class AuthService {
     return null;
   }
 
-  // Authorization Code Flow 로그인
-  public async initiateLogin(): Promise<void> {
+  // Authorization Code Flow 로그인 (PKCE 없음)
+  public initiateLogin(): void {
     const state = this.generateRandomString();
-    const codeVerifier = this.generateCodeVerifier();
-    const codeChallenge = await this.generateCodeChallenge(codeVerifier);
     
-    // Store for later use
+    // Store state for later verification
     sessionStorage.setItem('oauth_state', state);
-    sessionStorage.setItem('code_verifier', codeVerifier);
     
     const authUrl = new URL(`${this.config.url}/realms/${this.config.realm}/protocol/openid-connect/auth`);
     authUrl.searchParams.append('client_id', this.config.clientId);
@@ -90,8 +87,6 @@ class AuthService {
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('scope', 'openid profile email');
     authUrl.searchParams.append('state', state);
-    authUrl.searchParams.append('code_challenge', codeChallenge);
-    authUrl.searchParams.append('code_challenge_method', 'S256');
     
     window.location.href = authUrl.toString();
   }
@@ -108,16 +103,10 @@ class AuthService {
       }
 
       const storedState = sessionStorage.getItem('oauth_state');
-      const codeVerifier = sessionStorage.getItem('code_verifier');
       
       if (state !== storedState) {
         console.error('State mismatch:', { received: state, stored: storedState });
         throw new Error('Invalid state parameter - possible CSRF attack');
-      }
-      
-      if (!codeVerifier) {
-        console.error('Code verifier not found in sessionStorage');
-        throw new Error('Code verifier not found');
       }
 
       console.log('Starting token exchange with code:', code.substring(0, 10) + '...');
@@ -129,7 +118,6 @@ class AuthService {
       formData.append('client_id', this.config.clientId);
       formData.append('code', code);
       formData.append('redirect_uri', window.location.origin + '/callback');
-      formData.append('code_verifier', codeVerifier);
 
       const response = await fetch(tokenUrl, {
         method: 'POST',
@@ -145,7 +133,6 @@ class AuthService {
         
         // Clean up on failure
         sessionStorage.removeItem('oauth_state');
-        sessionStorage.removeItem('code_verifier');
         
         throw new Error(`Token exchange failed: ${response.status} - ${errorText}`);
       }
@@ -156,7 +143,6 @@ class AuthService {
       
       // Clean up
       sessionStorage.removeItem('oauth_state');
-      sessionStorage.removeItem('code_verifier');
       
       return true;
     } catch (error) {
@@ -169,25 +155,6 @@ class AuthService {
     const array = new Uint32Array(28);
     crypto.getRandomValues(array);
     return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-  }
-
-  private generateCodeVerifier(): string {
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    return btoa(String.fromCharCode.apply(null, Array.from(array)))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  }
-
-  private async generateCodeChallenge(verifier: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    const hash = await crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(hash))))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
   }
 
   public async refreshAccessToken(): Promise<boolean> {

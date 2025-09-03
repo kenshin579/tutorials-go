@@ -27,7 +27,7 @@ keycloak2/
 - **언어**: TypeScript
 - **프레임워크**: React 18
 - **라우팅**: React Router DOM
-- **인증**: Authorization Code Flow with PKCE (REST API)
+- **인증**: Authorization Code Flow (REST API)
 - **HTTP 클라이언트**: Axios
 - **포트**: 3000
 
@@ -210,7 +210,7 @@ docker logs keycloak-tutorial
 
 **토큰 교환 실패**
 ```
-원인: PKCE 코드 불일치 또는 만료
+원인: Authorization Code 만료 또는 State 불일치
 해결: 브라우저 개발자 도구에서 sessionStorage 확인
 ```
 
@@ -240,12 +240,12 @@ REACT_APP_API_URL=http://localhost:8081/api
 
 ## 인증 구현 방식
 
-### Authorization Code Flow with PKCE
+### Authorization Code Flow
 
 이 프로젝트는 **Keycloak 라이브러리 대신 REST API**를 사용하여 OAuth 2.0 Authorization Code Flow를 구현합니다.
 
 #### 주요 특징
-- ✅ **보안**: Authorization Code Flow with PKCE 사용
+- ✅ **간단한 구현**: 최소한의 코드로 OAuth 2.0 구현
 - ✅ **라이브러리 독립성**: keycloak-js 라이브러리 없이 구현
 - ✅ **표준 준수**: OAuth 2.0 및 OpenID Connect 표준 준수
 - ✅ **토큰 관리**: 자동 토큰 갱신 및 만료 처리
@@ -259,12 +259,12 @@ sequenceDiagram
     participant B as Backend
 
     U->>F: 로그인 버튼 클릭
-    F->>F: PKCE 코드 생성
-    F->>K: Authorization 요청 (code_challenge)
+    F->>F: State 파라미터 생성
+    F->>K: Authorization 요청 (state)
     K->>U: 로그인 페이지 표시
     U->>K: 사용자 인증
     K->>F: Authorization Code 반환 (/callback)
-    F->>K: 토큰 교환 (code + code_verifier)
+    F->>K: 토큰 교환 (code)
     K->>F: Access Token + Refresh Token
     F->>B: API 요청 (Bearer Token)
     B->>K: JWT 토큰 검증 (JWKS)
@@ -274,7 +274,7 @@ sequenceDiagram
 #### 구현된 기능
 
 **AuthService 클래스**
-- `initiateLogin()`: PKCE 코드 생성 및 Keycloak 로그인 페이지로 리다이렉트
+- `initiateLogin()`: State 파라미터 생성 및 Keycloak 로그인 페이지로 리다이렉트
 - `handleCallback()`: Authorization Code를 Access Token으로 교환
 - `refreshAccessToken()`: 토큰 자동 갱신
 - `getUserInfo()`: Keycloak UserInfo 엔드포인트 호출
@@ -293,11 +293,11 @@ sequenceDiagram
 
 ## 보안 고려사항
 
-- ✅ **PKCE 사용**: Authorization Code Injection 공격 방지
 - ✅ **State 파라미터**: CSRF 공격 방지
 - ✅ **토큰 저장**: localStorage 사용 (프로덕션에서는 httpOnly 쿠키 권장)
 - ✅ **토큰 만료**: 자동 갱신 및 만료 처리
 - ⚠️ **HTTP 통신**: 로컬 개발용 (프로덕션에서는 HTTPS 필수)
+- ⚠️ **Public Client**: PKCE 없는 간단한 구현 (학습용)
 - ⚠️ **Direct Access Grants**: 비활성화 (보안상 권장)
 
 ## 참고 문서

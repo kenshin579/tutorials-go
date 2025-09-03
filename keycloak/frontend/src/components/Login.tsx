@@ -6,9 +6,9 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
-  const handleKeycloakLogin = async () => {
+  const handleKeycloakLogin = () => {
     try {
-      await authService.initiateLogin();
+      authService.initiateLogin();
     } catch (err) {
       console.error('Keycloak login error:', err);
       setError('Keycloak 로그인 중 오류가 발생했습니다.');
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
             Keycloak 로그인
           </h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: '#666', lineHeight: '1.5' }}>
-            안전한 Authorization Code Flow를 사용하여<br/>
+            Authorization Code Flow를 사용하여<br/>
             Keycloak 호스팅 페이지에서 로그인합니다
           </p>
           <button 
