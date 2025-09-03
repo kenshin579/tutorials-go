@@ -27,7 +27,7 @@ keycloak2/
 - **언어**: TypeScript
 - **프레임워크**: React 18
 - **라우팅**: React Router DOM
-- **인증**: Keycloak JavaScript 어댑터
+- **인증**: Authorization Code Flow with PKCE (REST API)
 - **HTTP 클라이언트**: Axios
 - **포트**: 3000
 
@@ -70,7 +70,11 @@ docker run -d -p 8080:8080 \
 3. **Client 생성**
    - Client ID: `myclient`
    - Client Type: `OpenID Connect`
-   - Valid redirect URIs: `http://localhost:3000/*`
+   - Access Type: `public`
+   - Standard Flow Enabled: `ON`
+   - Direct Access Grants Enabled: `OFF` (보안상 권장)
+   - Valid redirect URIs: `http://localhost:3000/callback`
+   - Valid post logout redirect URIs: `http://localhost:3000/login`
    - Web origins: `http://localhost:3000`
 
 4. **Test User 생성**
@@ -78,7 +82,7 @@ docker run -d -p 8080:8080 \
    - Email: `myuser@example.com`
    - First Name: `My`
    - Last Name: `User`
-   - Password: `password`
+   - Password: `1234` (또는 원하는 비밀번호)
 
 ### 3. Backend 실행
 
@@ -123,12 +127,15 @@ npm start
 
 ## 테스트 시나리오
 
-### 기본 플로우
+### 기본 플로우 (Authorization Code Flow)
 1. http://localhost:3000 접속
-2. "Login with Keycloak" 버튼 클릭
-3. Keycloak 로그인 페이지에서 `myuser` / `password`로 로그인
-4. 사용자 정보 페이지에서 이름, 이메일 확인
-5. "Logout" 버튼으로 로그아웃
+2. "🔐 Keycloak으로 로그인" 버튼 클릭
+3. Keycloak 로그인 페이지로 자동 리다이렉트
+4. `myuser` / `1234`로 로그인
+5. `/callback` 페이지에서 토큰 교환 처리
+6. 사용자 정보 페이지(`/profile`)로 자동 이동
+7. 사용자 이름, 이메일 정보 확인
+8. "Logout" 버튼으로 로그아웃 후 로그인 페이지로 이동
 
 ### API 테스트
 ```bash
@@ -146,7 +153,8 @@ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
 
 ### Frontend Routes
 - `/` - 루트 (로그인 상태에 따라 리다이렉트)
-- `/login` - 로그인 페이지
+- `/login` - 로그인 페이지 (Authorization Code Flow)
+- `/callback` - OAuth 콜백 페이지 (토큰 교환 처리)
 - `/profile` - 사용자 프로필 페이지 (보호된 라우트)
 
 ### Keycloak
@@ -186,6 +194,32 @@ docker rm keycloak-tutorial
 docker logs keycloak-tutorial
 ```
 
+### 인증 관련 문제
+
+**400 Bad Request (unauthorized_client)**
+```
+원인: Direct Access Grants가 비활성화됨
+해결: Keycloak 클라이언트 설정에서 "Standard Flow Enabled: ON" 확인
+```
+
+**리다이렉트 오류**
+```
+원인: Valid Redirect URIs 설정 오류
+해결: http://localhost:3000/callback 정확히 설정
+```
+
+**토큰 교환 실패**
+```
+원인: PKCE 코드 불일치 또는 만료
+해결: 브라우저 개발자 도구에서 sessionStorage 확인
+```
+
+**CORS 오류**
+```
+원인: Web Origins 설정 누락
+해결: Keycloak 클라이언트에서 http://localhost:3000 추가
+```
+
 ## 개발 환경 변수
 
 ### Backend (.env)
@@ -204,11 +238,67 @@ REACT_APP_KEYCLOAK_CLIENT_ID=myclient
 REACT_APP_API_URL=http://localhost:8081/api
 ```
 
+## 인증 구현 방식
+
+### Authorization Code Flow with PKCE
+
+이 프로젝트는 **Keycloak 라이브러리 대신 REST API**를 사용하여 OAuth 2.0 Authorization Code Flow를 구현합니다.
+
+#### 주요 특징
+- ✅ **보안**: Authorization Code Flow with PKCE 사용
+- ✅ **라이브러리 독립성**: keycloak-js 라이브러리 없이 구현
+- ✅ **표준 준수**: OAuth 2.0 및 OpenID Connect 표준 준수
+- ✅ **토큰 관리**: 자동 토큰 갱신 및 만료 처리
+
+#### 인증 플로우
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant K as Keycloak
+    participant B as Backend
+
+    U->>F: 로그인 버튼 클릭
+    F->>F: PKCE 코드 생성
+    F->>K: Authorization 요청 (code_challenge)
+    K->>U: 로그인 페이지 표시
+    U->>K: 사용자 인증
+    K->>F: Authorization Code 반환 (/callback)
+    F->>K: 토큰 교환 (code + code_verifier)
+    K->>F: Access Token + Refresh Token
+    F->>B: API 요청 (Bearer Token)
+    B->>K: JWT 토큰 검증 (JWKS)
+    B->>F: 사용자 데이터 반환
+```
+
+#### 구현된 기능
+
+**AuthService 클래스**
+- `initiateLogin()`: PKCE 코드 생성 및 Keycloak 로그인 페이지로 리다이렉트
+- `handleCallback()`: Authorization Code를 Access Token으로 교환
+- `refreshAccessToken()`: 토큰 자동 갱신
+- `getUserInfo()`: Keycloak UserInfo 엔드포인트 호출
+- `logout()`: Keycloak 로그아웃 및 로컬 토큰 정리
+
+**컴포넌트**
+- `Login`: 단일 로그인 버튼 (Authorization Code Flow)
+- `Callback`: OAuth 콜백 처리 및 토큰 교환
+- `ProtectedRoute`: 인증 상태 기반 라우트 보호
+- `UserProfile`: 사용자 정보 표시 및 로그아웃
+
+**API 통신**
+- Axios 인터셉터를 통한 자동 토큰 추가
+- 401 에러 시 자동 토큰 갱신 시도
+- 토큰 갱신 실패 시 로그인 페이지로 리다이렉트
+
 ## 보안 고려사항
 
-- 이 프로젝트는 **로컬 개발 환경**에서만 사용하도록 설계되었습니다
-- HTTP 통신을 사용하므로 프로덕션 환경에서는 HTTPS 설정이 필요합니다
-- JWT 토큰은 브라우저 메모리에 저장되며, 새로고침 시 재로그인이 필요할 수 있습니다
+- ✅ **PKCE 사용**: Authorization Code Injection 공격 방지
+- ✅ **State 파라미터**: CSRF 공격 방지
+- ✅ **토큰 저장**: localStorage 사용 (프로덕션에서는 httpOnly 쿠키 권장)
+- ✅ **토큰 만료**: 자동 갱신 및 만료 처리
+- ⚠️ **HTTP 통신**: 로컬 개발용 (프로덕션에서는 HTTPS 필수)
+- ⚠️ **Direct Access Grants**: 비활성화 (보안상 권장)
 
 ## 참고 문서
 

@@ -1,55 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import keycloak from './services/keycloak';
+import authService from './services/authService';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import ProtectedRoute from './components/ProtectedRoute';
+import Callback from './components/Callback';
 
 function App() {
-  const [keycloakInitialized, setKeycloakInitialized] = useState(false);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if already initialized
-    if (keycloak.authenticated !== undefined) {
-      setKeycloakInitialized(true);
-      setIsAuthenticated(keycloak.authenticated === true);
-      return;
-    }
-
-    keycloak.init({ 
-      onLoad: 'check-sso',
-      checkLoginIframe: false,
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-      enableLogging: true
-    })
-      .then((authenticated: boolean) => {
-        console.log('Keycloak initialized. Authenticated:', authenticated);
-        console.log('Current URL:', window.location.href);
-        setKeycloakInitialized(true);
+    // Initialize authentication state
+    const initializeAuth = () => {
+      try {
+        const authenticated = authService.isAuthenticated();
+        console.log('Auth initialized. Authenticated:', authenticated);
         setIsAuthenticated(authenticated);
-      })
-      .catch((error: any) => {
-        console.error('Keycloak initialization failed:', error);
-        console.log('Continuing without authentication for demo purposes');
-        setKeycloakInitialized(true); // Continue anyway for demo
+        setAuthInitialized(true);
+      } catch (error) {
+        console.error('Auth initialization failed:', error);
+        setAuthInitialized(true);
         setIsAuthenticated(false);
-      });
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   // Listen for authentication changes
   useEffect(() => {
     const interval = setInterval(() => {
-      if (keycloak.authenticated !== isAuthenticated) {
-        console.log('Authentication status changed:', keycloak.authenticated);
-        setIsAuthenticated(keycloak.authenticated === true);
+      const currentAuthState = authService.isAuthenticated();
+      if (currentAuthState !== isAuthenticated) {
+        console.log('Authentication status changed:', currentAuthState);
+        setIsAuthenticated(currentAuthState);
       }
-    }, 500);
+    }, 1000); // Check every second
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
-  if (!keycloakInitialized) {
+  if (!authInitialized) {
     return (
       <div style={{ 
         display: 'flex', 
@@ -73,6 +65,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/callback" element={<Callback />} />
           <Route 
             path="/profile" 
             element={

@@ -74,15 +74,62 @@ class AuthService {
     return null;
   }
 
-  public async login(username: string, password: string): Promise<boolean> {
+  // Authorization Code Flow 로그인
+  public async initiateLogin(): Promise<void> {
+    const state = this.generateRandomString();
+    const codeVerifier = this.generateCodeVerifier();
+    const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+    
+    // Store for later use
+    sessionStorage.setItem('oauth_state', state);
+    sessionStorage.setItem('code_verifier', codeVerifier);
+    
+    const authUrl = new URL(`${this.config.url}/realms/${this.config.realm}/protocol/openid-connect/auth`);
+    authUrl.searchParams.append('client_id', this.config.clientId);
+    authUrl.searchParams.append('redirect_uri', window.location.origin + '/callback');
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('scope', 'openid profile email');
+    authUrl.searchParams.append('state', state);
+    authUrl.searchParams.append('code_challenge', codeChallenge);
+    authUrl.searchParams.append('code_challenge_method', 'S256');
+    
+    window.location.href = authUrl.toString();
+  }
+
+
+
+  // Authorization Code를 토큰으로 교환
+  public async handleCallback(code: string, state: string): Promise<boolean> {
     try {
+      // 이미 인증된 상태라면 성공으로 처리
+      if (this.isAuthenticated()) {
+        console.log('Already authenticated, skipping token exchange');
+        return true;
+      }
+
+      const storedState = sessionStorage.getItem('oauth_state');
+      const codeVerifier = sessionStorage.getItem('code_verifier');
+      
+      if (state !== storedState) {
+        console.error('State mismatch:', { received: state, stored: storedState });
+        throw new Error('Invalid state parameter - possible CSRF attack');
+      }
+      
+      if (!codeVerifier) {
+        console.error('Code verifier not found in sessionStorage');
+        throw new Error('Code verifier not found');
+      }
+
+      console.log('Starting token exchange with code:', code.substring(0, 10) + '...');
+      
       const tokenUrl = `${this.config.url}/realms/${this.config.realm}/protocol/openid-connect/token`;
       
       const formData = new URLSearchParams();
-      formData.append('grant_type', 'password');
+      formData.append('grant_type', 'authorization_code');
       formData.append('client_id', this.config.clientId);
-      formData.append('username', username);
-      formData.append('password', password);
+      formData.append('code', code);
+      formData.append('redirect_uri', window.location.origin + '/callback');
+      formData.append('code_verifier', codeVerifier);
 
       const response = await fetch(tokenUrl, {
         method: 'POST',
@@ -93,17 +140,54 @@ class AuthService {
       });
 
       if (!response.ok) {
-        throw new Error(`Login failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Token exchange failed:', response.status, errorText);
+        
+        // Clean up on failure
+        sessionStorage.removeItem('oauth_state');
+        sessionStorage.removeItem('code_verifier');
+        
+        throw new Error(`Token exchange failed: ${response.status} - ${errorText}`);
       }
 
       const tokenResponse: TokenResponse = await response.json();
+      console.log('Token exchange successful, saving tokens');
       this.saveTokensToStorage(tokenResponse);
+      
+      // Clean up
+      sessionStorage.removeItem('oauth_state');
+      sessionStorage.removeItem('code_verifier');
       
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Callback handling error:', error);
       return false;
     }
+  }
+
+  private generateRandomString(): string {
+    const array = new Uint32Array(28);
+    crypto.getRandomValues(array);
+    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
+  }
+
+  private generateCodeVerifier(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode.apply(null, Array.from(array)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+
+  private async generateCodeChallenge(verifier: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(hash))))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
   }
 
   public async refreshAccessToken(): Promise<boolean> {
