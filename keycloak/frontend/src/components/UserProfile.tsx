@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getUserInfo, UserInfo } from '../services/api';
-import keycloak from '../services/keycloak';
+import authService from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile: React.FC = () => {
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +27,15 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    keycloak.logout();
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout fails, clear local state and redirect
+      navigate('/login', { replace: true });
+    }
   };
 
   if (loading) {

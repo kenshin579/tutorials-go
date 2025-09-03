@@ -74,15 +74,37 @@ class AuthService {
     return null;
   }
 
-  public async login(username: string, password: string): Promise<boolean> {
+  // Authorization Code Flow 로그인 (최소 구현)
+  public initiateLogin(): void {
+    const authUrl = new URL(`${this.config.url}/realms/${this.config.realm}/protocol/openid-connect/auth`);
+    authUrl.searchParams.append('client_id', this.config.clientId);
+    authUrl.searchParams.append('redirect_uri', window.location.origin + '/callback');
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('scope', 'openid profile email');
+    
+    window.location.href = authUrl.toString();
+  }
+
+
+
+  // Authorization Code를 토큰으로 교환
+  public async handleCallback(code: string): Promise<boolean> {
     try {
+      // 이미 인증된 상태라면 성공으로 처리
+      if (this.isAuthenticated()) {
+        console.log('Already authenticated, skipping token exchange');
+        return true;
+      }
+
+      console.log('Starting token exchange with code:', code.substring(0, 10) + '...');
+      
       const tokenUrl = `${this.config.url}/realms/${this.config.realm}/protocol/openid-connect/token`;
       
       const formData = new URLSearchParams();
-      formData.append('grant_type', 'password');
+      formData.append('grant_type', 'authorization_code');
       formData.append('client_id', this.config.clientId);
-      formData.append('username', username);
-      formData.append('password', password);
+      formData.append('code', code);
+      formData.append('redirect_uri', window.location.origin + '/callback');
 
       const response = await fetch(tokenUrl, {
         method: 'POST',
@@ -93,18 +115,28 @@ class AuthService {
       });
 
       if (!response.ok) {
-        throw new Error(`Login failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Token exchange failed:', response.status, errorText);
+        
+        // Log error for debugging
+        
+        throw new Error(`Token exchange failed: ${response.status} - ${errorText}`);
       }
 
       const tokenResponse: TokenResponse = await response.json();
+      console.log('Token exchange successful, saving tokens');
       this.saveTokensToStorage(tokenResponse);
+      
+      // Token exchange successful
       
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Callback handling error:', error);
       return false;
     }
   }
+
+
 
   public async refreshAccessToken(): Promise<boolean> {
     if (!this.refreshToken) {

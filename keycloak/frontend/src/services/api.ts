@@ -1,15 +1,16 @@
 import axios from 'axios';
-import keycloak from './keycloak';
+import authService from './authService';
 
 const api = axios.create({
   baseURL: 'http://localhost:8081/api'
 });
 
 // Request interceptor to add token to headers
-api.interceptors.request.use((config) => {
-  if (keycloak.token) {
+api.interceptors.request.use(async (config) => {
+  const token = authService.getAccessToken();
+  if (token) {
     config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${keycloak.token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
@@ -17,10 +18,22 @@ api.interceptors.request.use((config) => {
 // Response interceptor to handle token expiration
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid, redirect to login
-      keycloak.login();
+      // Token expired or invalid, try to refresh
+      const refreshed = await authService.refreshAccessToken();
+      if (refreshed) {
+        // Retry the original request with new token
+        const originalRequest = error.config;
+        const newToken = authService.getAccessToken();
+        if (newToken) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api.request(originalRequest);
+        }
+      }
+      
+      // If refresh failed, redirect to login
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

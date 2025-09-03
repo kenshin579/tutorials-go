@@ -1,13 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import keycloak from '../services/keycloak';
+import authService from '../services/authService';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  if (keycloak.authenticated !== true) {
+  if (!authService.isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
