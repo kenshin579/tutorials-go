@@ -220,29 +220,22 @@ docker logs keycloak-tutorial
 해결: Keycloak 클라이언트에서 http://localhost:3000 추가
 ```
 
-## 개발 환경 변수
-
-### Backend (.env)
-```bash
-KEYCLOAK_URL=http://localhost:8080
-KEYCLOAK_REALM=myrealm
-KEYCLOAK_CLIENT_ID=myclient
-SERVER_PORT=8081
-```
-
-### Frontend (.env)
-```bash
-REACT_APP_KEYCLOAK_URL=http://localhost:8080
-REACT_APP_KEYCLOAK_REALM=myrealm
-REACT_APP_KEYCLOAK_CLIENT_ID=myclient
-REACT_APP_API_URL=http://localhost:8081/api
-```
-
 ## 인증 구현 방식
 
 ### 간단한 OAuth 2.0 구현
 
-이 프로젝트는 **Keycloak 라이브러리 대신 REST API**를 사용하여 최소한의 OAuth 2.0 Authorization Code Flow를 구현합니다.
+이 프로젝트는 **Keycloak 라이브러리 대신 REST API**를 사용하여 최소한의 OAuth 2.0 Authorization Code Flow를 구현합니다. 
+
+- Keycloak에서 말하는 Standard Flow = OAuth 2.0 / OpenID Connect의 Authorization Code Flow 입니다. 
+
+#### 🔑 Authorization Code Flow (표준 OAuth 2.0 용어)
+- RFC 6749 (OAuth 2.0 표준)에서 정의된 방식
+- 주로 웹 애플리케이션(특히 서버-사이드 렌더링 앱)에서 사용
+- 동작:
+  1. 사용자가 클라이언트(앱) → 인증 서버(Keycloak)로 리디렉션됨
+  2. 로그인 성공 후, 인증 서버가 authorization code를 redirect URI로 전달 
+  3. 클라이언트가 이 코드를 이용해 토큰 엔드포인트로 Access Token + Refresh Token 요청 
+  4. 응답으로 JWT(Access Token, ID Token 등)를 받음
 
 #### 주요 특징
 - ✅ **최소 구현**: 핵심 기능만으로 OAuth 2.0 구현
