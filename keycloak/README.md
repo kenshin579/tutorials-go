@@ -72,7 +72,6 @@ docker run -d -p 8080:8080 \
    - Client Type: `OpenID Connect`
    - Access Type: `public`
    - Standard Flow Enabled: `ON`
-   - Direct Access Grants Enabled: `OFF` (보안상 권장)
    - Valid redirect URIs: `http://localhost:3000/callback`
    - Valid post logout redirect URIs: `http://localhost:3000/login`
    - Web origins: `http://localhost:3000`
