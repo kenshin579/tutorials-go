@@ -5,7 +5,7 @@ Keycloak을 이용한 로그인/로그아웃 샘플 페이지 프로젝트입니
 ## 프로젝트 구조
 
 ```
-keycloak2/
+keycloak/
 ├── backend/          # Go + Echo 백엔드 서버
 ├── frontend/         # React + TypeScript 프론트엔드
 ├── docs/            # 프로젝트 문서
