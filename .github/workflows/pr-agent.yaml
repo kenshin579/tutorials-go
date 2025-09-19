@@ -1,0 +1,19 @@
+name: Automated Code Review
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize, ready_for_review ]
+  issue_comment:
+  workflow_call:
+    inputs:
+      ignore_glob:
+        description: "Glob pattern to ignore files"
+        required: false
+        default: "['**/mocks/**', 'docs/**']"
+        type: string
+
+jobs:
+  pr_agent_job:
+    uses: kenshin579/actions/.github/workflows/code-review.yml@feat/#8-pr-agent
+    secrets: inherit
+    with:
+      config_model: "deepseek/deepseek-r1-0528-qwen3-8b"
