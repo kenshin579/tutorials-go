@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  repository: localhost:7001/utility-box
+  pullPolicy: IfNotPresent
+  tag: "v0.1"
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Docker socket mount for docker-cli
+dockerSocket:
+  enabled: false
+  path: /var/run/docker.sock 

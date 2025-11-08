@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: utility-box
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: utility-box
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: utility-box
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: utility-box
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: 
+        - /bin/bash
+        - -c
+        - |
+          echo "Utility box started"
+          echo "Available tools: kubectl, docker, mysql, redis-cli, kafkactl, nmap, tcpdump, etc."
+          while true; do sleep 30; done
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.dockerSocket.enabled }}
+        volumeMounts:
+        - name: docker-socket
+          mountPath: {{ .Values.dockerSocket.path }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.dockerSocket.enabled }}
+      volumes:
+      - name: docker-socket
+        hostPath:
+          path: {{ .Values.dockerSocket.path }}
+          type: Socket
+      {{- end }} 

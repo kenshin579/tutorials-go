@@ -1,0 +1,13 @@
+namespace: toolbox
+
+application: redisinsight
+replicas: 1
+image: redis/redisinsight:latest
+
+resources:
+  requests:
+    memory: "100Mi"
+    cpu: "100m"
+  limits:
+    memory: "400Mi"
+    cpu: "400m"

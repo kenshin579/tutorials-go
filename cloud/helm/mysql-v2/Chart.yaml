@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: "1.0"
+description: mysql server
+name: mysql
+version: 9.1.4
+dependencies:
+  - name: mysql
+    version: 9.1.4
+    repository: "https://charts.bitnami.com/bitnami"
