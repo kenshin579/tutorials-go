@@ -1,0 +1,46 @@
+expose:
+  type: nodePort
+  tls:
+    enabled: false
+  nodePort:
+    ports:
+      http:
+        nodePort: 30024
+
+# todo: admin으로 로그인이 안됨
+harborAdminPassword: "password"
+existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
+
+persistence:
+  enabled: true
+  # 기본 스토리지 클래스 설정
+  persistentVolumeClaim:
+    registry:
+      storageClass: "standard"
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    chartmuseum:
+      storageClass: "standard"
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    jobservice:
+      storageClass: "standard"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    database:
+      storageClass: "standard"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    redis:
+      storageClass: "standard"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    trivy:
+      storageClass: "standard"
+      accessMode: ReadWriteOnce
+      size: 5Gi
+
+updateStrategy:
+  type: RollingUpdate
+
+logLevel: info

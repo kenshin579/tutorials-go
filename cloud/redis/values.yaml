@@ -1,0 +1,19 @@
+architecture: standalone
+auth:
+  enabled: true
+  password: "password"
+master:
+  service:
+    type: NodePort
+    nodePorts:
+      redis: "30026"
+  persistence:
+    enabled: true
+    size: 1Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"

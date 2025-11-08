@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: 7.2.5
+description: Redis(R) is an open source, scalable, distributed in-memory cache for applications.
+name: redis-cluster
+version: 9.1.3
+dependencies:
+  - name: redis-cluster
+    version: 9.1.3
+    repository: "https://charts.bitnami.com/bitnami"

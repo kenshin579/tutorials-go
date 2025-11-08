@@ -1,0 +1,10 @@
+auth:
+  rootPassword: "password"
+primary:
+  persistence:
+    enabled: true
+    existingClaim: mysql-pvc
+  service:
+    type: NodePort
+    nodePorts:
+      mysql: 30023

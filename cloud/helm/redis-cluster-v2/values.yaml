@@ -1,0 +1,34 @@
+redis-cluster:
+  containerSecurityContext:
+    enabled: false
+  cluster:
+    nodes: 3  # 최소 6개 노드 필요 (3 마스터 + 3 복제본)
+    replicas: 0  # 각 마스터당 1개의 복제본
+    init: true
+    initialDelaySeconds: 60
+  redis:
+    resources:
+      requests:
+        memory: "256Mi"  # 리소스 요구량 축소
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+  service:
+    type: NodePort
+    nodePorts:
+      redis: "30026"
+  usePassword: true
+  password: "password"
+
+  # readiness probe 설정 조정
+  master:
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 20
+      timeoutSeconds: 10
+  replica:
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 20
+      timeoutSeconds: 10

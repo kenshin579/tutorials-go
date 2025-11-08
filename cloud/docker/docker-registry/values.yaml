@@ -1,0 +1,16 @@
+persistence:
+  enabled: true
+  existingClaim: docker-registry-pvc
+  accessModes:
+    - ReadWriteOnce
+  size: 4Gi
+  mountPath: /var/lib/registry
+  hostPath: /mnt/kind/docker-registry  # kind 클러스터 내부 경로로 수정
+
+service:
+  type: NodePort
+  nodePort: 30025
+
+image:
+  repository: registry
+  tag: "2"
