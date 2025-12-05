@@ -87,5 +87,5 @@
 
 ## Phase 6: 문서화
 
-- [ ] `README.md` 작성 (프로젝트 설명, 실행 방법)
-- [ ] `docs/comparison.md` 작성 (Ingress vs Gateway 비교표)
+- [x] `README.md` 작성 (프로젝트 설명, 실행 방법)
+- [x] `docs/comparison.md` 작성 (Ingress vs Gateway 비교표)
