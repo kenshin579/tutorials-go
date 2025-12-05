@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"testing"
 
-	storeHttp "github.com/kenshin579/tutorials-go/go-httpmock/store/http"
+	storeHttp "github.com/kenshin579/tutorials-go/go-unit-test/httpmock/store/http"
 
-	"github.com/kenshin579/tutorials-go/go-httpmock/myresty"
+	"github.com/kenshin579/tutorials-go/go-unit-test/httpmock/myresty"
 
 	"github.com/stretchr/testify/assert"
 
