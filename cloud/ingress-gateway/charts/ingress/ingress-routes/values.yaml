@@ -1,0 +1,12 @@
+ingress:
+  name: echo-server-ingress
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: echo.local
+      paths:
+        - path: /
+          pathType: Prefix
+          serviceName: echo-server
+          servicePort: 80

@@ -1,0 +1,11 @@
+# Gateway API CRDs are installed via raw URL
+# This file serves as a placeholder for documentation purposes
+#
+# The actual CRDs are installed using ArgoCD with:
+# source:
+#   repoURL: https://github.com/kubernetes-sigs/gateway-api
+#   targetRevision: v1.2.0
+#   path: config/crd/experimental
+#
+# Or manually with:
+# kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml

@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ingress-infra
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: nginx-ingress
+            namespace: ingress-nginx
+            path: cloud/ingress-gateway/charts/ingress/nginx-ingress
+          - name: ingress-routes
+            namespace: app
+            path: cloud/ingress-gateway/charts/ingress/ingress-routes
+  template:
+    metadata:
+      name: "{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kenshin579/tutorials-go
+        targetRevision: HEAD
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

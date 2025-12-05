@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: gateway-infra
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: gateway-api-crds
+            namespace: gateway
+            path: cloud/ingress-gateway/charts/gateway/gateway-api-crds
+          - name: nginx-gateway
+            namespace: gateway
+            path: cloud/ingress-gateway/charts/gateway/nginx-gateway
+          - name: gateway-routes
+            namespace: gateway
+            path: cloud/ingress-gateway/charts/gateway/gateway-routes
+  template:
+    metadata:
+      name: "{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kenshin579/tutorials-go
+        targetRevision: HEAD
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
