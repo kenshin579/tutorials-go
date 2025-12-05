@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gateway-routes
+description: Gateway and HTTPRoute resources for echo-server
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

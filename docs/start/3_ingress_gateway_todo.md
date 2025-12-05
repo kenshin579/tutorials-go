@@ -47,22 +47,22 @@
 ## Phase 4: Gateway API 구성
 
 ### Gateway API CRDs
-- [ ] `charts/gateway/gateway-api-crds/Chart.yaml`
-- [ ] `charts/gateway/gateway-api-crds/values.yaml`
-- [ ] `charts/gateway/gateway-api-crds/templates/crds.yaml`
+- [x] `charts/gateway/gateway-api-crds/Chart.yaml`
+- [x] `charts/gateway/gateway-api-crds/values.yaml`
+- [x] `charts/gateway/gateway-api-crds/templates/crds.yaml`
 
 ### NGINX Gateway Fabric
-- [ ] `charts/gateway/nginx-gateway/Chart.yaml`
-- [ ] `charts/gateway/nginx-gateway/values.yaml`
+- [x] `charts/gateway/nginx-gateway/Chart.yaml`
+- [x] `charts/gateway/nginx-gateway/values.yaml`
 
 ### Gateway/HTTPRoute 리소스
-- [ ] `charts/gateway/gateway-routes/Chart.yaml`
-- [ ] `charts/gateway/gateway-routes/values.yaml`
-- [ ] `charts/gateway/gateway-routes/templates/gateway.yaml`
-- [ ] `charts/gateway/gateway-routes/templates/httproutes.yaml`
+- [x] `charts/gateway/gateway-routes/Chart.yaml`
+- [x] `charts/gateway/gateway-routes/values.yaml`
+- [x] `charts/gateway/gateway-routes/templates/gateway.yaml`
+- [x] `charts/gateway/gateway-routes/templates/httproutes.yaml`
 
 ### ArgoCD ApplicationSet
-- [ ] `bootstrap/infra-gateway.yaml`
+- [x] `bootstrap/infra-gateway.yaml`
 
 ---
 

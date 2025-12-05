@@ -1,0 +1,23 @@
+gateway:
+  name: echo-gateway
+  className: nginx
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        from: All
+
+httpRoutes:
+  - name: echo-server-route
+    hostnames:
+      - echo.local
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - name: echo-server
+            namespace: app
+            port: 80

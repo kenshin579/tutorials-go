@@ -1,0 +1,11 @@
+apiVersion: v2
+name: nginx-gateway
+description: NGINX Gateway Fabric wrapper for Kind cluster
+type: application
+version: 0.1.0
+appVersion: "2.2.1"
+
+dependencies:
+  - name: nginx-gateway-fabric
+    version: 2.2.1
+    repository: oci://ghcr.io/nginx/charts

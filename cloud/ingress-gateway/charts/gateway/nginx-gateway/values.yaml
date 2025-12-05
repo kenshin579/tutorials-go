@@ -1,0 +1,15 @@
+nginx-gateway-fabric:
+  service:
+    type: NodePort
+  nginxGateway:
+    gwAPIExperimentalFeatures:
+      enable: true
+  nodeSelector:
+    ingress-ready: "true"
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Equal"
+      effect: "NoSchedule"
