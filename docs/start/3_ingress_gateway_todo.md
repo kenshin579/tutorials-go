@@ -17,14 +17,14 @@
 ## Phase 2: 샘플 애플리케이션
 
 ### echo-server Helm Chart
-- [ ] `charts/echo-server/Chart.yaml`
-- [ ] `charts/echo-server/values.yaml`
-- [ ] `charts/echo-server/templates/_helpers.tpl`
-- [ ] `charts/echo-server/templates/deployment.yaml`
-- [ ] `charts/echo-server/templates/service.yaml`
+- [x] `charts/echo-server/Chart.yaml`
+- [x] `charts/echo-server/values.yaml`
+- [x] `charts/echo-server/templates/_helpers.tpl`
+- [x] `charts/echo-server/templates/deployment.yaml`
+- [x] `charts/echo-server/templates/service.yaml`
 
 ### ArgoCD Application
-- [ ] `bootstrap/apps.yaml` - echo-server Application 정의
+- [x] `bootstrap/apps.yaml` - echo-server Application 정의
 
 ---
 

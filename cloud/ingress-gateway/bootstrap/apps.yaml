@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: echo-server
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kenshin579/tutorials-go
+    targetRevision: HEAD
+    path: cloud/ingress-gateway/charts/echo-server
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
