@@ -1,7 +1,7 @@
 package user
 
 import (
-	mocks "github.com/kenshin579/tutorials-go/go-mockery/do_user/mocks/doer"
+	mocks "github.com/kenshin579/tutorials-go/go-unit-test/mockery/do_user/mocks/doer"
 	"github.com/stretchr/testify/mock"
 	"strings"
 	"testing"

@@ -86,19 +86,19 @@ Key files:
 ### Testing Patterns
 
 #### Unit Testing with Mocks
-`go-unit-test/go-mockery/` shows mockery-based testing:
+`go-unit-test/mockery/` shows mockery-based testing:
 - Generate mocks: `mockery --name=InterfaceName --output=mocks/`
 - Mock interfaces are in `mocks/` directories
 - Tests use `github.com/stretchr/testify/mock` for assertions
 
 #### Integration Testing
-`go-unit-test/go-testcontainers/` uses testcontainers for integration tests:
+`go-unit-test/testcontainers/` uses testcontainers for integration tests:
 - Spins up real databases (Redis, MongoDB) in Docker
 - Tests run against actual database instances
 - Clean setup/teardown in test functions
 
 #### HTTP Mocking
-`go-unit-test/go-httpmock/` demonstrates HTTP request mocking:
+`go-unit-test/httpmock/` demonstrates HTTP request mocking:
 - Uses `github.com/jarcoal/httpmock` for stubbing HTTP responses
 - Good for testing external API integrations
 
@@ -225,7 +225,7 @@ go run main.go
 ### Mock Generation
 When interfaces change, regenerate mocks:
 ```bash
-cd go-unit-test/go-mockery
+cd go-unit-test/mockery
 mockery --name=Doer --dir=do_user/doer --output=do_user/mocks/doer
 ```
 

@@ -1,6 +1,6 @@
 package user
 
-import "github.com/kenshin579/tutorials-go/go-mockery/do_user/doer"
+import "github.com/kenshin579/tutorials-go/go-unit-test/mockery/do_user/doer"
 
 type User struct {
 	Doer doer.Doer
