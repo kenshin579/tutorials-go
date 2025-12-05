@@ -31,16 +31,16 @@
 ## Phase 3: Ingress 구성
 
 ### NGINX Ingress Controller
-- [ ] `charts/ingress/nginx-ingress/Chart.yaml`
-- [ ] `charts/ingress/nginx-ingress/values.yaml`
+- [x] `charts/ingress/nginx-ingress/Chart.yaml`
+- [x] `charts/ingress/nginx-ingress/values.yaml`
 
 ### Ingress 리소스
-- [ ] `charts/ingress/ingress-routes/Chart.yaml`
-- [ ] `charts/ingress/ingress-routes/values.yaml`
-- [ ] `charts/ingress/ingress-routes/templates/ingress.yaml`
+- [x] `charts/ingress/ingress-routes/Chart.yaml`
+- [x] `charts/ingress/ingress-routes/values.yaml`
+- [x] `charts/ingress/ingress-routes/templates/ingress.yaml`
 
 ### ArgoCD ApplicationSet
-- [ ] `bootstrap/infra-ingress.yaml`
+- [x] `bootstrap/infra-ingress.yaml`
 
 ---
 
