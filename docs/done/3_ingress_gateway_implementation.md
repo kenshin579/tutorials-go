@@ -150,7 +150,7 @@ apiVersion: v2
 name: echo-server
 description: Echo Server for Ingress/Gateway demo
 version: 0.1.0
-appVersion: "v0.2"
+appVersion: "latest"
 ```
 
 **values.yaml:**
@@ -159,7 +159,7 @@ replicaCount: 1
 
 image:
   repository: kenshin579/echo-server
-  tag: v0.2
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:

@@ -3,4 +3,4 @@ name: echo-server
 description: Echo Server for Ingress/Gateway API demo
 type: application
 version: 0.1.0
-appVersion: "v0.2"
+appVersion: "latest"

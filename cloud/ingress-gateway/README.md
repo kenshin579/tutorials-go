@@ -18,7 +18,7 @@ Kubernetes에서 외부 트래픽을 처리하는 두 가지 방식인 **Ingress
                     │                 ▼                       │
                     │  ┌─────────────────────────────────┐   │
                     │  │         echo-server              │   │
-                    │  │    (kenshin579/echo-server:v0.2) │   │
+                    │  │    (kenshin579/echo-server:latest) │   │
                     │  └─────────────────────────────────┘   │
                     └─────────────────────────────────────────┘
 ```
@@ -128,7 +128,7 @@ make clean
 |---------|------|------|
 | Kind | v1.28.15 | 로컬 Kubernetes 클러스터 |
 | ArgoCD | v7.8.28 | GitOps 기반 배포 도구 |
-| echo-server | v0.2 | 테스트용 Echo 서버 |
+| echo-server | latest | 테스트용 Echo 서버 |
 | NGINX Ingress Controller | v1.12.0 | Ingress 구현체 |
 | Gateway API CRDs | v1.2.0 | Gateway API 리소스 정의 |
 | NGINX Gateway Fabric | v2.2.1 | Gateway API 구현체 |

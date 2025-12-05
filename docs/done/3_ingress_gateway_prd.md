@@ -11,7 +11,7 @@ Kubernetes에서 외부 트래픽을 처리하는 두 가지 방식인 **Ingress
   - Kind 클러스터, NGINX Gateway Fabric, cert-manager 사용
 - **echo-server**: `https://github.com/kenshin579/echo-server`
   - 샘플 애플리케이션으로 사용할 Go 기반 Echo Server
-  - Docker 이미지: `kenshin579/echo-server:v0.2`
+  - Docker 이미지: `kenshin579/echo-server:latest`
 
 ### 작성 위치
 - `cloud/ingress-gateway/`
@@ -87,7 +87,7 @@ cloud/ingress-gateway/
 |---------|------|------------|
 | Kind Cluster | 로컬 Kubernetes 클러스터 | kindest/node:v1.28.15 |
 | ArgoCD | GitOps 기반 배포 도구 | v7.8.28 |
-| Sample App | 테스트용 echo-server | kenshin579/echo-server:v0.2 |
+| Sample App | 테스트용 echo-server | kenshin579/echo-server:latest |
 
 ### 3.2 Ingress 방식
 
@@ -147,7 +147,7 @@ required_providers {
 
 #### Echo Server 설정
 - **소스**: https://github.com/kenshin579/echo-server
-- **이미지**: `kenshin579/echo-server:v0.2`
+- **이미지**: `kenshin579/echo-server:latest`
 - **포트**: 80
 - **Replicas**: 1
 - **네임스페이스**: `app`
@@ -339,7 +339,7 @@ make tf-destroy
 
 ### echo-server 프로젝트
 - GitHub: https://github.com/kenshin579/echo-server
-- Docker Hub: `kenshin579/echo-server:v0.2`
+- Docker Hub: `kenshin579/echo-server:latest`
 - `deploy/echo-deployments.yaml`: Kubernetes 배포 예시 참고
 
 ### 공식 문서

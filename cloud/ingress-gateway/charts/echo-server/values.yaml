@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: kenshin579/echo-server
-  tag: v0.2
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:
