@@ -4,8 +4,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/kenshin579/tutorials-go/go-init/abc"
-	"github.com/kenshin579/tutorials-go/go-init/lib1"
+	"github.com/kenshin579/tutorials-go/golang/init/abc"
+	"github.com/kenshin579/tutorials-go/golang/init/lib1"
 )
 
 var version string

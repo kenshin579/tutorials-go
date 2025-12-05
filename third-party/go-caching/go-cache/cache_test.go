@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kenshin579/tutorials-go/golang/go-data-structure/sort/model"
+	"github.com/kenshin579/tutorials-go/golang/data-structure/sort/model"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
 )

@@ -14,10 +14,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 go test ./...
 
 # Run tests in a specific directory
-go test ./golang/go-testing/...
+go test ./golang/testing/...
 
 # Run a single test file
-go test ./golang/go-testing/table_test.go
+go test ./golang/testing/table_test.go
 
 # Run a specific test function
 go test -run TestFunctionName ./path/to/package
@@ -50,7 +50,7 @@ go build
 # Run without building
 go run main.go
 
-# Build with ldflags (see golang/go-build-ldflags)
+# Build with ldflags (see golang/build-ldflags)
 go build -ldflags "-X main.version=1.0.0"
 ```
 
@@ -104,24 +104,24 @@ Key files:
 
 ### Concurrency Patterns
 
-**Mutex vs Distributed Locks** (`golang/go-concurrency/waitgroup/`):
+**Mutex vs Distributed Locks** (`golang/concurrency/waitgroup/`):
 - `counter_mutex.go`: Local mutex for single-process synchronization
 - `counter_redislock.go`: Redis-based distributed lock
 - `counter_redsync.go`: Redsync for distributed lock across multiple instances
 - `counter_mongolock.go`: MongoDB-based distributed lock
 - Choose based on deployment: single-process → mutex, distributed → Redis/Mongo locks
 
-**Context Usage** (`golang/go-context/`):
+**Context Usage** (`golang/context/`):
 - Timeout handling with `context.WithTimeout()`
 - Cancellation propagation across goroutines
 - API request cancellation patterns
 
 ### Design Patterns
 
-- **Builder Pattern** (`golang/go-design-pattern/builder/`): Fluent interface for complex object construction
-- **Decorator Pattern** (`golang/go-design-pattern/decorator/`): Dynamic behavior addition
-- **Template Pattern** (`golang/go-design-pattern/template/`): Algorithm skeleton with customizable steps
-- **Functional Options** (`golang/go-design-pattern/func_opts/`): Flexible configuration pattern
+- **Builder Pattern** (`golang/design-pattern/builder/`): Fluent interface for complex object construction
+- **Decorator Pattern** (`golang/design-pattern/decorator/`): Dynamic behavior addition
+- **Template Pattern** (`golang/design-pattern/template/`): Algorithm skeleton with customizable steps
+- **Functional Options** (`golang/design-pattern/func_opts/`): Flexible configuration pattern
 
 ## Key Dependencies and Usage
 
@@ -173,7 +173,7 @@ Each database directory (`database/{mysql,postgresql,redis,mongo}`) contains:
 
 ### Standalone Examples
 Most directories under `golang/` are self-contained:
-- Single topic focus (e.g., go-generics, go-context, go-reflect)
+- Single topic focus (e.g., generics, context, reflect)
 - Runnable test files demonstrating concepts
 - README.md with Korean explanations where needed
 
@@ -251,7 +251,7 @@ Viper is the standard for configuration:
 - See `project-layout/go-clean-arch/common/config/` for patterns
 
 ### Error Handling
-- Custom error types in `golang/go-errors/custom/`
+- Custom error types in `golang/errors/custom/`
 - Error wrapping and unwrapping examples
 - Structured error codes for API responses
 
