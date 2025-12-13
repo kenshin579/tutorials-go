@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 
-	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/repository"
-	articleMysqlRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/repository/mysql"
-	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/domain"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/repository"
+	articleMysqlRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/repository/mysql"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/domain"
 )
 
 func TestFetch(t *testing.T) {
