@@ -7,8 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/repository"
-	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/domain"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/repository"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/domain"
 )
 
 type mysqlArticleRepository struct {

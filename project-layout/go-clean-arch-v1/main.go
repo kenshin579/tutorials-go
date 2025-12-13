@@ -6,18 +6,18 @@ import (
 	"log"
 	"time"
 
-	_articleHttp "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/http"
-	_articleRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/repository/mysql"
-	_articleUcase "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/usecase"
-	_authorRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/author/repository/mysql"
-	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/common/config"
-	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/common/database"
+	_articleHttp "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/http"
+	_articleRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/repository/mysql"
+	_articleUcase "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/usecase"
+	_authorRepo "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/author/repository/mysql"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/common/config"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/common/database"
 
 	"github.com/labstack/echo"
 
 	"github.com/spf13/viper"
 
-	_articleHttpMiddleware "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch/article/http/middleware"
+	_articleHttpMiddleware "github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v1/article/http/middleware"
 	"go.uber.org/fx"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -33,8 +33,8 @@ func registerHooks(lifecycle fx.Lifecycle, e *echo.Echo, v *viper.Viper) {
 			},
 			OnStop: func(context.Context) error {
 				fmt.Println("Stopping server")
-				//logger.Print("Stopping admin server.")
-				//return logger.Sync()
+				// logger.Print("Stopping admin server.")
+				// return logger.Sync()
 				return nil
 			},
 		},
@@ -53,7 +53,7 @@ func ProvideBasicConfig() time.Duration {
 	return duration
 }
 
-//todo: 구동이후에 api 호출 주소가 등록이 안된 것 같음
+// todo: 구동이후에 api 호출 주소가 등록이 안된 것 같음
 func main() {
 	app := fx.New(
 		fx.Provide(
@@ -80,18 +80,18 @@ func main() {
 
 	<-app.Done()
 
-	//아래 버전은 잘 됨
-	//v := config.New()
-	//db, _ := database.New(v)
+	// 아래 버전은 잘 됨
+	// v := config.New()
+	// db, _ := database.New(v)
 	//
-	//e := NewEcho()
+	// e := NewEcho()
 	//
-	//authorRepo := _authorRepo.NewMysqlAuthorRepository(db)
-	//ar := _articleRepo.NewMysqlArticleRepository(db)
+	// authorRepo := _authorRepo.NewMysqlAuthorRepository(db)
+	// ar := _articleRepo.NewMysqlArticleRepository(db)
 	//
-	//timeoutContext := time.Duration(v.GetInt("context.timeout")) * time.Second
-	//au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	//_articleHttp.NewArticleHandler(e, au)
+	// timeoutContext := time.Duration(v.GetInt("context.timeout")) * time.Second
+	// au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
+	// _articleHttp.NewArticleHandler(e, au)
 	//
-	//e.Start(v.GetString("server.address"))
+	// e.Start(v.GetString("server.address"))
 }
