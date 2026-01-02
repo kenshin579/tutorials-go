@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: {{ .Values.gateway.name }}
   namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-{{ .Values.letsencrypt.environment }}
 spec:
   gatewayClassName: {{ .Values.gateway.className }}
   listeners:
@@ -10,6 +12,15 @@ spec:
     - name: {{ .name }}
       port: {{ .port }}
       protocol: {{ .protocol }}
+      {{- if .tls }}
+      tls:
+        mode: {{ .tls.mode }}
+        certificateRefs:
+          {{- range .tls.certificateRefs }}
+          - kind: {{ .kind }}
+            name: {{ .name }}
+          {{- end }}
+      {{- end }}
       allowedRoutes:
         namespaces:
           from: {{ .allowedRoutes.from }}

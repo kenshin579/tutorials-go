@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-{{ .Values.letsencrypt.environment }}
+spec:
+  acme:
+    email: {{ .Values.letsencrypt.email }}
+    server: {{ if eq .Values.letsencrypt.environment "prod" }}https://acme-v02.api.letsencrypt.org/directory{{ else }}https://acme-staging-v02.api.letsencrypt.org/directory{{ end }}
+    privateKeySecretRef:
+      name: letsencrypt-{{ .Values.letsencrypt.environment }}-key
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: {{ .Values.gateway.name }}
+                namespace: {{ .Release.Namespace }}
+                kind: Gateway

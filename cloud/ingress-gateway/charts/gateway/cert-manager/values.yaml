@@ -1,0 +1,45 @@
+cert-manager:
+  # Install CRDs with the Helm chart
+  crds:
+    enabled: true
+    keep: true
+
+  # Enable Gateway API support for HTTP-01 challenges
+  featureGates: "ExperimentalGatewayAPISupport=true"
+
+  # Controller configuration for Gateway API
+  config:
+    apiVersion: controller.config.cert-manager.io/v1alpha1
+    kind: ControllerConfiguration
+    enableGatewayAPI: true
+
+  # Resource configuration
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+  webhook:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+  cainjector:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+  # Prometheus metrics
+  prometheus:
+    enabled: false
