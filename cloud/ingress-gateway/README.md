@@ -107,8 +107,14 @@ make clean
     │   └── ingress-routes/     # Ingress 리소스
     └── gateway/                # Gateway API 관련 차트
         ├── gateway-api-crds/   # Gateway API CRDs
+        ├── cert-manager/       # cert-manager (TLS 인증서 관리)
         ├── nginx-gateway/      # NGINX Gateway Fabric
-        └── gateway-routes/     # Gateway, HTTPRoute 리소스
+        └── gateway-routes/     # Gateway, HTTPRoute, TLS 리소스
+            └── templates/
+                ├── gateway.yaml
+                ├── httproutes.yaml
+                ├── certificate.yaml      # TLS 인증서 (선택적)
+                └── clusterissuer.yaml    # Let's Encrypt Issuer (선택적)
 ```
 
 ## 비교: Ingress vs Gateway API
@@ -122,6 +128,61 @@ make clean
 | 프로토콜 지원 | HTTP/HTTPS | HTTP, HTTPS, TCP, UDP, gRPC |
 | 표준화 | 구현체마다 상이 | Kubernetes SIG 표준 |
 
+## TLS/HTTPS 활성화 (선택적)
+
+기본적으로 HTTP만 활성화되어 있습니다. HTTPS를 사용하려면 다음 단계를 따르세요:
+
+### 1. values.yaml 수정
+
+`charts/gateway/gateway-routes/values.yaml`:
+
+```yaml
+# TLS 활성화
+tls:
+  enabled: true  # false -> true로 변경
+
+# HTTPS 리스너 주석 해제
+gateway:
+  listeners:
+    - name: http
+      # ...
+    - name: https        # 주석 해제
+      port: 443
+      protocol: HTTPS
+      # ...
+
+# Let's Encrypt 설정 주석 해제
+letsencrypt:
+  email: your-email@example.com
+  environment: staging  # 또는 prod
+
+# Certificate 설정 주석 해제
+certificate:
+  name: echo-tls
+  dnsNames:
+    - echo.local
+```
+
+### 2. bootstrap 수정
+
+`bootstrap/infra-gateway.yaml`에서 cert-manager 주석 해제:
+
+```yaml
+elements:
+  - name: gateway-api-crds
+  - name: cert-manager      # 주석 해제
+    namespace: gateway
+    path: cloud/ingress-gateway/charts/gateway/cert-manager
+  - name: nginx-gateway
+  - name: gateway-routes
+```
+
+### 3. 재배포
+
+```bash
+make deploy-gateway
+```
+
 ## 사용된 컴포넌트
 
 | 컴포넌트 | 버전 | 설명 |
@@ -132,6 +193,7 @@ make clean
 | NGINX Ingress Controller | v1.12.0 | Ingress 구현체 |
 | Gateway API CRDs | v1.2.0 | Gateway API 리소스 정의 |
 | NGINX Gateway Fabric | v2.2.1 | Gateway API 구현체 |
+| cert-manager | v1.16.2 | TLS 인증서 자동 관리 (선택적) |
 
 ## 참고 자료
 
@@ -139,3 +201,4 @@ make clean
 - [Gateway API](https://gateway-api.sigs.k8s.io/)
 - [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/)
 - [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/)
+- [cert-manager](https://cert-manager.io/docs/)

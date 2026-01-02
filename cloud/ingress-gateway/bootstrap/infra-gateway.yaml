@@ -10,6 +10,10 @@ spec:
           - name: gateway-api-crds
             namespace: gateway
             path: cloud/ingress-gateway/charts/gateway/gateway-api-crds
+          ## cert-manager (TLS 사용 시 주석 해제)
+          # - name: cert-manager
+          #   namespace: gateway
+          #   path: cloud/ingress-gateway/charts/gateway/cert-manager
           - name: nginx-gateway
             namespace: gateway
             path: cloud/ingress-gateway/charts/gateway/nginx-gateway

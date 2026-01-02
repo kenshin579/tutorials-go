@@ -7,6 +7,32 @@ gateway:
       protocol: HTTP
       allowedRoutes:
         from: All
+    ## TLS 리스너 (HTTPS 사용 시 주석 해제)
+    # - name: https
+    #   port: 443
+    #   protocol: HTTPS
+    #   allowedRoutes:
+    #     from: All
+    #   tls:
+    #     mode: Terminate
+    #     certificateRefs:
+    #       - kind: Secret
+    #         name: echo-tls
+
+## TLS 설정 (HTTPS 사용 시 주석 해제)
+tls:
+  enabled: false  # true로 변경하면 TLS 활성화
+
+## Let's Encrypt Configuration (TLS 사용 시 주석 해제)
+# letsencrypt:
+#   email: your-email@example.com
+#   environment: staging  # staging 또는 prod
+
+## Certificate Configuration (TLS 사용 시 주석 해제)
+# certificate:
+#   name: echo-tls
+#   dnsNames:
+#     - echo.local
 
 httpRoutes:
   - name: echo-server-route
