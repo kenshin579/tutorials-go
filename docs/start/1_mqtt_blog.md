@@ -26,35 +26,42 @@
 
 ## 0장. 스터디 목표와 전제
 
+이 스터디는 MQTT를 처음 접하는 개발자가 실무에서 바로 활용할 수 있도록 구성되었습니다. 단순히 "메시지를 보내고 받는 방법"을 넘어서, 시스템 설계와 운영 관점에서 MQTT를 이해하는 것을 목표로 합니다. 특히 네트워크 불안정성을 전제로 한 재연결 전략까지 다루므로, 학습 후에는 프로덕션 환경에서도 안정적으로 동작하는 MQTT 기반 시스템을 구축할 수 있습니다.
+
 ### 이 스터디에서 다루는 것
 
 1. **MQTT v5만 사용합니다**
-   - v3.1.1은 다루지 않습니다
-   - v5에서 추가된 기능들이 실무에서 매우 유용하기 때문입니다
+   - v3.1.1은 다루지 않습니다. v5에서 추가된 기능들이 실무에서 매우 유용하기 때문입니다.
+   - v5는 2019년에 발표된 최신 버전으로, Reason Code, User Properties, Shared Subscription 등 운영에 필수적인 기능들이 대폭 추가되었습니다. 새로운 프로젝트를 시작한다면 v5를 선택하는 것이 합리적입니다.
 
 2. **Pub/Sub 시스템의 설계와 운영 관점을 이해합니다**
-   - 단순히 "메시지 보내고 받기"가 아닙니다
-   - 시스템이 어떻게 동작하는지 전체 그림을 봅니다
+   - 단순히 "메시지 보내고 받기"가 아닙니다. 시스템이 어떻게 동작하는지 전체 그림을 봅니다.
+   - Topic 네이밍 규칙, QoS 선택 기준, 세션 관리 등 설계 단계에서 결정해야 할 사항들을 다룹니다. 이러한 결정들은 나중에 변경하기 어려우므로 처음부터 올바르게 설계하는 것이 중요합니다.
 
 3. **"네트워크는 반드시 끊긴다"를 전제로 설계합니다**
-   - 이상적인 환경만 가정하지 않습니다
-   - 현실 세계에서는 네트워크가 언제든 끊길 수 있습니다
+   - 이상적인 환경만 가정하지 않습니다. 현실 세계에서는 네트워크가 언제든 끊길 수 있습니다.
+   - 모바일 환경에서는 Wi-Fi와 LTE 사이를 오가고, IoT 디바이스는 전원이 불안정할 수 있습니다. 이러한 상황을 처음부터 고려하지 않으면 프로덕션에서 예상치 못한 문제에 직면하게 됩니다.
 
 4. **재연결은 옵션이 아니라 기본 기능입니다**
-   - 끊어졌을 때 어떻게 복구할지가 핵심입니다
+   - 끊어졌을 때 어떻게 복구할지가 핵심입니다.
+   - 많은 MQTT 튜토리얼이 연결과 메시지 전송만 다루지만, 실제 서비스에서는 재연결 로직이 코드의 상당 부분을 차지합니다. 이 스터디에서는 재연결 전략을 별도의 장으로 다룹니다.
 
 ### 왜 MQTT를 배워야 할까요?
 
+MQTT는 1999년 IBM에서 석유 파이프라인 모니터링을 위해 개발된 프로토콜입니다. 위성 네트워크처럼 대역폭이 제한되고 불안정한 환경에서도 효율적으로 데이터를 전송하기 위해 설계되었습니다. 이러한 특성 덕분에 오늘날 IoT, 모바일 앱, 실시간 시스템에서 널리 사용되고 있습니다.
+
 여러분이 만드는 시스템에서 이런 요구사항이 있다면 MQTT가 좋은 선택입니다:
 
-- 수천~수만 개의 디바이스가 동시에 연결되어야 함
-- 실시간으로 데이터를 주고받아야 함
-- 네트워크 환경이 불안정함 (모바일, IoT)
-- 서버가 클라이언트에게 먼저 메시지를 보내야 함 (Push)
+- **수천~수만 개의 디바이스가 동시에 연결되어야 함**: MQTT Broker는 단일 인스턴스에서도 수십만 개의 동시 연결을 처리할 수 있습니다. HTTP 기반 폴링 방식으로는 이 정도 규모를 효율적으로 처리하기 어렵습니다.
+- **실시간으로 데이터를 주고받아야 함**: MQTT는 연결을 유지하므로 메시지 전달 지연이 밀리초 단위입니다. 새로운 연결을 맺는 오버헤드가 없어 실시간성이 중요한 시스템에 적합합니다.
+- **네트워크 환경이 불안정함 (모바일, IoT)**: 작은 패킷 크기와 내장된 재연결 메커니즘으로 불안정한 네트워크에서도 안정적으로 동작합니다.
+- **서버가 클라이언트에게 먼저 메시지를 보내야 함 (Push)**: HTTP에서는 클라이언트가 먼저 요청해야 하지만, MQTT에서는 서버(Publisher)가 언제든 클라이언트(Subscriber)에게 메시지를 보낼 수 있습니다.
 
 ---
 
 ## 1장. MQTT v5 개요
+
+이 장에서는 MQTT가 무엇인지, 왜 필요한지, 그리고 v5에서 어떤 점이 개선되었는지 알아봅니다. MQTT의 기본 개념을 이해하면 이후 장에서 다루는 Topic 설계, QoS 선택, 재연결 전략 등을 더 쉽게 이해할 수 있습니다.
 
 ### 1.1 MQTT란 무엇인가
 
@@ -62,14 +69,16 @@
 
 > MQTT는 **이벤트 기반 메시징 프로토콜**입니다.
 
+MQTT는 "Message Queuing Telemetry Transport"의 약자입니다. 이름에 "Message Queuing"이 들어있지만, 실제로는 메시지 큐(RabbitMQ, Kafka 등)와는 다른 Pub/Sub 패턴을 사용합니다. 경량 프로토콜로 설계되어 헤더 크기가 최소 2바이트에 불과하며, 이는 HTTP 헤더(수백 바이트)와 비교하면 매우 작은 크기입니다.
+
 조금 더 풀어서 설명하면:
-- **이벤트 기반**: "무언가 일어났을 때" 메시지를 보냅니다
-- **메시징**: 데이터를 주고받는 방식입니다
-- **프로토콜**: 통신 규칙입니다
+- **이벤트 기반**: "무언가 일어났을 때" 메시지를 보냅니다. 주기적으로 상태를 확인하는 폴링 방식이 아니라, 변화가 발생했을 때만 데이터를 전송합니다.
+- **메시징**: 데이터를 주고받는 방식입니다. 메시지는 Topic이라는 주소를 통해 분류되고 전달됩니다.
+- **프로토콜**: 통신 규칙입니다. TCP/IP 위에서 동작하며, WebSocket을 통해 브라우저에서도 사용할 수 있습니다.
 
 #### Broker 중심 구조
 
-MQTT의 가장 큰 특징은 **Broker**가 중간에 있다는 것입니다.
+MQTT의 가장 큰 특징은 **Broker**가 중간에 있다는 것입니다. 이러한 구조를 "허브 앤 스포크(Hub and Spoke)" 패턴이라고도 합니다. 클라이언트들은 서로 직접 통신하지 않고, 모든 메시지가 중앙의 Broker를 통해 전달됩니다. 이 구조 덕분에 클라이언트는 다른 클라이언트의 존재나 위치를 알 필요가 없으며, Broker만 알면 됩니다.
 
 ```
 [Publisher] ──publish──> [Broker] ──deliver──> [Subscriber]
@@ -79,13 +88,15 @@ MQTT의 가장 큰 특징은 **Broker**가 중간에 있다는 것입니다.
                             └──deliver──> [Subscriber]
 ```
 
-- **Publisher**: 메시지를 보내는 쪽
-- **Subscriber**: 메시지를 받는 쪽
-- **Broker**: 메시지를 중계하는 서버
+- **Publisher**: 메시지를 보내는 쪽. 데이터를 생성하고 특정 Topic으로 발행합니다.
+- **Subscriber**: 메시지를 받는 쪽. 관심 있는 Topic을 구독하고 해당 메시지를 수신합니다.
+- **Broker**: 메시지를 중계하는 서버. Publisher로부터 메시지를 받아 적절한 Subscriber에게 전달합니다.
 
-Publisher와 Subscriber는 서로를 직접 알지 못합니다. Broker만 알면 됩니다.
+Publisher와 Subscriber는 서로를 직접 알지 못합니다. Broker만 알면 됩니다. 이러한 느슨한 결합(Loose Coupling) 덕분에 시스템 확장이 용이합니다. 새로운 Subscriber를 추가해도 Publisher를 수정할 필요가 없고, 반대로 Publisher를 추가해도 기존 Subscriber에 영향을 주지 않습니다.
 
 #### HTTP와의 근본적인 차이
+
+MQTT를 이해하는 가장 좋은 방법은 익숙한 HTTP와 비교하는 것입니다. 두 프로토콜은 근본적으로 다른 통신 패턴을 사용하며, 각각 적합한 사용 사례가 있습니다.
 
 | 구분 | HTTP | MQTT |
 |------|------|------|
@@ -101,9 +112,11 @@ Publisher와 Subscriber는 서로를 직접 알지 못합니다. Broker만 알�
 
 ### 1.2 MQTT v5가 해결하려는 문제
 
+MQTT v5는 2019년에 OASIS 표준으로 발표되었습니다. v3.1.1이 2014년에 발표된 이후 5년간의 실무 경험을 바탕으로 많은 개선이 이루어졌습니다. 특히 대규모 IoT 시스템을 운영하면서 발견된 문제점들을 해결하는 데 초점을 맞췄습니다.
+
 #### v3의 한계
 
-MQTT v3.1.1은 오랫동안 사용되었지만 몇 가지 한계가 있었습니다:
+MQTT v3.1.1은 오랫동안 사용되었지만 실무에서 몇 가지 한계가 드러났습니다. 특히 장애 상황에서 원인을 파악하거나 시스템을 확장하는 데 어려움이 있었습니다.
 
 1. **왜 실패했는지 알 수 없음**
    - 연결이 끊어져도 이유를 모름
@@ -147,15 +160,17 @@ User Properties:
 
 ## 2장. MQTT v5 기본 아키텍처
 
+이 장에서는 MQTT 시스템을 구성하는 핵심 요소들과 메시지가 어떻게 흘러가는지 살펴봅니다. Client, Broker, Topic의 관계를 이해하면 MQTT 기반 시스템을 설계할 때 각 구성 요소의 역할과 책임을 명확히 정의할 수 있습니다.
+
 ### 2.1 구성 요소
 
 #### Client (클라이언트)
 
-MQTT 시스템에서 메시지를 보내거나 받는 모든 것이 Client입니다.
+MQTT 시스템에서 메시지를 보내거나 받는 모든 것이 Client입니다. 여기서 중요한 점은 "클라이언트"라는 용어가 HTTP에서의 의미와 다르다는 것입니다. HTTP에서 클라이언트는 서버에 요청을 보내는 쪽이지만, MQTT에서 클라이언트는 Broker에 연결하는 모든 참여자를 의미합니다. 백엔드 서버도 Broker에 연결하면 MQTT 클라이언트가 됩니다.
 
-- 센서, 모바일 앱, 서버 애플리케이션 모두 Client
-- Publisher이면서 동시에 Subscriber일 수 있음
-- Broker에 연결해서 동작
+- **센서, 모바일 앱, 서버 애플리케이션 모두 Client**: 온도 센서가 데이터를 보내든, 모바일 앱이 알림을 받든, 백엔드 서버가 명령을 내리든 모두 동등한 Client입니다.
+- **Publisher이면서 동시에 Subscriber일 수 있음**: 하나의 Client가 특정 Topic에 메시지를 발행하면서 동시에 다른 Topic의 메시지를 구독할 수 있습니다. 예를 들어 스마트 조명은 명령을 구독하면서 자신의 상태를 발행합니다.
+- **Broker에 연결해서 동작**: 모든 Client는 Broker와의 연결을 통해서만 메시지를 주고받습니다. Client들 사이에 직접 연결은 없습니다.
 
 ```
 [모바일 앱] ──── Client
@@ -165,13 +180,13 @@ MQTT 시스템에서 메시지를 보내거나 받는 모든 것이 Client입니
 
 #### Broker (브로커)
 
-메시지를 중계하는 서버입니다.
+메시지를 중계하는 서버입니다. MQTT 시스템의 심장부로, 모든 메시지가 Broker를 통해 흐릅니다. Broker의 안정성과 성능이 전체 시스템의 품질을 결정하므로, 프로덕션 환경에서는 Broker 선택과 운영에 많은 주의를 기울여야 합니다.
 
 **주요 역할:**
-1. Client 연결 관리
-2. Topic별 메시지 라우팅
-3. 메시지 저장 (필요시)
-4. 인증/인가
+1. **Client 연결 관리**: 수천에서 수백만 개의 동시 연결을 관리합니다. 각 연결의 인증, 세션 상태, Keep Alive를 추적합니다.
+2. **Topic별 메시지 라우팅**: Publisher가 보낸 메시지를 해당 Topic을 구독하는 모든 Subscriber에게 전달합니다. 이 과정이 효율적으로 이루어져야 지연 시간을 최소화할 수 있습니다.
+3. **메시지 저장 (필요시)**: QoS 1, 2 메시지는 전달이 확인될 때까지 저장합니다. Retained Message는 새 구독자가 즉시 마지막 상태를 받을 수 있도록 저장합니다.
+4. **인증/인가**: 클라이언트가 누구인지 확인하고(인증), 어떤 Topic에 접근할 수 있는지 결정합니다(인가). 보안이 중요한 시스템에서는 필수입니다.
 
 **대표적인 Broker:**
 
@@ -302,13 +317,15 @@ Broker는 "똑똑한 우체국"과 같습니다:
 
 ## 3장. Topic 설계
 
-Topic 설계는 MQTT 시스템의 **가장 중요한 설계 결정**입니다.
+Topic 설계는 MQTT 시스템의 **가장 중요한 설계 결정**입니다. 한 번 정해진 Topic 구조는 나중에 변경하기 매우 어렵습니다. 이미 운영 중인 시스템에서 Topic을 변경하려면 모든 Publisher와 Subscriber를 동시에 수정해야 하기 때문입니다. 따라서 처음부터 확장성과 유지보수성을 고려한 설계가 필수입니다.
+
+이 장에서는 Topic 네이밍 규칙, Wildcard 사용법, 그리고 실무에서 검증된 Best Practice를 다룹니다. 이 내용을 숙지하면 수천 개의 디바이스가 연결된 시스템에서도 효율적으로 메시지를 관리할 수 있습니다.
 
 ### 3.1 Topic 구조와 규칙
 
 #### 계층적 네이밍
 
-Topic은 슬래시(/)로 계층을 나눕니다.
+Topic은 슬래시(/)로 계층을 나눕니다. 이 구조는 파일 시스템의 디렉터리 구조와 유사합니다. 계층적 구조를 사용하면 Wildcard를 통해 특정 범위의 메시지만 구독할 수 있어 매우 유연한 메시지 필터링이 가능합니다. 예를 들어, 3층의 모든 센서 데이터만 구독하거나, 특정 건물의 모든 온도 데이터만 구독하는 것이 가능해집니다.
 
 ```
 # 좋은 예
@@ -343,11 +360,11 @@ acme/hq/3f/meeting-room-b/temperature
 
 ### 3.2 Wildcard
 
-Wildcard는 **Subscribe할 때만** 사용할 수 있습니다. Publish할 때는 사용할 수 없습니다.
+Wildcard는 **Subscribe할 때만** 사용할 수 있습니다. Publish할 때는 사용할 수 없습니다. Wildcard를 사용하면 여러 Topic을 한 번에 구독할 수 있어 코드가 간결해지고 관리가 용이해집니다. 하지만 과도한 Wildcard 사용은 불필요한 메시지를 수신하게 되어 성능 저하를 일으킬 수 있으므로 주의가 필요합니다.
 
 #### + (Single-Level Wildcard)
 
-한 단계만 대체합니다.
+한 단계만 대체합니다. 정확히 하나의 Topic 레벨을 대신하며, 빈 레벨은 매칭되지 않습니다. 특정 위치의 값만 다른 여러 Topic을 구독할 때 유용합니다.
 
 ```
 구독: home/+/temperature
@@ -465,13 +482,15 @@ home/livingroom/humidity
 
 ## 4장. MQTT v5 메시지 모델
 
+MQTT 메시지는 단순히 데이터만 담는 것이 아닙니다. v5에서는 Payload 외에도 User Properties, Message Expiry Interval 등 다양한 메타데이터를 함께 전송할 수 있습니다. 이 장에서는 메시지를 구성하는 요소들과 각각의 활용 방법을 알아봅니다. 올바른 메시지 모델링은 시스템의 확장성과 유지보수성에 큰 영향을 미칩니다.
+
 ### 4.1 Payload
 
-Payload는 메시지의 **본문**입니다. 실제 데이터가 들어갑니다.
+Payload는 메시지의 **본문**입니다. 실제 데이터가 들어가며, MQTT 프로토콜은 Payload의 형식을 강제하지 않습니다. JSON, XML, Binary, 심지어 단순 문자열도 가능합니다. 이러한 유연성은 장점이자 단점입니다. 형식의 자유도가 높은 만큼 Publisher와 Subscriber 간의 명확한 약속(계약)이 필요합니다.
 
 #### JSON 형식
 
-가장 많이 사용되는 형식입니다.
+가장 많이 사용되는 형식입니다. 대부분의 프로그래밍 언어에서 JSON 파싱 라이브러리를 제공하므로 구현이 쉽고, 사람이 읽을 수 있어 디버깅에 유리합니다.
 
 ```json
 {
@@ -616,13 +635,15 @@ if (now - message.timestamp) > threshold:
 
 ## 5장. QoS 완전 정복
 
-QoS(Quality of Service)는 메시지 **전달 보장 수준**입니다.
+QoS(Quality of Service)는 메시지 **전달 보장 수준**입니다. MQTT에서 가장 중요한 개념 중 하나로, 네트워크 상황과 메시지의 중요도에 따라 적절한 QoS를 선택해야 합니다. QoS 선택은 시스템의 신뢰성과 성능 사이의 트레이드오프입니다. 높은 QoS는 더 많은 네트워크 오버헤드와 지연을 발생시키지만, 메시지 전달을 더 강력하게 보장합니다.
+
+이 장에서는 각 QoS 레벨의 동작 원리를 상세히 설명하고, 실무에서 어떤 상황에 어떤 QoS를 선택해야 하는지 알아봅니다. 특히 QoS 1에서 발생할 수 있는 중복 메시지 처리 방법도 다룹니다.
 
 ### 5.1 QoS 0 / 1 / 2 동작 원리
 
 #### QoS 0: At Most Once (최대 한 번)
 
-"보내고 잊어버린다" 방식입니다.
+"보내고 잊어버린다" 방식입니다. 메시지를 한 번 전송하고 응답을 기다리지 않습니다. 네트워크 문제로 메시지가 유실되어도 재전송하지 않습니다. 가장 빠르고 가벼운 방식이지만, 메시지 전달을 보장하지 않습니다.
 
 ```
 [Publisher] ──PUBLISH──> [Broker] ──PUBLISH──> [Subscriber]
@@ -787,11 +808,15 @@ func handleState(msg StateMessage) {
 
 ## 6장. Session & 연결 관리
 
+MQTT에서 세션(Session)은 단순히 TCP 연결을 넘어서는 개념입니다. 세션에는 구독 정보, 전달되지 않은 메시지, QoS 흐름 상태 등이 포함됩니다. 올바른 세션 관리는 네트워크가 불안정한 환경에서 메시지 손실을 방지하는 핵심입니다. 이 장에서는 세션의 생명주기와 Keep Alive 메커니즘, 그리고 Retained Message 활용법을 다룹니다.
+
 ### 6.1 Session Expiry Interval
 
-세션은 Client와 Broker 간의 **연결 상태 정보**입니다.
+세션은 Client와 Broker 간의 **연결 상태 정보**입니다. v5에서는 Session Expiry Interval을 통해 연결이 끊어진 후에도 세션을 얼마나 유지할지 세밀하게 제어할 수 있습니다. 이 기능은 모바일 앱처럼 연결이 자주 끊어지는 환경에서 특히 유용합니다.
 
 #### Clean Start vs Session 유지
+
+Clean Start 플래그는 연결 시 이전 세션을 어떻게 처리할지 결정합니다. 이 설정은 시스템의 동작 방식에 큰 영향을 미치므로 신중하게 선택해야 합니다.
 
 **Clean Start = true (새 세션)**
 ```
@@ -947,12 +972,13 @@ PUBLISH
 
 > 이 장은 실무에서 **가장 중요한** 부분입니다.
 
+많은 MQTT 튜토리얼이 연결과 메시지 전송만 다루지만, 실제 프로덕션 코드에서는 재연결 로직이 전체 코드의 상당 부분을 차지합니다. 네트워크는 반드시 끊기며, 이에 대한 준비 없이는 안정적인 서비스를 운영할 수 없습니다. 이 장에서는 재연결이 필요한 이유, 재연결 시 발생하는 문제들, 그리고 검증된 재연결 전략을 상세히 다룹니다.
+
 ### 7.1 재연결이 반드시 필요한 이유
 
 #### 현실 세계의 네트워크
 
-이상적인 세계에서는 한 번 연결하면 영원히 유지됩니다.
-하지만 현실은 다릅니다:
+이상적인 세계에서는 한 번 연결하면 영원히 유지됩니다. 하지만 현실은 다릅니다. 네트워크 연결은 다양한 이유로 끊어질 수 있으며, 이는 버그가 아닌 정상적인 운영 환경의 일부입니다. 따라서 재연결은 예외 처리가 아니라 핵심 기능으로 설계해야 합니다.
 
 ```
 # 네트워크 끊김 원인들
@@ -1215,11 +1241,15 @@ for _, msg := range messages {
 
 ## 8장. MQTT v5 고급 기능
 
+MQTT v5에서는 실무에서 자주 필요한 고급 기능들이 추가되었습니다. 이 장에서는 로드 밸런싱을 위한 Shared Subscription, HTTP 스타일의 Request/Response 패턴, 그리고 디버깅에 필수적인 Reason Code를 다룹니다. 이 기능들을 활용하면 더 확장성 있고 운영하기 쉬운 시스템을 구축할 수 있습니다.
+
 ### 8.1 Shared Subscription
 
-여러 Subscriber가 **메시지를 나눠서** 처리하는 기능입니다.
+여러 Subscriber가 **메시지를 나눠서** 처리하는 기능입니다. 일반적인 MQTT 구독에서는 같은 Topic을 구독하는 모든 Subscriber가 동일한 메시지를 받습니다. 하지만 Shared Subscription을 사용하면 메시지가 구독자들 사이에 분배되어 로드 밸런싱 효과를 얻을 수 있습니다. 이는 대량의 메시지를 처리해야 하는 시스템에서 수평 확장을 가능하게 합니다.
 
 #### 개념
+
+Shared Subscription의 핵심은 같은 그룹 내의 Subscriber들이 메시지를 분배받는다는 것입니다. 이를 통해 단일 Subscriber의 처리 한계를 넘어서는 대량의 메시지를 처리할 수 있습니다.
 
 ```
 # 일반 구독
@@ -1284,21 +1314,36 @@ MQTT로 HTTP처럼 요청-응답을 구현하는 패턴입니다.
 
 #### Response Topic
 
-응답을 받을 Topic을 요청에 포함시킵니다.
+응답을 받을 Topic을 요청에 포함시킵니다. 전체 흐름을 이해하는 것이 중요합니다.
+
+![image-20260118172008215](/Users/user/GolandProjects/tutorials-go/docs/start/image-20260118172008215.png)
+
+
 
 ```
-# 요청
-PUBLISH
-  topic: device/cmd/get_status
-  response_topic: reply/client-123/status
-  correlation_data: req-001
-
-# 응답
-PUBLISH
-  topic: reply/client-123/status  # 요청의 response_topic
-  correlation_data: req-001        # 요청의 correlation_data
-  payload: {"status": "ok"}
+[요청자 Client A]                              [응답자 Client B]
+       │                                              │
+       ├─ 1. SUBSCRIBE: reply/client-123/status       │
+       │     (응답 받을 Topic 미리 구독)              │
+       │                                              │
+       ├─ 2. PUBLISH ─────────────────────────────────┼──► 요청 수신
+       │      topic: device/cmd/get_status            │
+       │      response_topic: reply/client-123/status │
+       │      correlation_data: req-001               │
+       │                                              │
+       │                                         처리 후
+       │                                              │
+       ◄──────────────────────────────────────────────┼─ 3. PUBLISH (응답)
+         응답 수신                                    │      topic: reply/client-123/status
+                                                      │      correlation_data: req-001
+                                                      │      payload: {"status": "ok"}
 ```
+
+**핵심 포인트:**
+
+- **요청자**는 요청 전에 `response_topic`을 미리 **SUBSCRIBE** 해야 함
+- **응답자**는 요청의 `response_topic`으로 **PUBLISH**하여 응답
+- 요청과 응답 모두 PUBLISH이며, 구독은 응답을 받기 위한 사전 준비
 
 #### Correlation Data
 
@@ -1398,13 +1443,15 @@ v5: "연결 실패 - Reason Code 134: Bad User Name or Password"
 
 ## 9장. 보안
 
+MQTT 시스템의 보안은 세 가지 축으로 구성됩니다: 인증(Authentication), 인가(Authorization), 그리고 암호화(Encryption). 인증은 "당신이 누구인가"를 확인하고, 인가는 "무엇을 할 수 있는가"를 결정하며, 암호화는 "통신 내용이 노출되지 않는가"를 보장합니다. 특히 IoT 환경에서는 수많은 디바이스가 연결되므로 보안 설계가 더욱 중요합니다.
+
 ### 9.1 인증
 
-Client가 **누구인지** 확인합니다.
+Client가 **누구인지** 확인합니다. MQTT에서는 연결 시점에 인증이 이루어지며, 한 번 인증된 연결은 세션이 유지되는 동안 유효합니다. 인증에 실패하면 Broker는 연결을 거부하고, v5에서는 Reason Code를 통해 실패 원인을 알려줍니다.
 
 #### Username / Password
 
-가장 기본적인 인증 방식입니다.
+가장 기본적인 인증 방식입니다. 설정이 간단하여 개발 및 테스트 환경에서 많이 사용됩니다. 하지만 보안 수준이 높지 않으므로 프로덕션에서는 TLS와 함께 사용하거나 다른 인증 방식을 고려해야 합니다.
 
 ```go
 // 연결 시 인증 정보 제공
@@ -1441,12 +1488,29 @@ config := paho.Connect{
 
 ### 9.2 인가
 
-인증된 Client가 **무엇을 할 수 있는지** 결정합니다.
+인증된 Client가 **무엇을 할 수 있는지** 결정합니다. ACL(Access Control List)은 **Broker 측에서 설정**하며, 클라이언트 코드가 아닌 Broker의 설정 파일이나 관리 시스템에서 구성합니다.
+
+#### Broker별 ACL 설정 방식
+
+| Broker | 설정 방식 |
+|--------|----------|
+| **Mosquitto** | `acl_file` 설정 파일 (텍스트) |
+| **EMQX** | Dashboard UI, REST API, 또는 외부 DB 연동 |
+| **HiveMQ** | XML 설정 또는 Extension |
+| **VerneMQ** | `vmq.acl` 파일 또는 플러그인 |
 
 #### Topic 기반 ACL
 
+**Mosquitto 설정 예시:**
+
+```bash
+# mosquitto.conf에서 ACL 파일 지정
+password_file /mosquitto/config/passwd
+acl_file /mosquitto/config/acl
 ```
-# ACL 설정 예시 (Mosquitto)
+
+```
+# /mosquitto/config/acl
 user sensor-001
 topic read sensor/+/state     # 읽기만 가능
 topic write sensor/001/#      # 자기 토픽만 쓰기
@@ -1454,6 +1518,123 @@ topic write sensor/001/#      # 자기 토픽만 쓰기
 user admin
 topic readwrite #             # 모든 토픽 읽기/쓰기
 ```
+
+#### ACL 변경 적용 방법
+
+ACL 파일을 수정한 후에는 Broker에 변경 사항을 적용해야 합니다.
+
+**Mosquitto 적용 방법:**
+
+| 방법 | 명령어 | 설명 |
+|------|--------|------|
+| 재시작 | `docker restart mosquitto` | 모든 연결 끊김 |
+| 설정 리로드 | `kill -SIGHUP $(pidof mosquitto)` | 연결 유지하며 리로드 (Linux) |
+| Dynamic Security | REST API 호출 | 런타임 변경 가능 (v2.0+) |
+
+**Broker별 동적 변경 지원:**
+
+| Broker | 동적 변경 | 방법 |
+|--------|----------|------|
+| **Mosquitto** | △ (플러그인 필요) | Dynamic Security 플러그인 |
+| **EMQX** | ✅ | Dashboard/REST API로 즉시 반영 |
+| **HiveMQ** | ✅ | Control Center에서 즉시 반영 |
+| **VerneMQ** | △ | `vmq-admin` CLI로 리로드 |
+
+#### Mosquitto Dynamic Security 플러그인
+
+Mosquitto 2.0부터 제공되는 **Dynamic Security 플러그인**을 사용하면 Broker 재시작 없이 런타임에 사용자, 그룹, ACL을 관리할 수 있습니다.
+
+**활성화 방법:**
+
+```bash
+# mosquitto.conf
+listener 1883
+allow_anonymous false
+plugin /usr/lib/mosquitto_dynamic_security.so
+plugin_opt_config_file /mosquitto/config/dynamic-security.json
+```
+
+**초기 설정:**
+
+```bash
+# 관리자 계정 생성
+mosquitto_ctrl dynsec init /mosquitto/config/dynamic-security.json admin-user
+
+# 클라이언트 추가
+mosquitto_ctrl dynsec createClient sensor-001 -p password123
+
+# ACL 설정
+mosquitto_ctrl dynsec addClientRole sensor-001 sensor-role
+```
+
+**장점:**
+- Broker 재시작 없이 사용자/권한 관리
+- JSON 기반 설정으로 백업/복원 용이
+- `mosquitto_ctrl` CLI 또는 MQTT 메시지로 관리 가능
+
+#### mosquitto-go-auth 플러그인
+
+외부 시스템과 연동하여 동적으로 ACL을 체크하려면 **mosquitto-go-auth** 플러그인을 사용할 수 있습니다. 이 오픈소스 플러그인은 매 요청마다 외부 Backend에서 권한을 조회하므로, Broker 재시작 없이 실시간으로 권한 변경이 반영됩니다.
+
+- GitHub: https://github.com/iegomez/mosquitto-go-auth
+
+**지원하는 Backend:**
+
+| Backend | 설명 |
+|---------|------|
+| **HTTP** | 외부 API 호출로 인증/인가 |
+| **PostgreSQL** | DB에서 사용자/ACL 조회 |
+| **MySQL** | DB에서 사용자/ACL 조회 |
+| **Redis** | 캐시 기반 빠른 조회 |
+| **MongoDB** | Document DB 연동 |
+| **JWT** | 토큰 기반 인증 |
+| **SQLite** | 경량 DB |
+
+**HTTP Backend 설정 예시:**
+
+```bash
+# mosquitto.conf
+auth_plugin /mosquitto/go-auth.so
+auth_opt_backends http
+auth_opt_http_host your-auth-server.com
+auth_opt_http_port 8080
+auth_opt_http_aclcheck_uri /mqtt/acl
+auth_opt_http_usercheck_uri /mqtt/user
+```
+
+**인증 서버 구현 예시 (Go):**
+
+```go
+// POST /mqtt/acl
+// Body: {"username": "sensor-001", "topic": "sensor/001/data", "acc": 2}
+// acc: 1=subscribe, 2=publish
+
+func checkACL(w http.ResponseWriter, r *http.Request) {
+    var req struct {
+        Username string `json:"username"`
+        Topic    string `json:"topic"`
+        Acc      int    `json:"acc"`  // 1: subscribe, 2: publish
+    }
+    json.NewDecoder(r.Body).Decode(&req)
+
+    // DB에서 권한 조회 후 동적으로 판단
+    allowed := checkPermissionFromDB(req.Username, req.Topic, req.Acc)
+
+    if allowed {
+        w.WriteHeader(http.StatusOK)       // 200: 허용
+    } else {
+        w.WriteHeader(http.StatusForbidden) // 403: 거부
+    }
+}
+```
+
+**장점:**
+- 매 요청마다 실시간 ACL 체크
+- Broker 재시작 없이 권한 변경 즉시 반영
+- 비즈니스 로직에 맞는 복잡한 권한 체크 가능
+- 기존 인증 시스템(LDAP, OAuth 등)과 통합 용이
+
+프로덕션 환경에서는 동적 변경이 가능한 방식을 선택하는 것이 운영에 유리합니다.
 
 #### Publish / Subscribe 권한 분리
 
@@ -1471,41 +1652,354 @@ dashboard:
 
 ### 9.3 TLS
 
-통신 내용을 **암호화**합니다.
+통신 내용을 **암호화**합니다. MQTT는 기본적으로 평문 통신을 하므로, 인터넷을 통한 통신이나 민감한 데이터 전송 시 TLS를 반드시 적용해야 합니다.
 
-#### 언제 필요한가
+#### MQTT 포트 규약
 
+| 포트 | 프로토콜 | 설명 |
+|------|----------|------|
+| **1883** | MQTT (평문) | 개발/테스트 또는 폐쇄망 |
+| **8883** | MQTTS (TLS) | 프로덕션 표준 |
+| **8084** | WSS (WebSocket + TLS) | 브라우저 연결 시 |
+
+#### TLS 인증 방식
+
+| 방식 | 설명 | 사용 사례 |
+|------|------|----------|
+| **Server Auth Only** | 클라이언트가 서버 인증서 검증 | 일반적인 웹 서비스와 동일 |
+| **Mutual TLS (mTLS)** | 서버와 클라이언트 상호 인증 | 높은 보안이 필요한 IoT |
+
+#### Mosquitto TLS 설정
+
+**1. 인증서 생성 (테스트용 Self-signed)**
+
+```bash
+# CA 인증서 생성
+openssl genrsa -out ca.key 2048
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 365 \
+    -out ca.crt -subj "/CN=MQTT CA"
+
+# 서버 인증서 생성
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr \
+    -subj "/CN=mqtt.example.com"
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key \
+    -CAcreateserial -out server.crt -days 365 -sha256
 ```
-# TLS 필수
-- 인터넷을 통한 통신
-- 민감한 데이터 전송
-- 인증 정보 보호
 
-# TLS 선택적
-- 폐쇄망 내부 통신
-- 성능이 극히 중요한 경우
+**2. Mosquitto 설정 (mosquitto.conf)**
+
+```bash
+# 평문 포트 (개발용, 프로덕션에서는 비활성화 권장)
+listener 1883 localhost
+
+# TLS 포트
+listener 8883
+cafile /mosquitto/certs/ca.crt
+certfile /mosquitto/certs/server.crt
+keyfile /mosquitto/certs/server.key
+
+# TLS 버전 설정 (1.2 이상 권장)
+tls_version tlsv1.2
+
+# Mutual TLS (클라이언트 인증서 요구 시)
+# require_certificate true
+# use_identity_as_username true
+```
+
+**3. Docker Compose 예시**
+
+```yaml
+version: '3'
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./certs:/mosquitto/certs
+```
+
+#### Go 클라이언트 TLS 설정
+
+```go
+import (
+    "crypto/tls"
+    "crypto/x509"
+    "os"
+)
+
+func createTLSConfig(caFile string) (*tls.Config, error) {
+    // CA 인증서 로드
+    caCert, err := os.ReadFile(caFile)
+    if err != nil {
+        return nil, err
+    }
+
+    caCertPool := x509.NewCertPool()
+    caCertPool.AppendCertsFromPEM(caCert)
+
+    return &tls.Config{
+        RootCAs:            caCertPool,
+        MinVersion:         tls.VersionTLS12,
+        InsecureSkipVerify: false,  // 프로덕션에서는 반드시 false
+    }, nil
+}
+
+// autopaho에서 사용
+func main() {
+    tlsConfig, _ := createTLSConfig("/path/to/ca.crt")
+
+    brokerURL, _ := url.Parse("tls://mqtt.example.com:8883")
+
+    config := autopaho.ClientConfig{
+        BrokerUrls: []*url.URL{brokerURL},
+        TlsCfg:     tlsConfig,  // TLS 설정 적용
+        // ...
+    }
+}
+```
+
+#### Mutual TLS (mTLS) 설정
+
+클라이언트도 인증서를 제출해야 하는 양방향 인증입니다.
+
+```go
+func createMutualTLSConfig(caFile, certFile, keyFile string) (*tls.Config, error) {
+    // CA 인증서 로드
+    caCert, err := os.ReadFile(caFile)
+    if err != nil {
+        return nil, err
+    }
+    caCertPool := x509.NewCertPool()
+    caCertPool.AppendCertsFromPEM(caCert)
+
+    // 클라이언트 인증서 로드
+    clientCert, err := tls.LoadX509KeyPair(certFile, keyFile)
+    if err != nil {
+        return nil, err
+    }
+
+    return &tls.Config{
+        RootCAs:      caCertPool,
+        Certificates: []tls.Certificate{clientCert},
+        MinVersion:   tls.VersionTLS12,
+    }, nil
+}
 ```
 
 #### 성능과 보안의 균형
 
-```
-# TLS 오버헤드
-- 핸드셰이크 지연 (초기 연결)
-- CPU 사용량 증가 (암호화/복호화)
-- 메모리 사용량 증가
+| 항목 | TLS 1.2 | TLS 1.3 |
+|------|---------|---------|
+| 핸드셰이크 | 2-RTT | 1-RTT (더 빠름) |
+| 암호화 스위트 | 다양함 | 간소화됨 |
+| 0-RTT 재연결 | X | O |
+| 권장 환경 | 레거시 호환 필요 시 | 신규 시스템 |
 
-# 경량 디바이스의 경우
-- TLS 1.3 사용 (더 가벼움)
-- 또는 VPN으로 네트워크 레벨 보안
+**경량 디바이스 고려사항:**
+- TLS 1.3 사용 권장 (핸드셰이크 오버헤드 감소)
+- 하드웨어 암호화 가속 지원 여부 확인
+- 리소스 제약 시 VPN으로 네트워크 레벨 보안 대체 고려
+
+### 9.4 MQTT over WebSocket
+
+브라우저는 TCP 소켓을 직접 사용할 수 없기 때문에, 웹 애플리케이션에서 MQTT를 사용하려면 WebSocket으로 감싸야 합니다. MQTT over WebSocket을 사용하면 프론트엔드에서도 실시간으로 MQTT Topic을 구독하고 메시지를 발행할 수 있습니다.
+
+#### 동작 원리
+
 ```
+[IoT 디바이스]                   [MQTT Broker]                  [웹 브라우저]
+      │                              │                              │
+      ├── TCP:1883 ─────────────────►│◄───────────── WSS:8084 ──────┤
+      │   (MQTT 원본)                │   (MQTT over WebSocket)      │
+      │                              │                              │
+      ├── PUBLISH sensor/temp ──────►│──────────────────────────────►│
+      │                              │         (실시간 전달)         │
+      │                              │                              │
+      │◄─────────────────────────────┤◄── PUBLISH command/device ───┤
+      │   (명령 수신)                │                              │
+```
+
+**핵심 포인트:**
+- WebSocket 클라이언트도 일반 MQTT 클라이언트와 **동일하게 동작**
+- 같은 Topic을 공유하며 서로 메시지를 주고받을 수 있음
+- Broker 입장에서는 연결 방식만 다를 뿐 동일한 클라이언트
+
+#### Mosquitto WebSocket 설정
+
+```bash
+# mosquitto.conf
+
+# 일반 MQTT (TCP)
+listener 1883
+
+# WebSocket (평문) - 개발용
+listener 8083
+protocol websockets
+
+# WebSocket (TLS) - 프로덕션
+listener 8084
+protocol websockets
+cafile /mosquitto/certs/ca.crt
+certfile /mosquitto/certs/server.crt
+keyfile /mosquitto/certs/server.key
+```
+
+#### 프론트엔드 연동 (JavaScript)
+
+**MQTT.js 설치:**
+
+```bash
+npm install mqtt
+```
+
+**React/Vue 등에서 사용:**
+
+```javascript
+import mqtt from 'mqtt';
+
+// WebSocket으로 MQTT Broker 연결
+const client = mqtt.connect('wss://mqtt.example.com:8084/mqtt', {
+    clientId: 'web-dashboard-' + Math.random().toString(16).substr(2, 8),
+    username: 'dashboard-user',
+    password: 'secret',
+    clean: true,
+});
+
+// 연결 성공
+client.on('connect', () => {
+    console.log('MQTT Connected!');
+
+    // Topic 구독
+    client.subscribe('sensor/+/temperature', { qos: 1 });
+    client.subscribe('sensor/+/humidity', { qos: 1 });
+});
+
+// 실시간 메시지 수신
+client.on('message', (topic, message) => {
+    const data = JSON.parse(message.toString());
+    console.log(`${topic}:`, data);
+
+    // 예: sensor/livingroom/temperature: { value: 25.5, unit: "°C" }
+    // UI 업데이트 로직
+    updateDashboard(topic, data);
+});
+
+// 메시지 발행 (디바이스 제어)
+function sendCommand(deviceId, command) {
+    client.publish(
+        `command/${deviceId}`,
+        JSON.stringify(command),
+        { qos: 1 }
+    );
+}
+
+// 사용 예: sendCommand('light-001', { action: 'turn_on', brightness: 80 });
+```
+
+**연결 해제:**
+
+```javascript
+// 컴포넌트 언마운트 시
+client.end();
+```
+
+#### React Hook 예시
+
+```javascript
+import { useEffect, useState } from 'react';
+import mqtt from 'mqtt';
+
+function useMQTT(brokerUrl, topics) {
+    const [messages, setMessages] = useState({});
+    const [client, setClient] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
+
+    useEffect(() => {
+        const mqttClient = mqtt.connect(brokerUrl);
+
+        mqttClient.on('connect', () => {
+            setIsConnected(true);
+            topics.forEach(topic => mqttClient.subscribe(topic));
+        });
+
+        mqttClient.on('message', (topic, message) => {
+            setMessages(prev => ({
+                ...prev,
+                [topic]: JSON.parse(message.toString())
+            }));
+        });
+
+        mqttClient.on('error', (err) => console.error('MQTT Error:', err));
+        mqttClient.on('close', () => setIsConnected(false));
+
+        setClient(mqttClient);
+
+        return () => mqttClient.end();
+    }, [brokerUrl]);
+
+    const publish = (topic, message) => {
+        if (client && isConnected) {
+            client.publish(topic, JSON.stringify(message));
+        }
+    };
+
+    return { messages, isConnected, publish };
+}
+
+// 사용 예시
+function Dashboard() {
+    const { messages, isConnected, publish } = useMQTT(
+        'wss://mqtt.example.com:8084/mqtt',
+        ['sensor/+/temperature', 'sensor/+/humidity']
+    );
+
+    return (
+        <div>
+            <p>연결 상태: {isConnected ? '✅ 연결됨' : '❌ 끊김'}</p>
+            <p>거실 온도: {messages['sensor/livingroom/temperature']?.value}°C</p>
+            <button onClick={() => publish('command/ac', { action: 'turn_on' })}>
+                에어컨 켜기
+            </button>
+        </div>
+    );
+}
+```
+
+#### 실제 사용 사례
+
+| 사용 사례 | 설명 |
+|----------|------|
+| **IoT 대시보드** | 센서 데이터 실시간 시각화 |
+| **스마트홈 앱** | 조명, 에어컨 등 원격 제어 |
+| **실시간 알림** | 이벤트 발생 시 즉시 알림 |
+| **채팅 애플리케이션** | 메시지 실시간 전송/수신 |
+| **라이브 모니터링** | 서버/장비 상태 실시간 확인 |
+| **협업 도구** | 문서 동시 편집 상태 공유 |
+
+#### WebSocket vs HTTP Polling
+
+| 항목 | WebSocket (MQTT) | HTTP Polling |
+|------|------------------|--------------|
+| 지연 시간 | 수 ms (실시간) | 폴링 간격에 의존 |
+| 서버 부하 | 낮음 (연결 유지) | 높음 (반복 요청) |
+| 양방향 통신 | ✅ 기본 지원 | ❌ 별도 구현 필요 |
+| 배터리 소모 | 낮음 | 높음 |
+
+**결론:** 실시간성이 중요한 웹 애플리케이션에서는 MQTT over WebSocket이 HTTP Polling보다 효율적입니다.
 
 ---
 
 ## 10장. Go + Paho (v5) 사용법
 
+이 장에서는 Go 언어로 MQTT v5 클라이언트를 구현하는 방법을 다룹니다. Eclipse Paho 프로젝트에서 제공하는 `paho.golang` 패키지를 사용하며, 특히 자동 재연결을 지원하는 `autopaho` 패키지의 사용법을 중심으로 설명합니다. 앞서 배운 개념들을 실제 코드로 구현하는 방법을 익히면 바로 프로덕션에 적용할 수 있습니다.
+
 ### 10.1 Paho v5 구조 이해
 
-Go에서 MQTT v5를 사용하려면 `eclipse/paho.golang` 패키지를 사용합니다.
+Go에서 MQTT v5를 사용하려면 `eclipse/paho.golang` 패키지를 사용합니다. 이 패키지는 두 가지 레벨의 API를 제공합니다. `paho` 패키지는 저수준 API로 세밀한 제어가 가능하고, `autopaho` 패키지는 자동 재연결 등 편의 기능이 포함된 고수준 API입니다. 실무에서는 대부분 `autopaho`를 사용하는 것이 좋습니다.
 
 #### 주요 패키지
 
@@ -1795,9 +2289,15 @@ func handler(msg *paho.Publish) {
 
 ## 11장. 운영 관점 MQTT v5
 
+MQTT 시스템을 프로덕션에서 안정적으로 운영하려면 적절한 모니터링과 장애 대응 전략이 필요합니다. 이 장에서는 반드시 모니터링해야 할 핵심 지표와 흔히 발생하는 장애 시나리오별 대응 방법을 다룹니다. 사전에 이러한 상황들을 준비해두면 장애 발생 시 빠르게 대응할 수 있습니다.
+
 ### 11.1 모니터링 포인트
 
+MQTT 시스템의 건강 상태를 파악하기 위해 다음 지표들을 모니터링해야 합니다. 대부분의 Broker가 이러한 메트릭을 제공하며, EMQX나 HiveMQ 같은 엔터프라이즈 Broker는 대시보드를 통해 시각화할 수 있습니다.
+
 #### 연결 수
+
+연결 수는 시스템 부하를 가장 직접적으로 나타내는 지표입니다. 갑작스러운 연결 수 변화는 네트워크 장애나 클라이언트 문제를 의미할 수 있습니다.
 
 ```
 # 모니터링 항목
@@ -1883,7 +2383,11 @@ func handler(msg *paho.Publish) {
 
 ## 12장. MQTT v5 사용 판단 기준
 
+모든 기술에는 적합한 사용처가 있습니다. MQTT는 강력한 프로토콜이지만, 모든 상황에 적합한 것은 아닙니다. 이 장에서는 MQTT를 선택해야 하는 상황과 다른 기술을 선택해야 하는 상황을 명확히 구분합니다. 잘못된 기술 선택은 프로젝트 전체에 영향을 미치므로, 프로젝트 초기에 올바른 판단을 내리는 것이 중요합니다.
+
 ### MQTT를 써야 하는 경우
+
+다음과 같은 요구사항이 있다면 MQTT가 좋은 선택입니다. 하나 이상 해당된다면 MQTT를 검토해볼 가치가 있습니다.
 
 1. **실시간 양방향 통신이 필요할 때**
    ```
@@ -1951,7 +2455,11 @@ func handler(msg *paho.Publish) {
 
 ## 13장. 스터디 마무리
 
+이 스터디를 통해 MQTT v5의 핵심 개념부터 실무 적용까지 전체적인 그림을 그릴 수 있게 되었기를 바랍니다. 마지막으로 배운 내용을 정리하고, 실무에 적용하기 전에 확인해야 할 체크리스트를 제공합니다.
+
 ### 13.1 핵심 요약
+
+지금까지 배운 내용 중 가장 중요한 포인트들을 정리합니다. 이 내용들은 MQTT 기반 시스템을 설계하고 구현할 때 항상 염두에 두어야 합니다.
 
 #### MQTT v5의 본질
 
