@@ -174,9 +174,60 @@ MQTT 시스템에서 메시지를 보내거나 받는 모든 것이 Client입니
 4. 인증/인가
 
 **대표적인 Broker:**
-- **Mosquitto**: 가볍고 무료, 학습/소규모에 적합
-- **EMQX**: 대규모 상용, 클러스터링 지원
-- **HiveMQ**: 엔터프라이즈급
+
+| Broker | 언어 | 라이선스 | 클러스터링 | 적합한 환경 |
+|--------|------|----------|------------|-------------|
+| Mosquitto | C | EPL/EDL (오픈소스) | X (기본) | 학습, 소규모, 에지 |
+| EMQX | Erlang/OTP | Apache 2.0 / 상용 | O | 대규모 IoT, 엔터프라이즈 |
+| HiveMQ | Java | 상용 / CE 무료 | O | 엔터프라이즈, 미션크리티컬 |
+| VerneMQ | Erlang | Apache 2.0 | O | 중대규모, 클라우드 |
+| NanoMQ | C | MIT | X | 에지, 임베디드 |
+
+**1. Mosquitto (Eclipse)**
+
+- 특징: 가장 널리 사용되는 오픈소스 브로커, 매우 가벼움 (메모리 수 MB), MQTT v5 완벽 지원
+- 장점: 빠른 시작 가능, 리소스 사용량 최소, 안정적이고 검증된 구현
+- 단점: 단일 노드만 지원, 클러스터링 미지원 (외부 솔루션 필요)
+- 추천: 개발/테스트 환경, 소규모 IoT (수백~수천 연결), 에지 게이트웨이
+
+**2. EMQX**
+
+- 특징: Erlang/OTP 기반 (높은 동시성), 단일 클러스터에서 수백만 연결 지원, 규칙 엔진/데이터 브리지 내장
+- 장점: 수평 확장 용이, 고가용성 기본 지원, REST API/대시보드 제공, Kafka/MySQL 등 네이티브 연동
+- 단점: Mosquitto 대비 리소스 사용량 높음, 고급 기능은 엔터프라이즈 버전 필요
+- 추천: 대규모 IoT 플랫폼, 상용 서비스, 클라우드 네이티브 환경
+
+**3. HiveMQ**
+
+- 특징: Java 기반 엔터프라이즈 브로커, Extension 시스템으로 기능 확장, Community Edition 무료 제공
+- 장점: 안정성과 성능, 상용 지원 및 SLA, AWS/Azure 마켓플레이스 제공
+- 단점: 상용 라이선스 비용, Community Edition 기능 제한
+- 추천: 미션 크리티컬 시스템, 기업 IoT 인프라, 금융/의료 등 규제 산업
+
+**4. VerneMQ**
+
+- 특징: Erlang 기반 오픈소스, 분산 아키텍처 설계, 플러그인 시스템
+- 장점: 완전 오픈소스, 클러스터링 무료 지원, 유연한 인증 플러그인
+- 단점: EMQX 대비 커뮤니티 작음, 문서화 상대적 부족
+- 추천: 오픈소스 기반 중대규모 시스템, 비용 절감이 중요한 환경
+
+**5. NanoMQ**
+
+- 특징: EMQ에서 개발한 초경량 브로커, 에지 컴퓨팅 특화, 브리지 기능 내장
+- 장점: 극히 낮은 리소스 사용, 빠른 시작 시간, 에지-클라우드 브리지 용이
+- 단점: 기능 제한적, 대규모 연결 미지원
+- 추천: 에지 디바이스, 라즈베리파이 등 SBC, 로컬 게이트웨이
+
+**선택 가이드:**
+
+| 상황 | 추천 브로커 |
+|------|-------------|
+| 학습/개발 | Mosquitto |
+| 소규모 (< 1만 연결) | Mosquitto, NanoMQ |
+| 중규모 (1만~10만 연결) | EMQX, VerneMQ |
+| 대규모 (> 10만 연결) | EMQX Enterprise, HiveMQ |
+| 에지/게이트웨이 | NanoMQ, Mosquitto |
+| 엔터프라이즈/SLA 필요 | HiveMQ, EMQX Enterprise |
 
 #### Topic (토픽)
 
@@ -1969,6 +2020,61 @@ MQTT가 보장하지 않는 것:
 - [ ] 인증 방식을 결정했는가?
 - [ ] Topic별 권한을 설정했는가?
 - [ ] TLS 사용 여부를 결정했는가?
+
+---
+
+## FAQ
+
+### Q: Topic에 Wildcard를 지원하나요?
+
+**A: 네, 지원합니다. 단, Subscribe할 때만 사용 가능합니다.**
+
+MQTT는 두 가지 Wildcard를 제공합니다:
+
+| Wildcard | 이름 | 설명 | 예시 |
+|----------|------|------|------|
+| `+` | Single-Level | 한 단계만 대체 | `home/+/temperature` → `home/livingroom/temperature` |
+| `#` | Multi-Level | 해당 위치부터 모든 하위 레벨 대체 | `home/#` → `home/livingroom/temperature` |
+
+**주의사항:**
+- Publish할 때는 Wildcard 사용 불가 (정확한 Topic 명시 필요)
+- `#`는 반드시 Topic의 마지막에만 위치해야 함
+- `home/#/temperature`와 같은 형태는 잘못된 사용
+
+자세한 내용은 [3.2 Wildcard](#32-wildcard) 섹션을 참고하세요.
+
+### Q: Wildcard로 구독했을 때 실제 매칭된 Topic을 알 수 있나요?
+
+**A: 네, 알 수 있습니다. 메시지에 항상 실제 Topic이 포함되어 전달됩니다.**
+
+Wildcard로 구독하더라도 메시지를 받을 때는 정확한 Topic 정보가 함께 옵니다.
+
+```
+# 구독
+SUBSCRIBE topic: home/+/temperature
+
+# 메시지 수신 시
+Message 1:
+  topic: home/livingroom/temperature  ← 실제 Topic
+  payload: 25
+
+Message 2:
+  topic: home/bedroom/temperature     ← 실제 Topic
+  payload: 22
+```
+
+**Go Paho 예시:**
+
+```go
+router.RegisterHandler("home/+/temperature", func(msg *paho.Publish) {
+    // msg.Topic에 실제 매칭된 Topic이 들어있음
+    fmt.Printf("Topic: %s, Payload: %s\n", msg.Topic, msg.Payload)
+    // 출력: Topic: home/livingroom/temperature, Payload: 25
+    // 출력: Topic: home/bedroom/temperature, Payload: 22
+})
+```
+
+이를 활용하면 Topic에서 방 이름 등을 파싱하여 처리할 수 있습니다.
 
 ---
 
