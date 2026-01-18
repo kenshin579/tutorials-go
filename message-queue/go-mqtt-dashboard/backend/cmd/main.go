@@ -62,6 +62,11 @@ func main() {
 			client.Disconnect(context.Background())
 			return
 		case <-ticker.C:
+			// Only publish when device is running
+			if !sim.IsRunning() {
+				continue
+			}
+
 			state := sim.GetState()
 			payload, err := json.Marshal(state)
 			if err != nil {

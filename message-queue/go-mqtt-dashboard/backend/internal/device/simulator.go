@@ -52,6 +52,13 @@ func (s *Simulator) HandleCommand(action string) {
 	}
 }
 
+// IsRunning returns true if the device is running
+func (s *Simulator) IsRunning() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.status == "running"
+}
+
 // ToJSON returns the state as JSON
 func (s *Simulator) ToJSON() ([]byte, error) {
 	return json.Marshal(s.GetState())
