@@ -33,7 +33,7 @@ run-be:
 # Frontend 실행
 run-fe:
 	@echo "🚀 Starting Frontend..."
-	cd frontend && npm start
+	cd frontend && npm run dev
 
 # Mosquitto 브로커 중지
 stop-broker:
