@@ -115,15 +115,16 @@
 
 .clearButton {
   padding: 4px 12px;
-  border: 1px solid #bdbdbd;
+  border: 1px solid #757575;
   border-radius: 4px;
-  background: white;
+  background: #424242;
+  color: #fff;
   cursor: pointer;
   font-size: 12px;
 }
 
 .clearButton:hover {
-  background: #f5f5f5;
+  background: #616161;
 }
 
 .logList {
