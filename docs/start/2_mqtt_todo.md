@@ -41,35 +41,35 @@
 ## Phase 3: Frontend 구현
 
 ### 3.1 프로젝트 초기화
-- [ ] React 프로젝트 생성 (Create React App 또는 Vite)
-- [ ] TypeScript 설정
-- [ ] mqtt.js 의존성 추가
+- [x] React 프로젝트 생성 (Create React App 또는 Vite)
+- [x] TypeScript 설정
+- [x] mqtt.js 의존성 추가
 
 ### 3.2 MQTT Hook 구현
-- [ ] `frontend/src/hooks/useMqtt.ts` 생성
-- [ ] MQTT 연결 로직 (WebSocket)
-- [ ] Subscribe 로직 (device/1/state)
-- [ ] Publish 로직 (device/1/command)
-- [ ] 연결 상태 관리
-- [ ] 자동 재연결 설정
-- [ ] 메시지 로그 히스토리 관리 (최대 50개)
-- [ ] 로그 초기화 함수 구현
+- [x] `frontend/src/hooks/useMqtt.ts` 생성
+- [x] MQTT 연결 로직 (WebSocket)
+- [x] Subscribe 로직 (device/1/state)
+- [x] Publish 로직 (device/1/command)
+- [x] 연결 상태 관리
+- [x] 자동 재연결 설정
+- [x] 메시지 로그 히스토리 관리 (최대 50개)
+- [x] 로그 초기화 함수 구현
 
 ### 3.3 UI 컴포넌트 구현
-- [ ] `frontend/src/components/DeviceStatus.tsx` 생성
-- [ ] `frontend/src/components/DeviceStatus.module.css` 생성
-- [ ] 연결 상태 표시 (Connected/Disconnected)
-- [ ] 디바이스 Status 표시 (아이콘 포함)
-- [ ] Temperature 표시
-- [ ] Start 버튼 구현 (녹색 스타일링)
-- [ ] Stop 버튼 구현 (빨간색 스타일링)
-- [ ] 버튼 비활성화 스타일 적용
-- [ ] 메시지 로그 영역 구현 (수신/송신 구분)
-- [ ] 로그 Clear 버튼 구현
+- [x] `frontend/src/components/DeviceStatus.tsx` 생성
+- [x] `frontend/src/components/DeviceStatus.module.css` 생성
+- [x] 연결 상태 표시 (Connected/Disconnected)
+- [x] 디바이스 Status 표시 (아이콘 포함)
+- [x] Temperature 표시
+- [x] Start 버튼 구현 (녹색 스타일링)
+- [x] Stop 버튼 구현 (빨간색 스타일링)
+- [x] 버튼 비활성화 스타일 적용
+- [x] 메시지 로그 영역 구현 (수신/송신 구분)
+- [x] 로그 Clear 버튼 구현
 
 ### 3.4 App 통합
-- [ ] `frontend/src/App.tsx` 수정
-- [ ] DeviceStatus 컴포넌트 연동
+- [x] `frontend/src/App.tsx` 수정
+- [x] DeviceStatus 컴포넌트 연동
 
 ## Phase 4: 통합 테스트
 

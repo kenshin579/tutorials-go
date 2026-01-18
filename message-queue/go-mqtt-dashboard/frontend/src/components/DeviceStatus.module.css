@@ -1,0 +1,184 @@
+.container {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.connectionStatus {
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.connected {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.disconnected {
+  color: #c62828;
+  font-weight: bold;
+}
+
+.stateTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.stateTable td {
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.stateTable td:first-child {
+  background: #fafafa;
+  font-weight: bold;
+  width: 40%;
+}
+
+.running {
+  color: #1565c0;
+  font-weight: bold;
+}
+
+.idle {
+  color: #757575;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.startButton, .stopButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.startButton {
+  background: #4caf50;
+  color: white;
+}
+
+.startButton:hover:not(:disabled) {
+  background: #43a047;
+}
+
+.stopButton {
+  background: #f44336;
+  color: white;
+}
+
+.stopButton:hover:not(:disabled) {
+  background: #e53935;
+}
+
+.startButton:disabled, .stopButton:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+}
+
+/* 로그 영역 스타일 */
+.logSection {
+  margin-top: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.logHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  font-weight: bold;
+}
+
+.clearButton {
+  padding: 4px 12px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.clearButton:hover {
+  background: #f5f5f5;
+}
+
+.logList {
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+}
+
+.logEmpty {
+  padding: 24px;
+  text-align: center;
+  color: #9e9e9e;
+}
+
+.logEntry {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.logEntry:last-child {
+  border-bottom: none;
+}
+
+.logIn {
+  background: #e3f2fd;
+}
+
+.logOut {
+  background: #fff3e0;
+}
+
+.logTime {
+  color: #757575;
+}
+
+.logDirection {
+  font-weight: bold;
+}
+
+.logIn .logDirection {
+  color: #1565c0;
+}
+
+.logOut .logDirection {
+  color: #e65100;
+}
+
+.logType {
+  font-weight: bold;
+  min-width: 50px;
+}
+
+.logMessage {
+  color: #424242;
+}
