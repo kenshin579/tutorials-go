@@ -2379,6 +2379,170 @@ MQTT 시스템의 건강 상태를 파악하기 위해 다음 지표들을 모�
 3. 불필요한 연결 정리
 ```
 
+### 11.3 Mosquitto 모니터링 도구
+
+Mosquitto를 사용하는 경우 다양한 방법으로 Broker 상태를 모니터링할 수 있습니다. 환경과 규모에 따라 적합한 도구를 선택하세요.
+
+#### $SYS Topic (내장 기능)
+
+Mosquitto는 자체 상태 정보를 `$SYS/#` Topic으로 발행합니다. 별도 설치 없이 바로 사용할 수 있어 빠른 상태 확인에 유용합니다.
+
+```bash
+# 모든 시스템 메트릭 구독
+mosquitto_sub -h localhost -t '$SYS/#' -v
+```
+
+**주요 메트릭:**
+
+| Topic | 설명 |
+|-------|------|
+| `$SYS/broker/clients/connected` | 현재 연결된 클라이언트 수 |
+| `$SYS/broker/clients/total` | 총 등록된 클라이언트 수 |
+| `$SYS/broker/messages/received` | 수신한 총 메시지 수 |
+| `$SYS/broker/messages/sent` | 발송한 총 메시지 수 |
+| `$SYS/broker/load/messages/received/1min` | 1분간 수신 메시지 비율 |
+| `$SYS/broker/load/publish/sent/1min` | 1분간 발송 메시지 비율 |
+| `$SYS/broker/uptime` | Broker 가동 시간 (초) |
+| `$SYS/broker/bytes/received` | 수신한 총 바이트 |
+| `$SYS/broker/bytes/sent` | 발송한 총 바이트 |
+
+**활성화 설정 (mosquitto.conf):**
+
+```bash
+# $SYS 메트릭 발행 간격 (초, 기본값 10)
+sys_interval 10
+```
+
+#### MQTT Explorer (GUI 도구)
+
+개발 및 테스트 환경에서 가장 쉽게 사용할 수 있는 데스크톱 앱입니다.
+
+- **다운로드**: https://mqtt-explorer.com
+- **주요 기능**:
+  - Topic 트리 시각화
+  - 실시간 메시지 모니터링
+  - 메시지 발행/구독 테스트
+  - Payload 히스토리 및 차트
+  - Retained Message 관리
+
+```
+# 연결 설정 예시
+Host: localhost
+Port: 1883
+Username: (선택)
+Password: (선택)
+```
+
+#### Prometheus + Grafana
+
+프로덕션 환경에서 권장하는 방식입니다. 메트릭 수집, 저장, 시각화, 알림까지 통합 관리할 수 있습니다.
+
+**mosquitto-exporter 사용:**
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  mosquitto-exporter:
+    image: sapcc/mosquitto-exporter
+    ports:
+      - "9234:9234"
+    environment:
+      - BROKER_ENDPOINT=tcp://mosquitto:1883
+    depends_on:
+      - mosquitto
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+```
+
+**prometheus.yml:**
+
+```yaml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'mosquitto'
+    static_configs:
+      - targets: ['mosquitto-exporter:9234']
+```
+
+**Grafana 대시보드 설정:**
+1. Grafana 접속 (http://localhost:3000)
+2. Data Source에 Prometheus 추가
+3. Dashboard Import에서 Mosquitto 템플릿 검색 또는 직접 생성
+
+#### Cedalo Management Center
+
+Mosquitto를 만든 Cedalo에서 제공하는 공식 상용 관리 도구입니다.
+
+- **사이트**: https://cedalo.com/mqtt-management-center
+- **주요 기능**:
+  - 웹 기반 대시보드
+  - 실시간 클라이언트 관리
+  - ACL 동적 관리 (GUI)
+  - 클러스터 모니터링
+  - 감사 로그
+
+#### 환경별 추천 도구
+
+| 환경 | 추천 도구 | 이유 |
+|------|----------|------|
+| **개발/테스트** | MQTT Explorer | 설치 쉽고 직관적인 GUI |
+| **소규모 프로덕션** | $SYS Topic + 스크립트 | 추가 인프라 불필요 |
+| **중규모 프로덕션** | Prometheus + Grafana | 알림, 히스토리, 대시보드 |
+| **대규모/엔터프라이즈** | Cedalo 또는 EMQX 전환 | 전문 지원, 클러스터링 |
+
+**$SYS Topic 모니터링 스크립트 예시 (Go):**
+
+```go
+func monitorBroker(cm *autopaho.ConnectionManager) {
+    topics := []string{
+        "$SYS/broker/clients/connected",
+        "$SYS/broker/messages/received",
+        "$SYS/broker/load/messages/received/1min",
+    }
+
+    for _, topic := range topics {
+        cm.Subscribe(context.Background(), &paho.Subscribe{
+            Subscriptions: []paho.SubscribeOptions{
+                {Topic: topic, QoS: 0},
+            },
+        })
+    }
+}
+
+// 메시지 핸들러에서 메트릭 수집
+func handleSysMessage(msg *paho.Publish) {
+    switch msg.Topic {
+    case "$SYS/broker/clients/connected":
+        clientCount, _ := strconv.Atoi(string(msg.Payload))
+        if clientCount > threshold {
+            alertSlack("클라이언트 수 임계치 초과: " + string(msg.Payload))
+        }
+    }
+}
+```
+
 ---
 
 ## 12장. MQTT v5 사용 판단 기준
@@ -2493,41 +2657,6 @@ MQTT가 보장하지 않는 것:
 - Idempotent 처리 구현
 - 타임스탬프/시퀀스 기반 정렬
 - 재연결 후 상태 동기화
-
-### 13.2 체크리스트
-
-스터디를 마치고 이 질문들에 답할 수 있어야 합니다.
-
-#### Topic 설계
-
-- [ ] 내 시스템의 Topic 구조를 설계했는가?
-- [ ] Command / Event / State를 구분했는가?
-- [ ] Wildcard 사용이 적절한가?
-
-#### QoS 선택
-
-- [ ] 각 Topic의 QoS를 결정했는가?
-- [ ] 그 이유를 설명할 수 있는가?
-- [ ] 중복 처리 방안은 있는가?
-
-#### 재연결 전략
-
-- [ ] 네트워크 끊김을 고려했는가?
-- [ ] 자동 재연결을 구현했는가?
-- [ ] 재연결 후 재구독을 구현했는가?
-- [ ] Backoff 전략을 적용했는가?
-
-#### 세션 관리
-
-- [ ] Session Expiry를 설정했는가?
-- [ ] Clean Start 정책을 결정했는가?
-- [ ] 오프라인 메시지 처리 방안은 있는가?
-
-#### 보안
-
-- [ ] 인증 방식을 결정했는가?
-- [ ] Topic별 권한을 설정했는가?
-- [ ] TLS 사용 여부를 결정했는가?
 
 ---
 
