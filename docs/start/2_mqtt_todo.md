@@ -11,27 +11,27 @@
 ## Phase 2: Backend 구현
 
 ### 2.1 프로젝트 초기화
-- [ ] Go 모듈 초기화 (`go mod init`)
-- [ ] autopaho 의존성 추가
+- [x] Go 모듈 초기화 (`go mod init`)
+- [x] autopaho 의존성 추가
 
 ### 2.2 MQTT Client 구현
-- [ ] `backend/internal/mqtt/client.go` 생성
-- [ ] MQTT 연결 로직 구현
-- [ ] Subscribe 로직 구현 (device/1/command)
-- [ ] Publish 로직 구현 (device/1/state)
-- [ ] 자동 재연결 설정
+- [x] `backend/internal/mqtt/client.go` 생성
+- [x] MQTT 연결 로직 구현
+- [x] Subscribe 로직 구현 (device/1/command)
+- [x] Publish 로직 구현 (device/1/state)
+- [x] 자동 재연결 설정
 
 ### 2.3 Device Simulator 구현
-- [ ] `backend/internal/device/simulator.go` 생성
-- [ ] State 구조체 정의
-- [ ] GetState 메서드 구현 (랜덤 온도 생성)
-- [ ] HandleCommand 메서드 구현 (start/stop)
+- [x] `backend/internal/device/simulator.go` 생성
+- [x] State 구조체 정의
+- [x] GetState 메서드 구현 (랜덤 온도 생성)
+- [x] HandleCommand 메서드 구현 (start/stop)
 
 ### 2.4 Main 구현
-- [ ] `backend/cmd/main.go` 생성
-- [ ] MQTT Client 초기화
-- [ ] 2초 주기 상태 Publish 로직
-- [ ] Command 수신 및 처리 연동
+- [x] `backend/cmd/main.go` 생성
+- [x] MQTT Client 초기화
+- [x] 2초 주기 상태 Publish 로직
+- [x] Command 수신 및 처리 연동
 
 ### 2.5 Backend 테스트
 - [ ] MQTT 연결 테스트
