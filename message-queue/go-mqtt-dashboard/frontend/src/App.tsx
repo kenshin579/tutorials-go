@@ -1,4 +1,5 @@
 import { DeviceStatus } from './components/DeviceStatus';
+import './App.css';
 
 function App() {
   return (
