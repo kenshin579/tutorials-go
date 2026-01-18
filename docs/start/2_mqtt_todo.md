@@ -76,8 +76,8 @@
 > **MCP Playwright**를 사용하여 E2E 테스트 수행
 
 ### 4.1 테스트 환경 준비
-- [ ] 전체 시스템 실행 (`make run-broker`, `make run-be`, `make run-fe`)
-- [ ] Frontend 접속 확인 (http://localhost:3000)
+- [x] 전체 시스템 실행 (`make run-broker`, `make run-be`, `make run-fe`)
+- [x] Frontend 접속 확인 (http://localhost:5173)
 
 ### 4.2 MCP Playwright 테스트 시나리오
 
@@ -95,13 +95,13 @@
 ```
 
 ### 4.3 테스트 체크리스트
-- [ ] 연결 상태 표시 확인 (🟢 Connected)
-- [ ] 디바이스 상태 실시간 업데이트 확인
-- [ ] Start 버튼 클릭 → status: running 변경
-- [ ] Stop 버튼 클릭 → status: idle 변경
-- [ ] 메시지 로그에 수신/송신 기록 표시
-- [ ] Clear 버튼으로 로그 초기화
-- [ ] Broker 재시작 후 자동 재연결 확인
+- [x] 연결 상태 표시 확인 (🟢 Connected)
+- [x] 디바이스 상태 실시간 업데이트 확인
+- [x] Start 버튼 클릭 → status: running 변경
+- [x] Stop 버튼 클릭 → status: idle 변경
+- [x] 메시지 로그에 수신/송신 기록 표시
+- [x] Clear 버튼으로 로그 초기화
+- [x] Broker 재시작 후 자동 재연결 확인
 
 ## Phase 5: 문서화
 
