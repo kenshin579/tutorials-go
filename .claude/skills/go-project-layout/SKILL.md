@@ -2,6 +2,7 @@
 name: go-project-layout
 description: Go 프로젝트를 새로 생성하거나 구조를 변경할 때 clean architecture 폴더 구조를 적용합니다.
 user-invocable: true
+model: haiku
 allowed-tools: Read, Grep, Glob
 ---
 
