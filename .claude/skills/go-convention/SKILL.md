@@ -2,6 +2,7 @@
 name: go-convention
 description: Go 코드를 작성하거나 리뷰할 때 프로젝트의 코딩 컨벤션을 적용합니다. Go 파일을 생성, 수정, 리뷰할 때 자동으로 사용됩니다.
 user-invocable: true
+model: haiku
 allowed-tools: Read, Grep, Glob
 ---
 

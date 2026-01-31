@@ -2,6 +2,7 @@
 name: analyze-codebase
 description: 코드베이스 구조를 분석하고 요약합니다
 user-invocable: true
+model: sonnet
 context: fork
 agent: Explore
 ---
