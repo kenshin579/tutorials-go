@@ -64,14 +64,15 @@ classDiagram
 
 | 파일 | 설명 |
 |------|------|
-| `domain.go` | `NotificationStrategy`, `NotificationStrategyProvider` 인터페이스 정의 |
-| `email_service.go` | 이메일 알림 서비스 구현체 |
-| `sms_service.go` | SMS 알림 서비스 구현체 |
-| `push_service.go` | 푸시 알림 서비스 구현체 |
-| `slack_service.go` | Slack 알림 서비스 구현체 |
-| `provider.go` | Strategy Provider (Factory) 구현 |
-| `notification_usecase.go` | 알림 유스케이스 (Context) |
-| `user_preference_store.go` | 사용자 설정 저장소 (Mock) |
+| `main.go` | 실행 진입점 (예제 코드) |
+| `pkg/domain.go` | `NotificationStrategy`, `NotificationStrategyProvider` 인터페이스 정의 |
+| `pkg/email_service.go` | 이메일 알림 서비스 구현체 |
+| `pkg/sms_service.go` | SMS 알림 서비스 구현체 |
+| `pkg/push_service.go` | 푸시 알림 서비스 구현체 |
+| `pkg/slack_service.go` | Slack 알림 서비스 구현체 |
+| `pkg/provider.go` | Strategy Provider (Factory) 구현 |
+| `pkg/notification_usecase.go` | 알림 유스케이스 (Context) |
+| `pkg/user_preference_store.go` | 사용자 설정 저장소 (Mock) |
 
 ## 핵심 구성요소
 
@@ -164,8 +165,8 @@ func TestProvider(t *testing.T) {
 }
 ```
 
-## 테스트 실행
+## 실행
 
 ```bash
-go test -v -run TestFactoryPattern ./...
+go run main.go
 ```

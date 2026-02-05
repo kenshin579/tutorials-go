@@ -1,4 +1,4 @@
-package factory
+package pkg
 
 import "context"
 
