@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kenshin579/tutorials-go/golang/pattern/factory/pkg"
+	"github.com/kenshin579/tutorials-go/golang/pattern/factory/notification"
 )
 
 func main() {
@@ -16,16 +16,16 @@ func main() {
 	fmt.Println()
 
 	// 1. 각 Service 생성
-	emailService := pkg.NewEmailService("smtp.gmail.com", 587)
-	smsService := pkg.NewSMSService("api-key-123", "010-1234-5678")
-	pushService := pkg.NewPushService("fcm-token-abc")
-	slackService := pkg.NewSlackService("https://hooks.slack.com/xxx")
+	emailService := notification.NewEmailService("smtp.gmail.com", 587)
+	smsService := notification.NewSMSService("api-key-123", "010-1234-5678")
+	pushService := notification.NewPushService("fcm-token-abc")
+	slackService := notification.NewSlackService("https://hooks.slack.com/xxx")
 
 	// 2. UserPreferenceStore 생성 (사용자 설정 저장소)
-	userPrefStore := pkg.NewMockUserPreferenceStore()
+	userPrefStore := notification.NewMockUserPreferenceStore()
 
 	// 3. Strategy Provider(Factory) 생성
-	provider := pkg.NewNotificationStrategyProvider(
+	provider := notification.NewNotificationStrategyProvider(
 		emailService,
 		smsService,
 		pushService,
@@ -34,11 +34,11 @@ func main() {
 	)
 
 	// 4. NotificationUsecase 생성
-	notificationUsecase := pkg.NewNotificationUsecase(provider)
+	notificationUsecase := notification.NewNotificationUsecase(provider)
 
 	// 5. 타입을 직접 지정하여 알림 전송
 	fmt.Println("--- 타입 직접 지정 방식 ---")
-	_ = notificationUsecase.SendByType(ctx, pkg.NotificationTypeSlack, "#general", "Hello Slack!")
+	_ = notificationUsecase.SendByType(ctx, notification.NotificationTypeSlack, "#general", "Hello Slack!")
 	fmt.Println()
 
 	// 6. 사용자별 설정에 따라 자동으로 Strategy 선택

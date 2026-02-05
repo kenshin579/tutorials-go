@@ -54,12 +54,12 @@ classDiagram
 | 파일 | 설명 |
 |------|------|
 | `main.go` | 실행 진입점 (예제 코드) |
-| `pkg/domain.go` | `PaymentStrategy` 인터페이스 및 `PaymentResult` 타입 정의 |
-| `pkg/credit_card_service.go` | 신용카드 결제 서비스 구현체 |
-| `pkg/kakao_pay_service.go` | 카카오페이 결제 서비스 구현체 |
-| `pkg/naver_pay_service.go` | 네이버페이 결제 서비스 구현체 |
-| `pkg/payment_usecase.go` | 결제 유스케이스 (Context) |
-| `pkg/helper.go` | 헬퍼 함수 |
+| `payment/domain.go` | `PaymentStrategy` 인터페이스 및 `PaymentResult` 타입 정의 |
+| `payment/credit_card_service.go` | 신용카드 결제 서비스 구현체 |
+| `payment/kakao_pay_service.go` | 카카오페이 결제 서비스 구현체 |
+| `payment/naver_pay_service.go` | 네이버페이 결제 서비스 구현체 |
+| `payment/payment_usecase.go` | 결제 유스케이스 (Context) |
+| `payment/helper.go` | 헬퍼 함수 |
 
 ## 핵심 구성요소
 
