@@ -22,7 +22,7 @@ func main() {
 	slackService := notification.NewSlackService("https://hooks.slack.com/xxx")
 
 	// 2. UserPreferenceStore 생성 (사용자 설정 저장소)
-	userPrefStore := notification.NewMockUserPreferenceStore()
+	userPrefStore := notification.NewUserPreferenceStore()
 
 	// 3. Strategy Provider(Factory) 생성
 	provider := notification.NewNotificationStrategyProvider(
