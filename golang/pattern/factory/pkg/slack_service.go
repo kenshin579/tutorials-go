@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// SlackService는 Slack 알림 서비스입니다.
+// SlackService 는 Slack 알림 서비스입니다.
 type SlackService struct {
 	webhookURL string
 }

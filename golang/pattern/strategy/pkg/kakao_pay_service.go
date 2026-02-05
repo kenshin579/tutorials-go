@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// KakaoPayService는 카카오페이 결제 서비스입니다.
+// KakaoPayService 는 카카오페이 결제 서비스입니다.
 type KakaoPayService struct {
 	userID string
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// EmailService는 이메일 알림 서비스입니다.
+// EmailService 는 이메일 알림 서비스입니다.
 type EmailService struct {
 	smtpHost string
 	smtpPort int

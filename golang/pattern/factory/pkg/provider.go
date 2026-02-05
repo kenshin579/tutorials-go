@@ -5,13 +5,13 @@ import (
 	"fmt"
 )
 
-// notificationStrategyProvider는 NotificationStrategyProvider의 구현체입니다.
+// notificationStrategyProvider 는 NotificationStrategyProvider 의 구현체입니다.
 type notificationStrategyProvider struct {
 	strategies          map[NotificationType]NotificationStrategy
 	userPreferenceStore UserPreferenceStore
 }
 
-// NewNotificationStrategyProvider는 Provider를 생성합니다.
+// NewNotificationStrategyProvider 는 Provider 를 생성합니다.
 func NewNotificationStrategyProvider(
 	emailService *EmailService,
 	smsService *SMSService,
@@ -32,13 +32,13 @@ func NewNotificationStrategyProvider(
 	}
 }
 
-// Get은 알림 타입에 해당하는 Strategy를 반환합니다.
+// Get 은 알림 타입에 해당하는 Strategy 를 반환합니다.
 func (p *notificationStrategyProvider) Get(ctx context.Context, notificationType NotificationType) (NotificationStrategy, bool) {
 	strategy, ok := p.strategies[notificationType]
 	return strategy, ok
 }
 
-// GetByUserPreference는 사용자 설정에 따른 Strategy를 반환합니다.
+// GetByUserPreference 는 사용자 설정에 따른 Strategy 를 반환합니다.
 func (p *notificationStrategyProvider) GetByUserPreference(ctx context.Context, userID string) (NotificationStrategy, bool) {
 	preferredType, err := p.userPreferenceStore.GetPreferredNotificationType(ctx, userID)
 	if err != nil {

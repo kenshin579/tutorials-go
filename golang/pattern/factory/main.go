@@ -24,7 +24,7 @@ func main() {
 	// 2. UserPreferenceStore 생성 (사용자 설정 저장소)
 	userPrefStore := pkg.NewMockUserPreferenceStore()
 
-	// 3. Strategy Provider (Factory) 생성
+	// 3. Strategy Provider(Factory) 생성
 	provider := pkg.NewNotificationStrategyProvider(
 		emailService,
 		smsService,
