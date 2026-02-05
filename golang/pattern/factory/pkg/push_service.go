@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// PushService는 푸시 알림 서비스입니다.
+// PushService 는 푸시 알림 서비스입니다.
 type PushService struct {
 	fcmToken string
 }

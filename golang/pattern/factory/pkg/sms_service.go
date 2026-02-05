@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// SMSService는 SMS 알림 서비스입니다.
+// SMSService 는 SMS 알림 서비스입니다.
 type SMSService struct {
 	apiKey    string
 	senderNum string

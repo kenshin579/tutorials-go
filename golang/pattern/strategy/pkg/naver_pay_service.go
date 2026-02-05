@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// NaverPayService는 네이버페이 결제 서비스입니다.
+// NaverPayService 는 네이버페이 결제 서비스입니다.
 type NaverPayService struct {
 	userID string
 }

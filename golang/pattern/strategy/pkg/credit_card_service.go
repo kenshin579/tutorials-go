@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// CreditCardService는 신용카드 결제 서비스입니다.
+// CreditCardService 는 신용카드 결제 서비스입니다.
 type CreditCardService struct {
 	cardNumber string
 	cvv        string

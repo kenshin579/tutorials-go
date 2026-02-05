@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-// mockUserPreferenceStore는 테스트/데모용 UserPreferenceStore 구현체입니다.
+// mockUserPreferenceStore 는 테스트/데모용 UserPreferenceStore 구현체입니다.
 type mockUserPreferenceStore struct {
 	preferences map[string]NotificationType
 }
