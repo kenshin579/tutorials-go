@@ -1,4 +1,4 @@
-package pkg
+package notification
 
 import (
 	"context"
