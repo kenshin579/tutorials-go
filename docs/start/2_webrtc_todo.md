@@ -11,18 +11,18 @@
 
 ## Phase 2: Backend - Room 관리 및 Signaling
 
-- [ ] `room/manager.go` 구현 (Room 구조체, Join/Leave/Broadcast)
-- [ ] `handler/signaling.go` 구현 (WebSocket 핸들러, 메시지 파싱 및 라우팅)
-- [ ] `main.go` 구현 (Echo 서버 부트스트랩, 라우트 등록)
-- [ ] WebSocket 연결 및 메시지 송수신 동작 확인
+- [x] `room/manager.go` 구현 (Room 구조체, Join/Leave/Broadcast)
+- [x] `handler/signaling.go` 구현 (WebSocket 핸들러, 메시지 파싱 및 라우팅)
+- [x] `main.go` 구현 (Echo 서버 부트스트랩, 라우트 등록)
+- [x] WebSocket 연결 및 메시지 송수신 동작 확인
 
 ## Phase 3: Backend - SFU 핵심 로직 (Pion WebRTC)
 
-- [ ] `sfu/peer.go` 구현 (Peer 구조체, PeerConnection 생성, ICE 콜백)
-- [ ] `sfu/router.go` 구현 (OnTrack → RTP 포워딩 루프)
-- [ ] Signaling 핸들러에서 offer/answer/ice 메시지 → SFU PeerConnection 연동
-- [ ] 새 Peer 입장 시 기존 트랙 구독 (AddTrack + Renegotiation)
-- [ ] Peer 퇴장 시 트랙 제거 및 리소스 정리 (RemoveTrack + PeerConnection Close)
+- [x] `sfu/peer.go` 구현 (Peer 구조체, PeerConnection 생성, ICE 콜백)
+- [x] `sfu/router.go` 구현 (OnTrack → RTP 포워딩 루프)
+- [x] Signaling 핸들러에서 offer/answer/ice 메시지 → SFU PeerConnection 연동
+- [x] 새 Peer 입장 시 기존 트랙 구독 (AddTrack + Renegotiation)
+- [x] Peer 퇴장 시 트랙 제거 및 리소스 정리 (RemoveTrack + PeerConnection Close)
 
 ## Phase 4: Frontend - WebSocket Signaling Hook
 
