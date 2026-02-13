@@ -26,22 +26,22 @@
 
 ## Phase 4: Frontend - WebSocket Signaling Hook
 
-- [ ] `hooks/useSignaling.ts` 구현 (WebSocket 연결, 메시지 타입 확장)
-- [ ] 채팅 메시지 WebSocket 송수신 로직 구현
+- [x] `hooks/useSignaling.ts` 구현 (WebSocket 연결, 메시지 타입 확장)
+- [x] 채팅 메시지 WebSocket 송수신 로직 구현
 
 ## Phase 5: Frontend - WebRTC Hook (SFU 연동)
 
-- [ ] `hooks/useWebRTC.ts` 구현 (PeerConnection 생성, 로컬 미디어 획득)
-- [ ] Offer 생성 → SFU 전송 → Answer 수신 흐름 구현
-- [ ] ICE Candidate 교환 구현
-- [ ] `ontrack` 이벤트에서 Remote Stream Map 관리
-- [ ] SFU Renegotiation Offer 수신 → 자동 Answer 응답 구현
+- [x] `hooks/useWebRTC.ts` 구현 (PeerConnection 생성, 로컬 미디어 획득)
+- [x] Offer 생성 → SFU 전송 → Answer 수신 흐름 구현
+- [x] ICE Candidate 교환 구현
+- [x] `ontrack` 이벤트에서 Remote Stream Map 관리
+- [x] SFU Renegotiation Offer 수신 → 자동 Answer 응답 구현
 
 ## Phase 6: Frontend - UI 컴포넌트
 
-- [ ] `components/VideoGrid.tsx` 구현 (다자간 비디오 그리드, 동적 레이아웃)
-- [ ] `components/ChatPanel.tsx` 구현 (WebSocket 채팅, 발신자 이름 표시)
-- [ ] `App.tsx` 구현 (Room 입장 화면 + 통화 화면 조합)
+- [x] `components/VideoGrid.tsx` 구현 (다자간 비디오 그리드, 동적 레이아웃)
+- [x] `components/ChatPanel.tsx` 구현 (WebSocket 채팅, 발신자 이름 표시)
+- [x] `App.tsx` 구현 (Room 입장 화면 + 통화 화면 조합)
 
 ## Phase 7: 통합 테스트 (MCP Playwright)
 
