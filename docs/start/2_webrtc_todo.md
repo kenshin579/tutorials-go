@@ -45,10 +45,10 @@
 
 ## Phase 7: 통합 테스트 (MCP Playwright)
 
-- [ ] Backend 서버 시작 및 Frontend 개발 서버 시작
-- [ ] MCP Playwright로 Room 입장 화면 렌더링 확인
-- [ ] MCP Playwright로 Room 입장 후 로컬 비디오 표시 확인
-- [ ] 브라우저 탭 3개에서 동일 Room 입장 → 다자간 영상 송출 확인
-- [ ] 채팅 메시지 전송 → Room 내 전체 수신 확인
-- [ ] 참가자 퇴장 → 비디오 제거 및 UI 업데이트 확인
-- [ ] 콘솔 로그에서 ICE/RTP 포워딩 흐름 확인
+- [x] Backend 서버 시작 및 Frontend 개발 서버 시작
+- [x] MCP Playwright로 Room 입장 화면 렌더링 확인
+- [x] MCP Playwright로 Room 입장 후 로컬 비디오 표시 확인 (fake media 사용)
+- [ ] 브라우저 탭 3개에서 동일 Room 입장 → 다자간 영상 송출 확인 (수동 테스트 필요)
+- [x] 채팅 메시지 전송 → Room 내 전체 수신 확인
+- [ ] 참가자 퇴장 → 비디오 제거 및 UI 업데이트 확인 (수동 테스트 필요)
+- [x] 콘솔 로그에서 ICE/RTP 포워딩 흐름 확인
