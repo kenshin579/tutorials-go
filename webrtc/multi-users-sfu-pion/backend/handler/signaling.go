@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/room"
-	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/sfu"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-pion/backend/room"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-pion/backend/sfu"
 	"github.com/labstack/echo/v4"
 	"github.com/pion/webrtc/v4"
 )

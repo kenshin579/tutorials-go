@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/sfu"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-pion/backend/sfu"
 )
 
 const MaxPeersPerRoom = 6

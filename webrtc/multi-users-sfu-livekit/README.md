@@ -2,7 +2,7 @@
 
 LiveKit을 활용한 다자간 화상 통화 + 채팅 예제입니다.
 
-기존 [multi-users-sfu](../multi-users-sfu)에서 Pion으로 직접 구현했던 SFU를 LiveKit 서버로 대체하여, 코드가 얼마나 간소화되는지 비교할 수 있습니다.
+기존 [multi-users-sfu-pion](../multi-users-sfu-pion)에서 Pion으로 직접 구현했던 SFU를 LiveKit 서버로 대체하여, 코드가 얼마나 간소화되는지 비교할 수 있습니다.
 
 ## Pion SFU vs LiveKit 비교
 
@@ -107,7 +107,7 @@ make stop-livekit
 ## 프로젝트 구조
 
 ```
-webrtc/multi-users-livekit/
+webrtc/multi-users-sfu-livekit/
 ├── Makefile                       # 실행 스크립트
 ├── README.md
 ├── backend/
@@ -155,4 +155,4 @@ LiveKit 접속용 JWT 토큰을 발급합니다.
 - [LiveKit Docs](https://docs.livekit.io)
 - [livekit-client SDK](https://github.com/livekit/client-sdk-js)
 - [livekit/server-sdk-go](https://github.com/livekit/server-sdk-go)
-- [Pion SFU 직접 구현 예제](../multi-users-sfu)
+- [Pion SFU 직접 구현 예제](../multi-users-sfu-pion)

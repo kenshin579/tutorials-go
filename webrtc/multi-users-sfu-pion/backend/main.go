@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/handler"
-	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/room"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-pion/backend/handler"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-pion/backend/room"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

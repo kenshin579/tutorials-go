@@ -14,7 +14,7 @@ Pion WebRTC 기반 SFU(Selective Forwarding Unit) 서버를 활용한 다자간 
 
 ## P2P vs SFU 비교
 
-| 항목 | P2P (simple-p2p) | SFU (multi-users-sfu) |
+| 항목 | P2P (simple-p2p) | SFU (multi-users-sfu-pion) |
 |------|-------------------|------------------------|
 | 최대 인원 | 2명 | 6명 |
 | 미디어 경로 | 브라우저 ↔ 브라우저 | 브라우저 ↔ SFU 서버 ↔ 브라우저 |
@@ -25,7 +25,7 @@ Pion WebRTC 기반 SFU(Selective Forwarding Unit) 서버를 활용한 다자간 
 ## 프로젝트 구조
 
 ```
-webrtc/multi-users-sfu/
+webrtc/multi-users-sfu-pion/
 ├── Makefile
 ├── backend/
 │   ├── main.go                      # Echo 서버 설정 (CORS, WebSocket 엔드포인트)

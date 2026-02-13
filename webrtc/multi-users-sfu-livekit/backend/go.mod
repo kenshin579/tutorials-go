@@ -1,4 +1,4 @@
-module github.com/kenshin579/tutorials-go/webrtc/multi-users-livekit/backend
+module github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-livekit/backend
 
 go 1.25.0
 
