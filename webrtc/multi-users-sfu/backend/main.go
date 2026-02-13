@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/kenshin579/tutorials-go/webrtc/backend/handler"
-	"github.com/kenshin579/tutorials-go/webrtc/backend/room"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/handler"
+	"github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend/room"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -23,6 +23,6 @@ func main() {
 
 	e.GET("/ws", sh.HandleWebSocket)
 
-	log.Println("Starting signaling server on :8080")
+	log.Println("Starting SFU server on :8080")
 	e.Logger.Fatal(e.Start(":8080"))
 }

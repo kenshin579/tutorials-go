@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/kenshin579/tutorials-go/webrtc/backend/room"
+	"github.com/kenshin579/tutorials-go/webrtc/simple-p2p/backend/room"
 	"github.com/labstack/echo/v4"
 )
 

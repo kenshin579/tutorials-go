@@ -1,4 +1,4 @@
-module github.com/kenshin579/tutorials-go/webrtc/backend
+module github.com/kenshin579/tutorials-go/webrtc/simple-p2p/backend
 
 go 1.24.2
 
