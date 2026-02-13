@@ -1,4 +1,4 @@
-module github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu/backend
+module github.com/kenshin579/tutorials-go/webrtc/multi-users-sfu-pion/backend
 
 go 1.25.0
 
