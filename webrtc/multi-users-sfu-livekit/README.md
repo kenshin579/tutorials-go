@@ -26,20 +26,12 @@ LiveKit을 활용한 다자간 화상 통화 + 채팅 예제입니다.
 
 ## 시스템 구조
 
-```
-┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│  Browser A  │◄───────►│              │◄───────►│  Browser B  │
-│  (React)    │  WebRTC │   LiveKit    │  WebRTC │  (React)    │
-│             │         │   Server     │         │             │
-└──────┬──────┘         │  (Docker)    │         └──────┬──────┘
-       │                │   :7880      │                │
-       │                └──────────────┘                │
-       │                                                │
-       │    ┌──────────────────────────┐                │
-       └───►│  Token Server (Echo)     │◄───────────────┘
-            │  GET /token              │
-            │  :8080                   │
-            └──────────────────────────┘
+```mermaid
+graph LR
+    A["Browser A<br/>(React)"] <-->|WebRTC| LK["LiveKit Server<br/>(Docker :7880)"]
+    B["Browser B<br/>(React)"] <-->|WebRTC| LK
+    A -->|GET /token| TS["Token Server<br/>(Echo :8080)"]
+    B -->|GET /token| TS
 ```
 
 - **LiveKit Server**: SFU 역할. 미디어 라우팅, 시그널링, 룸 관리 모두 처리

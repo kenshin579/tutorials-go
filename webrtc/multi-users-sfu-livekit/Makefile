@@ -8,7 +8,8 @@ run-livekit:
 		-e LIVEKIT_KEYS="devkey: secret" \
 		livekit/livekit-server \
 		--dev \
-		--bind 0.0.0.0
+		--bind 0.0.0.0 \
+		--node-ip 127.0.0.1
 
 stop-livekit:
 	docker stop livekit-server
