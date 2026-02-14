@@ -1,8 +1,6 @@
 module github.com/kenshin579/tutorials-go
 
-go 1.21.3
-
-toolchain go1.22.3
+go 1.26.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.0
