@@ -4,6 +4,32 @@ import (
 	"fmt"
 )
 
+// interface{} 기반 함수 - 리턴 타입이 interface{}이므로 타입 단언(type assertion)이 필요하다.
+func foo1(a interface{}) interface{} {
+	return a
+}
+
+// generics 기반 함수 - 리턴 타입이 T이므로 타입 단언이 필요 없다.
+func foo2[T any](a T) T {
+	return a
+}
+
+func Example_interfaceVsGeneric() {
+	var (
+		a int = 10
+		b int = 20
+		c int
+	)
+	c = foo1(a).(int) // 리턴 타입이 interface{} 이다.
+	fmt.Println(c)
+	c = foo2(b) // 리턴 타입이 int이다.
+	fmt.Println(c)
+
+	//Output:
+	//10
+	//20
+}
+
 func minNoGeneric(a, b int) int {
 	if a < b {
 		return a
@@ -110,8 +136,9 @@ func minComparableNumbers[T ComparableNumbers](a, b T) T {
 	return b
 }
 
-func minComparableNumbers2[T ComparableNumbers](a, b T) T {
-	if a < b { // 위 타입들이 < 연산자를 지원하기 때문에 문법 오류가 없다.
+// ComparableNumbers2는 IntegerType | Float로 합성된 constraint이다.
+func minComparableNumbers2[T ComparableNumbers2](a, b T) T {
+	if a < b {
 		return a
 	}
 	return b
