@@ -1,10 +1,10 @@
-package example1
+package go_generics
 
 import (
 	"fmt"
 )
 
-func min(a, b int) int {
+func minNoGeneric(a, b int) int {
 	if a < b {
 		return a
 	}
@@ -17,12 +17,12 @@ func minInt16(a, b int16) int16 {
 	return b
 }
 
-func Example_No_Generics() {
+func Example_noGenerics() {
 	var (
 		a int = 10
 		b int = 20
 	)
-	fmt.Println(min(a, b))
+	fmt.Println(minNoGeneric(a, b))
 	var (
 		c int16 = 10
 		d int16 = 20
@@ -35,19 +35,19 @@ func Example_No_Generics() {
 }
 
 // func name['식별자' '타입 제한자']
-func print[T any](a T) {
+func printAny[T any](a T) {
 	fmt.Println(a)
 }
 
-func Example_Generics() {
+func Example_generics() {
 	var (
 		a int     = 10
 		b float32 = 3.14
 		c string  = "hello"
 	)
-	print(a)
-	print(b)
-	print(c)
+	printAny(a)
+	printAny(b)
+	printAny(c)
 }
 
 //func min[T any](a, b T) T {
@@ -65,8 +65,8 @@ func minType[T int | int16 | int32 | int64 | float32 | float64](a, b T) T {
 	return b
 }
 
-// /타입 제한자는 파이프 연산자로 여러 개를 쉽게 추가가 가능하다.
-func Example_타입_제한자() {
+// 타입 제한자는 파이프 연산자로 여러 개를 쉽게 추가가 가능하다.
+func Example_typeConstraint() {
 	var (
 		a int     = 10
 		b int     = 20
@@ -85,13 +85,13 @@ func Example_타입_제한자() {
 	//1.14
 }
 
-// 타압 제한자 선언
+// 타입 제한자 선언
 // 매번 타입 제한자를 만드는 것은 비효율적이므로 타입 제한자를 interface 키워드로 선언하여 사용이 가능하다.
 type ComparableNumbers interface {
 	int | int16 | int32 | int64 | float32 | float64
 }
 
-type Integer interface {
+type IntegerType interface {
 	int | int16 | int32 | int64
 }
 
@@ -100,7 +100,7 @@ type Float interface {
 }
 
 type ComparableNumbers2 interface {
-	Integer | Float
+	IntegerType | Float
 }
 
 func minComparableNumbers[T ComparableNumbers](a, b T) T {
@@ -117,7 +117,7 @@ func minComparableNumbers2[T ComparableNumbers](a, b T) T {
 	return b
 }
 
-func Example_ComparableNumbers() {
+func Example_comparableNumbers() {
 	var (
 		a int     = 10
 		b int     = 20

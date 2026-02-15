@@ -1,4 +1,4 @@
-package example3
+package go_generics
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ func (n *Node[T]) Push(v T) *Node[T] {
 	return node
 }
 
-func Example_Generics_Func() {
+func Example_genericsStruct() {
 	node1 := NewNode(1) // *Node[int]
 	node1.Push(2).Push(3).Push(4)
 
@@ -63,7 +63,7 @@ func Map[F, T any](s []F, f func(F) T) []T {
 	return rst
 }
 
-func Example_Generic_Map() {
+func Example_genericMap() {
 	doubled := Map([]int{1, 2, 3}, func(i int) int {
 		return i * 2
 	})
