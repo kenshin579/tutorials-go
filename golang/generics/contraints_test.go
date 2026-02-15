@@ -19,7 +19,7 @@ func min[T constraints.Ordered](a, b T) T {
 	return b
 }
 
-func Example_Ordered() {
+func Example_ordered() {
 	var (
 		a int     = 10
 		b int     = 20
@@ -60,7 +60,7 @@ func min2[T Integer](a, b T) T {
 	return b
 }
 
-func Example_Extended() {
+func Example_extended() {
 	var (
 		a int = 10
 		b int = 20

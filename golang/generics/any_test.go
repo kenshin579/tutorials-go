@@ -10,7 +10,7 @@ func foo2[T any](a T) T {
 	return a
 }
 
-func Example_Print() {
+func Example_any() {
 	var (
 		a int = 10
 		b int = 20
