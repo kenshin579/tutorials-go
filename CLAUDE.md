@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 이 저장소는 Go 언어 학습을 위한 튜토리얼 및 예제 코드 모음집입니다. 각 디렉터리는 독립적인 예제로 구성되어 있으며, 실무에서 자주 사용되는 패턴과 라이브러리 활용법을 다룹니다.
 
+### 블로그 연계
+- 이 저장소는 `blog-v2.advenoh.pe.kr` IT 블로그의 샘플 코드 저장소 역할도 수행
+- 블로그 글 작성 시 관련 샘플 코드를 이 저장소에 먼저 작성하고 테스트
+
 ## Common Commands
 
 ### Testing
