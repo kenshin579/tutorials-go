@@ -22,7 +22,9 @@
 # terraform
 .terraform/
 .terraform.*
-terraform*
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
 **/node_modules
 **/dist
 **/dist-ssr
