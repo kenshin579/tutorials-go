@@ -1,0 +1,45 @@
+# =============================================================================
+# ArgoCD ApplicationSet 예제
+# - ApplicationSet: 여러 Application을 템플릿으로 한 번에 정의
+# - ArgoCD가 이 파일을 감시하여 변경 시 자동으로 K8s에 배포한다
+#
+# 사용법:
+#   kubectl apply -f bootstrap/sample-apps.yaml
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: sample-apps
+  namespace: argocd
+spec:
+  generators:
+    # list generator: 배포할 앱 목록을 직접 나열
+    - list:
+        elements:
+          - appName: sample-nginx
+
+  template:
+    metadata:
+      # {{appName}}은 위 elements의 값으로 치환된다
+      name: "{{appName}}"
+    spec:
+      project: default
+
+      # Source: Helm 차트가 위치한 Git 저장소와 경로
+      source:
+        repoURL: https://github.com/kenshin579/tutorials-go.git
+        targetRevision: main
+        path: "cloud/terraform/charts/{{appName}}"
+
+      # Destination: 배포 대상 클러스터와 Namespace
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: study
+
+      # SyncPolicy: 자동 동기화 설정
+      syncPolicy:
+        automated:
+          prune: true       # Git에서 삭제된 리소스는 K8s에서도 삭제
+          selfHeal: true    # 수동 변경을 감지하면 Git 상태로 복원
+        syncOptions:
+          - CreateNamespace=true

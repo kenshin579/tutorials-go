@@ -1,0 +1,23 @@
+# =============================================================================
+# Helm Values: 차트의 설정값을 정의
+# - 앱 설정을 변경할 때 이 파일만 수정하면 ArgoCD가 자동 반영한다
+# - 템플릿(templates/)에서 {{ .Values.xxx }}로 참조
+# =============================================================================
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.27.0"
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi

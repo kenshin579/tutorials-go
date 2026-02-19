@@ -1,0 +1,10 @@
+# Helm 차트 메타데이터
+# - name: 차트 이름
+# - version: 차트 버전 (패키징/배포 관리용)
+# - appVersion: 실제 애플리케이션 버전
+apiVersion: v2
+name: sample-nginx
+description: ArgoCD 배포 실습용 NGINX 샘플 차트
+type: application
+version: 0.1.0
+appVersion: "1.27.0"
