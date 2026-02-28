@@ -1,0 +1,50 @@
+services:
+  pyroscope:
+    image: grafana/pyroscope:latest
+    ports:
+      - "4040:4040"
+    networks:
+      - pyroscope-net
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - pyroscope
+    networks:
+      - pyroscope-net
+
+  app-basic:
+    build:
+      context: .
+      dockerfile: basic/Dockerfile
+    depends_on:
+      - pyroscope
+    environment:
+      - PYROSCOPE_SERVER=http://pyroscope:4040
+    networks:
+      - pyroscope-net
+
+  app-http:
+    build:
+      context: .
+      dockerfile: http-server/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - pyroscope
+    environment:
+      - PYROSCOPE_SERVER=http://pyroscope:4040
+      - PORT=8080
+    networks:
+      - pyroscope-net
+
+networks:
+  pyroscope-net:
+    driver: bridge
