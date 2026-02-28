@@ -1,0 +1,102 @@
+[
+  {
+    "id": "1",
+    "name": "Go Programming Language",
+    "description": "The Go programming language is an open source project to make programmers more productive",
+    "category": "books",
+    "price": 35.99,
+    "in_stock": true,
+    "tags": ["programming", "golang", "backend"],
+    "created_at": "2024-01-15T10:00:00Z"
+  },
+  {
+    "id": "2",
+    "name": "Mechanical Keyboard",
+    "description": "Cherry MX Blue switches mechanical keyboard for developers",
+    "category": "electronics",
+    "price": 129.99,
+    "in_stock": true,
+    "tags": ["keyboard", "mechanical", "developer"],
+    "created_at": "2024-02-20T14:30:00Z"
+  },
+  {
+    "id": "3",
+    "name": "Docker Deep Dive",
+    "description": "Zero to Docker in a single book. Learn Docker and containers from the deep end",
+    "category": "books",
+    "price": 29.99,
+    "in_stock": true,
+    "tags": ["docker", "devops", "containers"],
+    "created_at": "2024-03-10T09:15:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with USB-C charging",
+    "category": "electronics",
+    "price": 49.99,
+    "in_stock": false,
+    "tags": ["mouse", "wireless", "ergonomic"],
+    "created_at": "2024-04-05T16:45:00Z"
+  },
+  {
+    "id": "5",
+    "name": "Kubernetes in Action",
+    "description": "A comprehensive guide to Kubernetes for developers and DevOps engineers",
+    "category": "books",
+    "price": 44.99,
+    "in_stock": true,
+    "tags": ["kubernetes", "devops", "cloud"],
+    "created_at": "2024-05-12T11:20:00Z"
+  },
+  {
+    "id": "6",
+    "name": "USB-C Hub",
+    "description": "7-in-1 USB-C hub with HDMI, USB 3.0, and SD card reader",
+    "category": "electronics",
+    "price": 39.99,
+    "in_stock": true,
+    "tags": ["usb-c", "hub", "accessories"],
+    "created_at": "2024-06-01T08:00:00Z"
+  },
+  {
+    "id": "7",
+    "name": "OpenSearch Essentials",
+    "description": "Learn OpenSearch from basics to advanced search and analytics",
+    "category": "books",
+    "price": 42.99,
+    "in_stock": true,
+    "tags": ["opensearch", "search", "analytics"],
+    "created_at": "2024-07-20T13:10:00Z"
+  },
+  {
+    "id": "8",
+    "name": "Monitor Stand",
+    "description": "Adjustable monitor stand with USB ports for desk organization",
+    "category": "electronics",
+    "price": 59.99,
+    "in_stock": true,
+    "tags": ["monitor", "stand", "desk"],
+    "created_at": "2024-08-15T10:30:00Z"
+  },
+  {
+    "id": "9",
+    "name": "Go Web Programming",
+    "description": "Build modern web applications and microservices with Go programming language",
+    "category": "books",
+    "price": 38.99,
+    "in_stock": false,
+    "tags": ["golang", "web", "programming"],
+    "created_at": "2024-09-01T07:45:00Z"
+  },
+  {
+    "id": "10",
+    "name": "Noise Cancelling Headphones",
+    "description": "Premium noise cancelling headphones for focused programming sessions",
+    "category": "electronics",
+    "price": 199.99,
+    "in_stock": true,
+    "tags": ["headphones", "noise-cancelling", "audio"],
+    "created_at": "2024-10-10T15:00:00Z"
+  }
+]
