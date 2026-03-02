@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-debug-app
+  labels:
+    app: go-debug-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-debug-app
+  template:
+    metadata:
+      labels:
+        app: go-debug-app
+    spec:
+      containers:
+        - name: app
+          image: go-debug-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: debug
+              containerPort: 2345
+          env:
+            - name: PORT
+              value: "8080"
+          securityContext:
+            capabilities:
+              add:
+                - SYS_PTRACE
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          # Note: Disable probes during debugging sessions
+          # as breakpoints will cause health checks to fail.
+          # Uncomment for production use:
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 30
