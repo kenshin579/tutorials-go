@@ -1,0 +1,14 @@
+services:
+  app-debug:
+    build:
+      context: ../../../..
+      dockerfile: golang/debugging/remote-debugging/Dockerfile.debug
+    ports:
+      - "8080:8080"   # Application port
+      - "2345:2345"   # Delve debug port
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    environment:
+      - PORT=8080

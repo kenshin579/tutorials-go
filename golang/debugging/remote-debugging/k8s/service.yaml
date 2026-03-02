@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-debug-app
+  labels:
+    app: go-debug-app
+spec:
+  type: ClusterIP
+  selector:
+    app: go-debug-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: debug
+      port: 2345
+      targetPort: 2345
