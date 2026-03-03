@@ -1,0 +1,29 @@
+all: false
+dir: "{{.InterfaceDir}}"
+filename: mocks_test.go
+formatter: goimports
+template: testify
+
+packages:
+  # downcaser - 인터페이스 파일 옆에 테스트 전용 Mock 생성
+  github.com/kenshin579/tutorials-go/go-unit-test/mockery/downcaser:
+    config:
+      all: true
+
+  # do_user - mocks/ 별도 디렉토리에 생성
+  github.com/kenshin579/tutorials-go/go-unit-test/mockery/do_user/doer:
+    config:
+      dir: "{{.InterfaceDir}}/../mocks/doer"
+      filename: "mock_{{.InterfaceName}}.go"
+      pkgname: mocks
+    interfaces:
+      Doer:
+
+  # message - mocks/ 별도 디렉토리에 생성
+  github.com/kenshin579/tutorials-go/go-unit-test/mockery/message:
+    config:
+      dir: "{{.InterfaceDir}}/mocks"
+      filename: "mock_{{.InterfaceName}}.go"
+      pkgname: mocks
+    interfaces:
+      MessageService:
