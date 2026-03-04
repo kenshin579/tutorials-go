@@ -29,8 +29,8 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/thoas/go-funk v0.9.2
 	go.mongodb.org/mongo-driver v1.9.1
-	go.uber.org/fx v1.13.1
-	go.uber.org/zap v1.16.0
+	go.uber.org/fx v1.24.0
+	go.uber.org/zap v1.26.0
 	golang.org/x/net v0.21.0
 	golang.org/x/sync v0.19.0
 	google.golang.org/grpc v1.36.1
@@ -176,8 +176,8 @@ require (
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
 	go.opencensus.io v0.22.4 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
-	go.uber.org/dig v1.10.0 // indirect
-	go.uber.org/multierr v1.5.0 // indirect
+	go.uber.org/dig v1.19.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
