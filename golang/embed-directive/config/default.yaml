@@ -1,0 +1,8 @@
+server:
+  port: 8080
+  host: localhost
+
+app:
+  name: my-app
+  version: 1.0.0
+  debug: false
