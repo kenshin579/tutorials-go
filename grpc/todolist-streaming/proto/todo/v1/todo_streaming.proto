@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package todo.v1;
+
+option go_package = "github.com/kenshin579/tutorials-go/grpc/todolist-streaming/gen/todo/v1;todopb";
+
+import "google/protobuf/timestamp.proto";
+
+message Todo {
+  string id = 1;
+  string title = 2;
+  bool completed = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+// --- Server Streaming ---
+message ListTodosRequest {
+  bool completed_only = 1;
+}
+
+// --- Client Streaming ---
+message CreateTodoRequest {
+  string title = 1;
+}
+
+message BatchCreateResponse {
+  int32 created_count = 1;
+  repeated string ids = 2;
+}
+
+// --- Bidirectional Streaming ---
+enum ActionType {
+  ACTION_TYPE_UNSPECIFIED = 0;
+  ACTION_TYPE_CREATE = 1;
+  ACTION_TYPE_COMPLETE = 2;
+  ACTION_TYPE_DELETE = 3;
+}
+
+message TodoAction {
+  ActionType action = 1;
+  string todo_id = 2;
+  string title = 3;
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_CREATED = 1;
+  EVENT_TYPE_COMPLETED = 2;
+  EVENT_TYPE_DELETED = 3;
+  EVENT_TYPE_ERROR = 4;
+}
+
+message TodoEvent {
+  EventType event = 1;
+  string todo_id = 2;
+  string message = 3;
+}
+
+// Streaming 서비스
+service TodoStreamingService {
+  // Server Streaming: 필터 조건으로 Todo 목록 스트림
+  rpc ListTodos(ListTodosRequest) returns (stream Todo);
+
+  // Client Streaming: 여러 Todo를 배치로 생성
+  rpc BatchCreateTodos(stream CreateTodoRequest) returns (BatchCreateResponse);
+
+  // Bidirectional Streaming: 실시간 Todo 작업 & 이벤트
+  rpc TodoUpdates(stream TodoAction) returns (stream TodoEvent);
+}
+
+// Unary 서비스 (벤치마크 비교용)
+service TodoUnaryService {
+  rpc CreateTodo(CreateTodoRequest) returns (Todo);
+  rpc GetTodos(ListTodosRequest) returns (TodoList);
+}
+
+message TodoList {
+  repeated Todo todos = 1;
+}
