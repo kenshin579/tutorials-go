@@ -31,10 +31,10 @@ require (
 	go.mongodb.org/mongo-driver v1.9.1
 	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.26.0
-	golang.org/x/net v0.21.0
+	golang.org/x/net v0.28.0
 	golang.org/x/sync v0.19.0
-	google.golang.org/grpc v1.36.1
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/grpc v1.67.1
+	google.golang.org/protobuf v1.36.4
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/go-playground/validator.v9 v9.31.0
@@ -78,7 +78,7 @@ require (
 	github.com/tryvium-travels/memongo v0.6.1
 	github.com/wI2L/jettison v0.7.4
 	golang.org/x/exp v0.0.0-20231219180239-dc181d75b848
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
+	golang.org/x/oauth2 v0.22.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -94,9 +94,10 @@ require (
 	github.com/antchfx/xmlquery v1.3.15 // indirect
 	github.com/antchfx/xpath v1.2.3 // indirect
 	github.com/avast/retry-go/v4 v4.7.0 // indirect
+	github.com/bits-and-blooms/bitset v1.24.4 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/containerd/cgroups v1.0.1 // indirect
 	github.com/containerd/containerd v1.5.9 // indirect
@@ -109,6 +110,7 @@ require (
 	github.com/eapache/go-resiliency v1.3.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/failsafe-go/failsafe-go v0.9.6 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/go-redis/redis_rate/v10 v10.0.1 // indirect
@@ -159,6 +161,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
+	github.com/sony/gobreaker/v2 v2.4.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
