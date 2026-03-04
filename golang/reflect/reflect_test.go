@@ -5,15 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"strings"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-reflect/model"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
+	"github.com/kenshin579/tutorials-go/golang/reflect/model"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/guregu/null.v4"
 )
 
-func Example_Type_Value_정보_확인() {
+func Example_typeValueInfo() {
 	type Foo struct {
 		x int
 		y float64
@@ -38,7 +40,7 @@ func Example_Type_Value_정보_확인() {
 	// z: str(string)
 }
 
-func Example_Struct_Type_Value_메타_정보_확인() {
+func Example_structTypeValueMeta() {
 	type ArticleRequest struct {
 		Title string `json:"title" validate:"required"`
 		Body  string `json:"body" validate:"required"`
@@ -62,7 +64,7 @@ func Example_Struct_Type_Value_메타_정보_확인() {
 	// string Body json:"body" validate:"required"
 }
 
-func Example_Value_변경() {
+func Example_valueModify() {
 	languages := []string{"golang", "java", "c++"}
 	sliceValue := reflect.ValueOf(languages)
 	value := sliceValue.Index(1)
@@ -88,7 +90,7 @@ func Example_Value_변경() {
 
 }
 
-func Example_Method_동적_호출() {
+func Example_methodDynamicCall() {
 	caption := "go is an open source programming language"
 	// 1. TitleCase를 바로 호출
 	title := TitleCase(caption)
@@ -106,10 +108,10 @@ func Example_Method_동적_호출() {
 }
 
 func TitleCase(s string) string {
-	return strings.Title(s)
+	return cases.Title(language.English).String(s)
 }
 
-func Example_Len() {
+func Example_dynamicLen() {
 	list1 := list.New() // list1.Len() == 0
 	list2 := list.New()
 	list2.PushFront(0.5) // list2.Len() == 1
@@ -138,7 +140,7 @@ func Len(x interface{}) int {
 	panic(fmt.Sprintf("'%v' does not have a length", x))
 }
 
-func Example_구조체_필드_순회하기() {
+func Example_iterateStructFields() {
 	cat := &model.Cat{
 		Name:  "nabi",
 		Age:   5,
