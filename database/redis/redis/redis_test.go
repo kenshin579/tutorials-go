@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-redis/model"
+	"github.com/kenshin579/tutorials-go/database/redis/model"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
