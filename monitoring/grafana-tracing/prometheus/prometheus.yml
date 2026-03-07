@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'go-app'
+    static_configs:
+      - targets: ['app:8080']
+    # Exemplar 수집을 위해 OpenMetrics 형식 활성화
+    scrape_protocols:
+      - OpenMetricsText1.0.0
+      - PrometheusProto
