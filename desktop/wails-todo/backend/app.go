@@ -60,7 +60,9 @@ func (a *App) DeleteTodo(id string) []Todo {
 				Type:          runtime.QuestionDialog,
 				Title:         "삭제 확인",
 				Message:       fmt.Sprintf("'%s'을(를) 삭제하시겠습니까?", t.Title),
+				Buttons:       []string{"Yes", "No"},
 				DefaultButton: "No",
+				CancelButton:  "No",
 			})
 			if err == nil && result == "Yes" {
 				a.store.Todos = append(a.store.Todos[:i], a.store.Todos[i+1:]...)
