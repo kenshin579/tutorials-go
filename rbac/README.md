@@ -69,9 +69,9 @@ npm run dev
 
 | 이메일 | 비밀번호 | Role | 설명 |
 |--------|----------|------|------|
-| admin@example.com | password123 | admin | 모든 권한 |
-| manager@example.com | password123 | manager | 상품/주문 관리 (제한적) |
-| user@example.com | password123 | user | 조회 + 본인 주문만 |
+| admin@example.com | admin123 | admin | 모든 권한 |
+| manager@example.com | manager123 | manager | 상품/주문 관리 (제한적) |
+| user@example.com | user123 | user | 조회 + 본인 주문만 |
 
 ## 권한 모델
 
