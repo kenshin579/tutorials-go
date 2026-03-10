@@ -26,7 +26,7 @@ type Order struct {
 	Product    Product     `gorm:"foreignKey:ProductID" json:"product"`
 	Quantity   int         `gorm:"not null" json:"quantity"`
 	TotalPrice float64     `gorm:"type:decimal(10,2);not null" json:"total_price"`
-	Status     OrderStatus `gorm:"not null;default:pending" json:"status"`
+	Status     OrderStatus `gorm:"size:20;not null;default:pending" json:"status"`
 	OrderedBy  uint        `gorm:"not null" json:"ordered_by"`
 	Orderer    User        `gorm:"foreignKey:OrderedBy" json:"orderer"`
 	CreatedAt  time.Time   `json:"created_at"`
