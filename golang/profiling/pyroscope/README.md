@@ -4,10 +4,12 @@ Grafana Pyroscope를 활용한 Go 애플리케이션 Continuous Profiling 예제
 
 ## 예제 구성
 
-| 디렉토리 | 설명 |
-|----------|------|
-| `basic/` | Pyroscope SDK 기본 연동 (CPU, 메모리, 뮤텍스 부하 생성) |
-| `http-server/` | Echo HTTP 서버 + Pyroscope + Profiling Labels |
+| 디렉토리 | 설명 | 수집 방식 |
+|----------|------|----------|
+| `basic/` | Pyroscope SDK 기본 연동 (CPU, 메모리, 뮤텍스 부하 생성) | Push |
+| `http-server/` | Echo HTTP 서버 + Pyroscope SDK + Profiling Labels | Push |
+| `pull-server/` | pprof 엔드포인트만 노출하는 HTTP 서버 | Pull |
+| `alloy/` | Grafana Alloy 설정 (Pull 모드 스크래핑) | Pull |
 
 ## 실행 방법
 
@@ -27,9 +29,10 @@ docker compose logs -f app
 |--------|-----|------|
 | Pyroscope | http://localhost:4040 | Pyroscope UI |
 | Grafana | http://localhost:3000 | Grafana 대시보드 (admin/admin) |
-| App (http-server) | http://localhost:8080 | Echo HTTP 서버 |
+| App (http-server) | http://localhost:8080 | Echo HTTP 서버 (Push 모드) |
+| App (pull-server) | http://localhost:6060 | pprof 서버 (Pull 모드) |
 
-### http-server 부하 생성
+### http-server 부하 생성 (Push 모드)
 
 ```bash
 # 빠른 응답 (기준선)
@@ -41,6 +44,25 @@ curl http://localhost:8080/slow
 # 메모리 부하
 curl http://localhost:8080/memory
 ```
+
+### pull-server 부하 생성 (Pull 모드)
+
+```bash
+# 빠른 응답
+curl http://localhost:6060/fast
+
+# CPU 부하
+curl http://localhost:6060/slow
+
+# 메모리 부하
+curl http://localhost:6060/memory
+
+# pprof 엔드포인트 직접 확인
+curl http://localhost:6060/debug/pprof/
+```
+
+> Pull 모드에서는 Alloy가 15초마다 pprof 엔드포인트를 스크래핑한다.
+> Grafana에서 `pull.golang.app` 애플리케이션으로 조회할 수 있다.
 
 ### 로컬 실행 (개발용)
 

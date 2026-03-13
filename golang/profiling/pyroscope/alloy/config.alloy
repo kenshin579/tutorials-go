@@ -1,0 +1,39 @@
+// Grafana Alloy - Pyroscope Pull 모드 설정
+//
+// app-pull 서비스의 pprof 엔드포인트를 주기적으로 스크래핑하여
+// Pyroscope 서버로 프로파일 데이터를 전송한다.
+
+pyroscope.scrape "pull_app" {
+  targets = [
+    {"__address__" = "app-pull:6060", "service_name" = "pull.golang.app"},
+  ]
+
+  scrape_interval = "15s"  // 15초마다 스크래핑
+
+  profiling_config {
+    profile.process_cpu {
+      enabled = true
+    }
+    profile.memory {
+      enabled = true
+      path    = "/debug/pprof/allocs"
+    }
+    profile.goroutine {
+      enabled = true
+    }
+    profile.mutex {
+      enabled = true
+    }
+    profile.block {
+      enabled = true
+    }
+  }
+
+  forward_to = [pyroscope.write.endpoint.receiver]
+}
+
+pyroscope.write "endpoint" {
+  endpoint {
+    url = "http://pyroscope:4040"
+  }
+}
