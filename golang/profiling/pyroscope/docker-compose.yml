@@ -45,6 +45,29 @@ services:
     networks:
       - pyroscope-net
 
+  # --- Pull 모드 ---
+  app-pull:
+    build:
+      context: .
+      dockerfile: pull-server/Dockerfile
+    ports:
+      - "6060:6060"
+    environment:
+      - PORT=6060
+    networks:
+      - pyroscope-net
+
+  alloy:
+    image: grafana/alloy:latest
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy
+    command: ["run", "/etc/alloy/config.alloy"]
+    depends_on:
+      - pyroscope
+      - app-pull
+    networks:
+      - pyroscope-net
+
 networks:
   pyroscope-net:
     driver: bridge
