@@ -66,14 +66,17 @@ curl http://localhost:6060/debug/pprof/
 
 ### 로컬 실행 (개발용)
 
+> Docker Compose 없이 앱만 로컬에서 직접 실행할 때 사용한다.
+> Pyroscope 서버가 필요하므로 먼저 별도로 띄워야 한다.
+
 ```bash
-# Pyroscope 서버만 실행
+# 1. Pyroscope 서버만 실행 (Docker Compose를 사용했다면 생략)
 docker run -d -p 4040:4040 grafana/pyroscope:latest
 
-# basic 예제 실행
+# 2. basic 예제 실행
 cd basic && go run .
 
-# http-server 예제 실행
+# 3. http-server 예제 실행
 cd http-server && go run .
 ```
 
