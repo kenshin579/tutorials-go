@@ -80,6 +80,27 @@ cd basic && go run .
 cd http-server && go run .
 ```
 
+## 아키텍처
+
+### Push 모드 (http-server, basic)
+
+앱이 Pyroscope SDK를 사용하여 프로파일 데이터를 직접 Pyroscope 서버로 전송한다.
+
+```
+App (Pyroscope SDK) → Pyroscope Server
+```
+
+### Pull 모드 (pull-server)
+
+앱은 `net/http/pprof` 엔드포인트만 노출하고, Grafana Alloy가 주기적으로 스크래핑하여 Pyroscope 서버로 전송한다.
+
+```
+App (pprof 엔드포인트) ← Alloy (15초마다 스크래핑) → Pyroscope Server
+```
+
+- Alloy 설정 파일: `alloy/config.alloy`
+- `docker-compose.yml`에서 Alloy 컨테이너에 볼륨 마운트하여 사용
+
 ## Grafana에서 확인
 
 1. http://localhost:3000 접속 (admin/admin)
