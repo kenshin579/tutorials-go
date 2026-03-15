@@ -9,5 +9,5 @@ RUN CGO_ENABLED=0 go build -o /app/server ./http-server/
 
 FROM alpine:latest
 COPY --from=builder /app/server /server
-EXPOSE 8080
+EXPOSE 7080
 CMD ["/server"]

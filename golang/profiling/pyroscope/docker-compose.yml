@@ -36,12 +36,12 @@ services:
       context: .
       dockerfile: http-server/Dockerfile
     ports:
-      - "8080:8080"
+      - "7080:7080"
     depends_on:
       - pyroscope
     environment:
       - PYROSCOPE_SERVER=http://pyroscope:4040
-      - PORT=8080
+      - PORT=7080
     networks:
       - pyroscope-net
 

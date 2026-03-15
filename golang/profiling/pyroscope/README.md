@@ -29,20 +29,20 @@ docker compose logs -f app
 |--------|-----|------|
 | Pyroscope | http://localhost:4040 | Pyroscope UI |
 | Grafana | http://localhost:3000 | Grafana 대시보드 (admin/admin) |
-| App (http-server) | http://localhost:8080 | Echo HTTP 서버 (Push 모드) |
+| App (http-server) | http://localhost:7080 | Echo HTTP 서버 (Push 모드) |
 | App (pull-server) | http://localhost:6060 | pprof 서버 (Pull 모드) |
 
 ### http-server 부하 생성 (Push 모드)
 
 ```bash
 # 빠른 응답 (기준선)
-curl http://localhost:8080/fast
+curl http://localhost:7080/fast
 
 # CPU 부하
-curl http://localhost:8080/slow
+curl http://localhost:7080/slow
 
 # 메모리 부하
-curl http://localhost:8080/memory
+curl http://localhost:7080/memory
 ```
 
 ### pull-server 부하 생성 (Pull 모드)

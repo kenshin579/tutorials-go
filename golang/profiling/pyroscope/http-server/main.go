@@ -9,9 +9,9 @@
 //
 // 부하 생성:
 //
-//	curl http://localhost:8080/fast
-//	curl http://localhost:8080/slow
-//	curl http://localhost:8080/memory
+//	curl http://localhost:7080/fast
+//	curl http://localhost:7080/slow
+//	curl http://localhost:7080/memory
 package main
 
 import (
@@ -61,7 +61,7 @@ func main() {
 	e.GET("/slow", handleSlow)
 	e.GET("/memory", handleMemory)
 
-	port := getEnv("PORT", "8080")
+	port := getEnv("PORT", "7080")
 	log.Printf("서버 시작: http://localhost:%s (Pyroscope: %s)", port, serverAddr)
 	e.Logger.Fatal(e.Start(":" + port))
 }
