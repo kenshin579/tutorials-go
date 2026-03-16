@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-chain-demo
+  labels:
+    app: init-chain-demo
+spec:
+  initContainers:
+    # Init 1: DB 서비스 대기
+    - name: wait-for-db
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for redis-service..."
+          until nc -z redis-service 6379; do
+            echo "redis-service not ready, retrying in 2s..."
+            sleep 2
+          done
+          echo "redis-service is ready!"
+
+    # Init 2: 설정 파일 생성
+    - name: download-config
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo '{"db_host":"redis-service","db_port":6379,"log_level":"info"}' > /config/app-config.json
+          echo "Config file created."
+      volumeMounts:
+        - name: config-volume
+          mountPath: /config
+
+  containers:
+    - name: main-app
+      image: main-app:local
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 3000
+      volumeMounts:
+        - name: config-volume
+          mountPath: /config
+          readOnly: true
+
+  volumes:
+    - name: config-volume
+      emptyDir: {}

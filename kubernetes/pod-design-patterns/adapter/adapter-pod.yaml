@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: adapter-demo
+  labels:
+    app: adapter-demo
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+    prometheus.io/path: "/metrics"
+spec:
+  containers:
+    - name: main-app
+      image: main-app:local
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 3000
+
+    - name: metrics-adapter
+      image: metrics-adapter:local
+      imagePullPolicy: Never
+      env:
+        - name: APP_STATS_URL
+          value: "http://localhost:3000/stats"
+      ports:
+        - containerPort: 9090

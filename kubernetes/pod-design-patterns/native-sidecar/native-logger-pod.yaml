@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: native-sidecar-demo
+  labels:
+    app: native-sidecar-demo
+spec:
+  initContainers:
+    # Native Sidecar: restartPolicy: Always가 핵심
+    - name: request-logger
+      image: request-logger:local
+      imagePullPolicy: Never
+      restartPolicy: Always
+      env:
+        - name: TARGET_URL
+          value: "http://localhost:3000"
+        - name: LOG_FILE
+          value: "/var/log/app/access.log"
+      ports:
+        - containerPort: 8080
+      startupProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 1
+        periodSeconds: 1
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/app
+
+  containers:
+    - name: main-app
+      image: main-app:local
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 3000
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/app
+
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
