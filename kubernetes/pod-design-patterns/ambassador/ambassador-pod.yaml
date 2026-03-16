@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ambassador-demo
+  labels:
+    app: ambassador-demo
+spec:
+  containers:
+    - name: main-app
+      image: main-app:local
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 3000
+
+    - name: redis-proxy
+      image: redis-proxy:local
+      imagePullPolicy: Never
+      env:
+        - name: REDIS_ADDR
+          value: "redis-service:6379"

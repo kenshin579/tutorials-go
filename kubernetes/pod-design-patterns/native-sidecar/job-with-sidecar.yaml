@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-native-sidecar
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: log-collector
+          image: request-logger:local
+          imagePullPolicy: Never
+          restartPolicy: Always
+          env:
+            - name: TARGET_URL
+              value: "http://localhost:3000"
+            - name: LOG_FILE
+              value: "/var/log/app/job.log"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /var/log/app
+
+      containers:
+        - name: batch-job
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Job started"
+              sleep 5
+              echo "Job completed"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /var/log/app
+
+      restartPolicy: Never
+      volumes:
+        - name: shared-logs
+          emptyDir: {}
+  backoffLimit: 1
