@@ -19,9 +19,8 @@ spec:
       ports:
         - containerPort: 8080
       startupProbe:
-        httpGet:
+        tcpSocket:
           port: 8080
-          path: /
         initialDelaySeconds: 1
         periodSeconds: 1
       volumeMounts:
