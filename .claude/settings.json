@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go test *)",
+      "Bash(go build *)",
+      "Bash(go mod *)",
+      "Bash(make *)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)"
+    ]
+  },
+  "env": {
+    "GO_ENV": "development"
+  }
+}
