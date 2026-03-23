@@ -1,0 +1,39 @@
+{
+  "name": "ralph-loop-demo",
+  "description": "Ralph Loop 데모용 Go HTTP API 서버",
+  "branchName": "feat/ralph-loop-demo",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "GET /api/hello 엔드포인트 구현",
+      "priority": 1,
+      "passes": true,
+      "acceptanceCriteria": [
+        "GET /api/hello가 200 상태코드를 반환한다",
+        "응답이 JSON 형식이다",
+        "status, message, time 필드가 포함된다"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "GET /health 헬스체크 엔드포인트 구현",
+      "priority": 2,
+      "passes": true,
+      "acceptanceCriteria": [
+        "GET /health가 200 상태코드를 반환한다",
+        "status가 healthy이다",
+        "uptime이 비어있지 않다"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "단위 테스트 작성",
+      "priority": 3,
+      "passes": true,
+      "acceptanceCriteria": [
+        "모든 핸들러에 테스트가 존재한다",
+        "go test ./... 통과"
+      ]
+    }
+  ]
+}
