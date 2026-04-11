@@ -1,0 +1,22 @@
+server:
+  port: 8090
+
+ssh:
+  privateKeyPath: ~/.ssh/id_rsa
+
+robots:
+  - id: robot-1
+    name: Test Robot A
+    host: localhost
+    port: 2222
+    username: ubuntu
+    authType: password
+    description: 테스트 로봇 A
+
+  - id: robot-2
+    name: Test Robot B
+    host: localhost
+    port: 2223
+    username: ubuntu
+    authType: password
+    description: 테스트 로봇 B
