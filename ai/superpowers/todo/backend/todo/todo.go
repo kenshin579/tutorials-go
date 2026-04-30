@@ -1,7 +1,7 @@
-// Package todo defines the domain model and in-memory store for the
-// superpowers todo learning sample. The store is concurrency-safe via
-// sync.RWMutex, and the package exposes only value types so that
-// callers cannot mutate stored state through returned references.
+// Package todo defines the domain model and (in later phases) an
+// in-memory, concurrency-safe store for the superpowers todo learning sample.
+// All stored values are passed by value so callers cannot mutate stored
+// state through returned references.
 package todo
 
 import (
@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Priority is the importance level of a todo item.
@@ -57,7 +58,7 @@ func (n NewTodo) Validate() error {
 	if title == "" {
 		return &ValidationError{Field: "title", Message: "title is required"}
 	}
-	if len(title) > 200 {
+	if utf8.RuneCountInString(title) > 200 {
 		return &ValidationError{Field: "title", Message: "title must be at most 200 characters"}
 	}
 	if n.Priority != "" && !n.Priority.IsValid() {
@@ -88,7 +89,7 @@ func (p Patch) Validate() error {
 		if t == "" {
 			return &ValidationError{Field: "title", Message: "title is required"}
 		}
-		if len(t) > 200 {
+		if utf8.RuneCountInString(t) > 200 {
 			return &ValidationError{Field: "title", Message: "title must be at most 200 characters"}
 		}
 	}

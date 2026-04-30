@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -32,10 +33,7 @@ func TestPriority_IsValid(t *testing.T) {
 func TestNewTodo_Validate(t *testing.T) {
 	t.Parallel()
 	future := time.Now().Add(24 * time.Hour)
-	tooLong := ""
-	for i := 0; i < 201; i++ {
-		tooLong += "a"
-	}
+	tooLong := strings.Repeat("a", 201)
 
 	tests := []struct {
 		name      string
@@ -48,6 +46,8 @@ func TestNewTodo_Validate(t *testing.T) {
 		{"empty title", NewTodo{Title: ""}, "title"},
 		{"whitespace title", NewTodo{Title: "   "}, "title"},
 		{"title length 201", NewTodo{Title: tooLong}, "title"},
+		{"korean title at boundary", NewTodo{Title: strings.Repeat("가", 200)}, ""},
+		{"korean title over boundary", NewTodo{Title: strings.Repeat("가", 201)}, "title"},
 		{"invalid priority", NewTodo{Title: "x", Priority: Priority("urgent")}, "priority"},
 	}
 	for _, tc := range tests {
@@ -83,10 +83,7 @@ func TestNewTodo_Validate_TitleLengthBoundaries(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			title := ""
-			for i := 0; i < tc.titleLen; i++ {
-				title += "a"
-			}
+			title := strings.Repeat("a", tc.titleLen)
 			err := NewTodo{Title: title}.Validate()
 			if tc.wantValid {
 				assert.NoError(t, err)
