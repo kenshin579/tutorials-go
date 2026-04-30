@@ -263,3 +263,101 @@ input, select { font-family: inherit; }
 }
 
 .filter-bar__order:hover { background: var(--color-border-soft); }
+
+/* TodoList */
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.todo-list--empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  border-style: dashed;
+  color: var(--color-text-subtle);
+  font-size: var(--text-base);
+}
+
+/* TodoItem */
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.todo-item:last-child { border-bottom: 0; }
+
+.todo-item:hover { background: var(--color-border-soft); }
+
+.todo-item__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.todo-item__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.todo-item__title {
+  display: block;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  cursor: text;
+  word-break: break-word;
+}
+
+.todo-item--completed .todo-item__title {
+  color: var(--color-text-subtle);
+  text-decoration: line-through;
+}
+
+.todo-item__title-edit {
+  width: 100%;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  font-size: var(--text-base);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-accent-ring);
+}
+
+.todo-item__due {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-subtle);
+  margin-top: 2px;
+}
+
+.todo-item__priority {
+  font-size: var(--text-xs);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.todo-item__priority--high   { background: var(--color-priority-high-bg);   color: var(--color-priority-high-fg);   }
+.todo-item__priority--medium { background: var(--color-priority-medium-bg); color: var(--color-priority-medium-fg); }
+.todo-item__priority--low    { background: var(--color-priority-low-bg);    color: var(--color-priority-low-fg);    }
+
+.todo-item__delete {
+  background: transparent;
+  border: 0;
+  color: var(--color-text-subtle);
+  padding: 4px 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.todo-item__delete:hover { color: var(--color-priority-high-fg); }
