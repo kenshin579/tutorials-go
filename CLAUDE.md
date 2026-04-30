@@ -261,6 +261,5 @@ Viper is the standard for configuration:
 
 ## Language Version
 
-- **Go Version**: 1.21.3 minimum (specified in go.mod)
-- **Toolchain**: go1.22.3
-- Some examples may use features from Go 1.18+ (generics, workspaces)
+- **Go Version**: 1.26.0 (specified in go.mod)
+- Some examples may use features from Go 1.18+ (generics, workspaces, `http.ServeMux` 향상된 라우팅 등)
