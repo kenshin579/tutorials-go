@@ -6,6 +6,11 @@ frontend/*.tsbuildinfo
 frontend/vite.config.d.ts
 frontend/vite.config.js
 
+# playwright
+frontend/playwright-report/
+frontend/test-results/
+frontend/.playwright/
+
 # misc
 .DS_Store
 *.log

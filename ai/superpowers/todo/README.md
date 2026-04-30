@@ -21,7 +21,8 @@ make build           # frontend 프로덕션 빌드
 make preview-fe      # 빌드 결과 :4173 프리뷰
 make test            # backend + frontend 테스트
 make test-be         # backend만
-make test-fe         # frontend만
+make test-fe         # frontend 단위 테스트만
+make test-e2e        # Playwright e2e (BE+FE 자동 기동)
 ```
 
 ## 동작 검증
@@ -41,6 +42,17 @@ curl -s -X PATCH -H "Content-Type: application/json" \
 curl -s http://localhost:8080/api/todos
 curl -s -X DELETE -i http://localhost:8080/api/todos/$ID | head -1
 ```
+
+### 자동 e2e 검증 (Playwright)
+
+```bash
+make test-e2e          # 헤드리스로 9개 시나리오 실행
+make test-e2e:ui       # Playwright UI 모드 (디버깅용)
+# 또는 직접:
+cd frontend && npm run test:e2e
+```
+
+`webServer` 옵션이 BE+FE를 자동 기동/정리합니다. 이미 `:8080` 또는 `:5173`이 떠있으면 재사용합니다.
 
 ### Frontend + Backend 통합 검증
 

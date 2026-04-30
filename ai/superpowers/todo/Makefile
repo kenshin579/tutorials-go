@@ -1,4 +1,4 @@
-.PHONY: dev-be dev-fe build preview-fe test test-be test-fe install clean
+.PHONY: dev-be dev-fe build preview-fe test test-be test-fe test-e2e install clean
 
 BE_DIR := backend
 FE_DIR := frontend
@@ -26,5 +26,8 @@ test-be:
 test-fe:
 	cd $(FE_DIR) && npm test -- --run
 
+test-e2e:
+	cd $(FE_DIR) && npm run test:e2e
+
 clean:
-	rm -rf $(FE_DIR)/dist $(FE_DIR)/node_modules
+	rm -rf $(FE_DIR)/dist $(FE_DIR)/node_modules $(FE_DIR)/playwright-report $(FE_DIR)/test-results
