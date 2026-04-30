@@ -172,3 +172,143 @@ func TestHandler_List_InvalidQueryParam(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_Update_PatchSemantics(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name       string
+		body       string
+		wantStatus int
+		wantInBody string
+		wantField  string
+	}{
+		{
+			name:       "completed only",
+			body:       `{"completed":true}`,
+			wantStatus: http.StatusOK,
+			wantInBody: `"completed":true`,
+		},
+		{
+			name:       "clear duedate",
+			body:       `{"dueDate":null}`,
+			wantStatus: http.StatusOK,
+			wantInBody: `"dueDate":null`,
+		},
+		{
+			name:       "set duedate",
+			body:       `{"dueDate":"2026-05-15T18:00:00Z"}`,
+			wantStatus: http.StatusOK,
+			wantInBody: `"dueDate":"2026-05-15T18:00:00Z"`,
+		},
+		{
+			name:       "title only",
+			body:       `{"title":"updated"}`,
+			wantStatus: http.StatusOK,
+			wantInBody: `"title":"updated"`,
+		},
+		{
+			name:       "priority only",
+			body:       `{"priority":"high"}`,
+			wantStatus: http.StatusOK,
+			wantInBody: `"priority":"high"`,
+		},
+		{
+			name:       "empty body",
+			body:       `{}`,
+			wantStatus: http.StatusBadRequest,
+			wantInBody: `"validation_failed"`,
+		},
+		{
+			name:       "title null rejected",
+			body:       `{"title":null}`,
+			wantStatus: http.StatusBadRequest,
+			wantInBody: `"validation_failed"`,
+			wantField:  "title",
+		},
+		{
+			name:       "completed null rejected",
+			body:       `{"completed":null}`,
+			wantStatus: http.StatusBadRequest,
+			wantInBody: `"validation_failed"`,
+			wantField:  "completed",
+		},
+		{
+			name:       "priority null rejected",
+			body:       `{"priority":null}`,
+			wantStatus: http.StatusBadRequest,
+			wantInBody: `"validation_failed"`,
+			wantField:  "priority",
+		},
+		{
+			name:       "invalid priority",
+			body:       `{"priority":"urgent"}`,
+			wantStatus: http.StatusBadRequest,
+			wantInBody: `"validation_failed"`,
+			wantField:  "priority",
+		},
+		{
+			name:       "bad duedate string",
+			body:       `{"dueDate":"not-a-date"}`,
+			wantStatus: http.StatusBadRequest,
+			wantInBody: `"validation_failed"`,
+			wantField:  "dueDate",
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			h, s := newTestHandler(t)
+			added := s.Add(NewTodo{Title: "x"})
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+added.ID, strings.NewReader(tc.body))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			c.SetParamNames("id")
+			c.SetParamValues(added.ID)
+
+			assert.NoError(t, h.Update(c))
+			assert.Equal(t, tc.wantStatus, rec.Code, "body: %s", rec.Body.String())
+			assert.Contains(t, rec.Body.String(), tc.wantInBody)
+			if tc.wantField != "" {
+				assert.Contains(t, rec.Body.String(), `"field":"`+tc.wantField+`"`)
+			}
+		})
+	}
+}
+
+func TestHandler_Update_NotFound(t *testing.T) {
+	t.Parallel()
+	h, _ := newTestHandler(t)
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/nope", strings.NewReader(`{"completed":true}`))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues("nope")
+
+	assert.NoError(t, h.Update(c))
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+	assert.Contains(t, rec.Body.String(), `"code":"not_found"`)
+}
+
+func TestHandler_Update_InvalidJSON(t *testing.T) {
+	t.Parallel()
+	h, s := newTestHandler(t)
+	added := s.Add(NewTodo{Title: "x"})
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPatch, "/api/todos/"+added.ID, strings.NewReader(`{not json`))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues(added.ID)
+
+	assert.NoError(t, h.Update(c))
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	assert.Contains(t, rec.Body.String(), `"code":"invalid_json"`)
+}
