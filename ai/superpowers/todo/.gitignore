@@ -11,6 +11,9 @@ frontend/playwright-report/
 frontend/test-results/
 frontend/.playwright/
 
+# brainstorm visual companion (mockup files, persisted but not source)
+.superpowers/
+
 # misc
 .DS_Store
 *.log
