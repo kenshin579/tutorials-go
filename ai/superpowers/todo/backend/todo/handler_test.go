@@ -115,3 +115,60 @@ func TestHandler_Create_201BodyShape(t *testing.T) {
 	assert.False(t, got.CreatedAt.IsZero())
 	assert.Equal(t, got.CreatedAt, got.UpdatedAt)
 }
+
+func TestHandler_List_Defaults(t *testing.T) {
+	t.Parallel()
+	h, s := newTestHandler(t)
+	s.Add(NewTodo{Title: "first"})
+	s.Add(NewTodo{Title: "second"})
+
+	_, c, rec := newJSONRequest(http.MethodGet, "/api/todos", "")
+	assert.NoError(t, h.List(c))
+	assert.Equal(t, http.StatusOK, rec.Code)
+	body := rec.Body.String()
+	assert.Contains(t, body, `"title":"first"`)
+	assert.Contains(t, body, `"title":"second"`)
+	assert.True(t, strings.HasPrefix(strings.TrimSpace(body), "["))
+}
+
+func TestHandler_List_FilterAndSort(t *testing.T) {
+	t.Parallel()
+	h, s := newTestHandler(t)
+	a := s.Add(NewTodo{Title: "active"})
+	b := s.Add(NewTodo{Title: "done"})
+	completed := true
+	if _, err := s.Update(b.ID, Patch{Completed: &completed}); err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	_ = a
+
+	_, c, rec := newJSONRequest(http.MethodGet, "/api/todos?status=active", "")
+	assert.NoError(t, h.List(c))
+	assert.Equal(t, http.StatusOK, rec.Code)
+	body := rec.Body.String()
+	assert.Contains(t, body, `"title":"active"`)
+	assert.NotContains(t, body, `"title":"done"`)
+}
+
+func TestHandler_List_InvalidQueryParam(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name  string
+		query string
+	}{
+		{"bad status", "status=invalid"},
+		{"bad sort", "sort=garbage"},
+		{"bad order", "order=sideways"},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			h, _ := newTestHandler(t)
+			_, c, rec := newJSONRequest(http.MethodGet, "/api/todos?"+tc.query, "")
+			assert.NoError(t, h.List(c))
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+			assert.Contains(t, rec.Body.String(), `"code":"validation_failed"`)
+		})
+	}
+}

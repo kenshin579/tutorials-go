@@ -68,6 +68,44 @@ func errBody(code, msg string, details map[string]any) echo.Map {
 	return echo.Map{"error": body}
 }
 
+// List handles GET /api/todos with optional status/sort/order query params.
+// Empty params apply defaults (status=all, sort=createdAt, order=desc).
+func (h *Handler) List(c echo.Context) error {
+	q, err := parseQuery(c)
+	if err != nil {
+		return writeError(c, err)
+	}
+	return c.JSON(http.StatusOK, h.store.List(q))
+}
+
+// parseQuery validates and converts URL query params into a Query.
+// Returns *ValidationError when any param has an invalid value.
+func parseQuery(c echo.Context) (Query, error) {
+	q := Query{}
+	if v := c.QueryParam("status"); v != "" {
+		s := StatusFilter(v)
+		if !s.IsValid() {
+			return Query{}, &ValidationError{Field: "status", Message: "status must be one of: all, active, completed"}
+		}
+		q.Status = s
+	}
+	if v := c.QueryParam("sort"); v != "" {
+		s := SortKey(v)
+		if !s.IsValid() {
+			return Query{}, &ValidationError{Field: "sort", Message: "sort must be one of: createdAt, dueDate, priority"}
+		}
+		q.Sort = s
+	}
+	if v := c.QueryParam("order"); v != "" {
+		o := OrderDir(v)
+		if !o.IsValid() {
+			return Query{}, &ValidationError{Field: "order", Message: "order must be one of: asc, desc"}
+		}
+		q.Order = o
+	}
+	return q, nil
+}
+
 // writeError maps domain errors to JSON error responses with appropriate HTTP status codes.
 // *ValidationError → 400 validation_failed (with field detail), ErrNotFound → 404 not_found,
 // all else → 500 internal_error (logged).
