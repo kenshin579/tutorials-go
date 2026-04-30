@@ -32,29 +32,55 @@ export function TodoItem({ todo, onUpdate, onRemove }: Props) {
     }
   }
 
+  const itemClass = ['todo-item', todo.completed ? 'todo-item--completed' : '']
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <li>
+    <li className={itemClass}>
       <input
         type="checkbox"
+        className="todo-item__checkbox"
         aria-label="완료"
         checked={todo.completed}
         onChange={(e) => onUpdate(todo.id, { completed: e.target.checked })}
       />
-      {editing ? (
-        <input
-          aria-label="제목 편집"
-          value={draft}
-          autoFocus
-          onChange={(e) => setDraft(e.target.value)}
-          onBlur={commit}
-          onKeyDown={onKey}
-        />
-      ) : (
-        <span onClick={() => setEditing(true)}>{todo.title}</span>
-      )}
-      <span data-priority={todo.priority}>{priorityLabel[todo.priority]}</span>
-      {todo.dueDate && <span>마감: {new Date(todo.dueDate).toLocaleString()}</span>}
-      <button type="button" aria-label="삭제" onClick={() => onRemove(todo.id)}>×</button>
+      <div className="todo-item__main">
+        {editing ? (
+          <input
+            className="todo-item__title-edit"
+            aria-label="제목 편집"
+            value={draft}
+            autoFocus
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={onKey}
+          />
+        ) : (
+          <span className="todo-item__title" onClick={() => setEditing(true)}>
+            {todo.title}
+          </span>
+        )}
+        {todo.dueDate && (
+          <span className="todo-item__due">
+            마감 {new Date(todo.dueDate).toLocaleString()}
+          </span>
+        )}
+      </div>
+      <span
+        className={`todo-item__priority todo-item__priority--${todo.priority}`}
+        data-priority={todo.priority}
+      >
+        {priorityLabel[todo.priority]}
+      </span>
+      <button
+        type="button"
+        className="todo-item__delete"
+        aria-label="삭제"
+        onClick={() => onRemove(todo.id)}
+      >
+        ×
+      </button>
     </li>
   )
 }

@@ -61,17 +61,18 @@ test('3. 필터 (전체/미완료/완료) 전환', async ({ page }) => {
   await expect(completedCheckbox).toBeChecked()
 
   // 미완료 필터: "활성 항목"만
-  await page.getByRole('radio', { name: '미완료', exact: true }).click()
+  // hidden radio 패턴이므로 label 요소를 직접 클릭하여 input change 트리거
+  await page.locator('.filter-bar__segment').filter({ hasText: /^미완료/ }).click()
   await expect(page.getByRole('list').getByText('활성 항목')).toBeVisible()
   await expect(page.getByRole('list').getByText('완료 항목')).not.toBeVisible()
 
-  // 완료 필터: "완료 항목"만
-  await page.getByRole('radio', { name: '완료', exact: true }).click()
+  // 완료 필터: "완료 항목"만 (^완료로 시작하는 segment만 — '미완료'와 구분)
+  await page.locator('.filter-bar__segment').filter({ hasText: /^완료/ }).click()
   await expect(page.getByRole('list').getByText('완료 항목')).toBeVisible()
   await expect(page.getByRole('list').getByText('활성 항목')).not.toBeVisible()
 
   // 전체로 복귀
-  await page.getByRole('radio', { name: '전체', exact: true }).click()
+  await page.locator('.filter-bar__segment').filter({ hasText: /^전체/ }).click()
   await expect(page.getByRole('list').getByText('활성 항목')).toBeVisible()
   await expect(page.getByRole('list').getByText('완료 항목')).toBeVisible()
 })

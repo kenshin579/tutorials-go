@@ -67,6 +67,37 @@ cd frontend && npm run test:e2e
    - 삭제 버튼 → 항목 제거
 5. 백엔드 종료 후 새로고침 → "에러" 배너 표시 확인
 
+## 테마
+
+Minimalist+ × Indigo × Pretendard 방향. 디자인 토큰은 `frontend/src/index.css`의 `:root`에 모두 정의되어 있어, 색/타이포/스페이싱을 한 곳에서 일괄 변경할 수 있다.
+
+### 핵심 토큰
+
+| 영역 | 변수 | 기본값 |
+|---|---|---|
+| 강조색 | `--color-accent` | `#6366f1` (indigo-500) |
+| 본문색 | `--color-text` | `#18181b` |
+| 배경 | `--color-bg` | `#fafafa` |
+| 폰트 | `--font-sans` | `Pretendard Variable` (CDN) → fallback system-ui |
+| 라디우스 | `--radius-md` / `--radius-lg` | `8px` / `10px` |
+| priority high | `--color-priority-high-bg/fg` | `#fef2f2` / `#b91c1c` |
+| priority medium | `--color-priority-medium-bg/fg` | `#eef2ff` / `#4338ca` |
+| priority low | `--color-priority-low-bg/fg` | `#f4f4f5` / `#71717a` |
+
+### 컴포넌트 클래스 (BEM 변형)
+
+- `.app-header` — 제목 + 상태 카운트 ("N개 진행 중 · M개 완료")
+- `.todo-form` — 흰 카드 안에 input/select/button inline
+- `.filter-bar__segments` — pill segmented control (hidden radio + label, 카운트는 aria-hidden)
+- `.todo-list` — 카드 컨테이너, `.todo-list--empty`는 dashed border
+- `.todo-item--completed` — line-through 적용
+- `.todo-item__priority--{low,medium,high}` — priority별 색
+- `.error-banner` — dismissible 빨강 배너
+
+### 다크모드
+
+`color-scheme: light`만 선언되어 있고 다크 토큰은 미정의. 추후 별도 작업.
+
 ## 정책
 
 - **데이터 영속성 없음**: 서버 재시작 시 모든 todo 손실 (in-memory).

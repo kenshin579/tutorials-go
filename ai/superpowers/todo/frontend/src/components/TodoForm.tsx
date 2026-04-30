@@ -30,15 +30,17 @@ export function TodoForm({ onCreate }: Props) {
   }
 
   return (
-    <form onSubmit={submit} aria-label="새 할일 추가">
+    <form className="todo-form" onSubmit={submit} aria-label="새 할일 추가">
       <input
+        className="todo-form__input"
         aria-label="제목"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="할 일 입력..."
+        placeholder="할 일을 입력하세요…"
         maxLength={200}
       />
       <select
+        className="todo-form__priority"
         aria-label="우선순위"
         value={priority}
         onChange={(e) => setPriority(e.target.value as Priority)}
@@ -48,12 +50,19 @@ export function TodoForm({ onCreate }: Props) {
         <option value="high">높음</option>
       </select>
       <input
+        className="todo-form__due"
         aria-label="마감일"
         type="datetime-local"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
       />
-      <button type="submit" disabled={!title.trim() || submitting}>추가</button>
+      <button
+        className="todo-form__submit"
+        type="submit"
+        disabled={!title.trim() || submitting}
+      >
+        추가
+      </button>
     </form>
   )
 }
