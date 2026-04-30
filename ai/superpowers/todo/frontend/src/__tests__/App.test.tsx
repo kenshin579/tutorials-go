@@ -33,6 +33,15 @@ describe('App 통합 시나리오', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toBeDefined())
   })
 
+  it('에러 배너 닫기 버튼 클릭 시 배너 숨김', async () => {
+    server.use(http.get('/api/todos', () => HttpResponse.error()))
+    render(<App />)
+    await waitFor(() => expect(screen.getByRole('alert')).toBeDefined())
+
+    await userEvent.click(screen.getByRole('button', { name: '에러 닫기' }))
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
   it('헤더에 active/completed 카운트를 표시한다', async () => {
     render(<App />)
     // 빈 상태에서는 카운트 표시 생략

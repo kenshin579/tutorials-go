@@ -110,3 +110,29 @@ input, select { font-family: inherit; }
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
+
+/* Error banner */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px 14px;
+  margin-bottom: var(--space-4);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-md);
+  color: var(--color-error-fg);
+  font-size: var(--text-base);
+}
+
+.error-banner__label { font-weight: 500; }
+.error-banner__message { flex: 1; }
+
+.error-banner__close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
