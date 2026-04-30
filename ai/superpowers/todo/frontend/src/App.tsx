@@ -51,7 +51,7 @@ export default function App() {
         </div>
       )}
       <TodoForm onCreate={create} />
-      <FilterBar query={query} onChange={setQuery} />
+      <FilterBar query={query} counts={counts} onChange={setQuery} />
       <TodoList todos={todos} onUpdate={update} onRemove={remove} />
     </main>
   )

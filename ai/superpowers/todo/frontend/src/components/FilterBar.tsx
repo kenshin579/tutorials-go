@@ -2,30 +2,42 @@ import type { Order, Query, SortKey, Status } from '../types'
 
 interface Props {
   query: Query
+  counts: { all: number; active: number; completed: number }
   onChange: (next: Query) => void
 }
 
-export function FilterBar({ query, onChange }: Props) {
+const segments: Array<{ value: Status; label: string }> = [
+  { value: 'all', label: '전체' },
+  { value: 'active', label: '미완료' },
+  { value: 'completed', label: '완료' },
+]
+
+export function FilterBar({ query, counts, onChange }: Props) {
   return (
-    <div role="toolbar" aria-label="필터/정렬">
-      <fieldset>
-        <legend>상태</legend>
-        {(['all', 'active', 'completed'] as Status[]).map((s) => (
-          <label key={s}>
+    <div className="filter-bar" role="toolbar" aria-label="필터/정렬">
+      <fieldset className="filter-bar__segments">
+        <legend className="visually-hidden">상태</legend>
+        {segments.map((s) => (
+          <label key={s.value} className="filter-bar__segment">
             <input
               type="radio"
               name="status"
-              value={s}
-              checked={query.status === s}
-              onChange={() => onChange({ ...query, status: s })}
+              value={s.value}
+              checked={query.status === s.value}
+              onChange={() => onChange({ ...query, status: s.value })}
             />
-            {s === 'all' ? '전체' : s === 'active' ? '미완료' : '완료'}
+            <span className="filter-bar__segment-label">
+              {s.label}
+              <span className="filter-bar__count" aria-hidden="true">{counts[s.value]}</span>
+            </span>
           </label>
         ))}
       </fieldset>
-      <label>
-        정렬
+
+      <div className="filter-bar__sort">
         <select
+          className="filter-bar__sort-select"
+          aria-label="정렬"
           value={query.sort}
           onChange={(e) => onChange({ ...query, sort: e.target.value as SortKey })}
         >
@@ -33,14 +45,17 @@ export function FilterBar({ query, onChange }: Props) {
           <option value="dueDate">마감일</option>
           <option value="priority">우선순위</option>
         </select>
-      </label>
-      <button
-        type="button"
-        aria-label="정렬 방향 토글"
-        onClick={() => onChange({ ...query, order: (query.order === 'asc' ? 'desc' : 'asc') as Order })}
-      >
-        {query.order === 'asc' ? '↑' : '↓'}
-      </button>
+        <button
+          type="button"
+          className="filter-bar__order"
+          aria-label="정렬 방향 토글"
+          onClick={() =>
+            onChange({ ...query, order: (query.order === 'asc' ? 'desc' : 'asc') as Order })
+          }
+        >
+          {query.order === 'asc' ? '↑' : '↓'}
+        </button>
+      </div>
     </div>
   )
 }
