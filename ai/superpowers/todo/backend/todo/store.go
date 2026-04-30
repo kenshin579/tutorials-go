@@ -36,7 +36,7 @@ func (s *Store) Add(input NewTodo) Todo {
 		Title:     strings.TrimSpace(input.Title),
 		Completed: false,
 		Priority:  priority,
-		DueDate:   input.DueDate,
+		DueDate:   copyTimePointer(input.DueDate),
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -79,7 +79,7 @@ func (s *Store) Update(id string, p Patch) (Todo, error) {
 	if p.ClearDueDate {
 		t.DueDate = nil
 	} else if p.DueDate != nil {
-		t.DueDate = p.DueDate
+		t.DueDate = copyTimePointer(p.DueDate)
 	}
 	t.UpdatedAt = time.Now().UTC()
 	s.todos[id] = t
@@ -268,4 +268,15 @@ func compareTime(a, b time.Time) int {
 		return 1
 	}
 	return 0
+}
+
+// copyTimePointer returns a fresh *time.Time pointing to a copy of *t,
+// or nil when t is nil. Used in Add/Update to prevent external mutation
+// of stored DueDate via pointer aliasing.
+func copyTimePointer(t *time.Time) *time.Time {
+	if t == nil {
+		return nil
+	}
+	v := *t
+	return &v
 }

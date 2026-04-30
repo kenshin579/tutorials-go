@@ -243,3 +243,36 @@ func ids(ts []Todo) []string {
 	}
 	return out
 }
+
+func TestStore_Add_DueDateNotAliased(t *testing.T) {
+	t.Parallel()
+	s := newTestStore(t)
+	due := time.Date(2026, 5, 1, 12, 0, 0, 0, time.UTC)
+	added := s.Add(NewTodo{Title: "x", DueDate: &due})
+
+	// Mutate caller's pointer target.
+	due = due.Add(24 * time.Hour)
+
+	got, ok := s.Get(added.ID)
+	assert.True(t, ok)
+	assert.NotNil(t, got.DueDate)
+	assert.Equal(t, time.Date(2026, 5, 1, 12, 0, 0, 0, time.UTC), *got.DueDate,
+		"caller mutation must not leak into stored state")
+}
+
+func TestStore_Update_DueDateNotAliased(t *testing.T) {
+	t.Parallel()
+	s := newTestStore(t)
+	added := s.Add(NewTodo{Title: "x"})
+	due := time.Date(2026, 5, 1, 12, 0, 0, 0, time.UTC)
+
+	_, err := s.Update(added.ID, Patch{DueDate: &due})
+	assert.NoError(t, err)
+
+	due = due.Add(24 * time.Hour)
+
+	got, ok := s.Get(added.ID)
+	assert.True(t, ok)
+	assert.NotNil(t, got.DueDate)
+	assert.Equal(t, time.Date(2026, 5, 1, 12, 0, 0, 0, time.UTC), *got.DueDate)
+}
