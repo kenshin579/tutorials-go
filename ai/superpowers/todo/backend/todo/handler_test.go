@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -86,4 +87,31 @@ func TestHandler_Delete_Returns404OnUnknownID(t *testing.T) {
 	assert.NoError(t, h.Delete(c))
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	assert.Contains(t, rec.Body.String(), `"code":"not_found"`)
+}
+
+func TestHandler_Create_Returns400OnInvalidPriority(t *testing.T) {
+	t.Parallel()
+	h, _ := newTestHandler(t)
+	_, c, rec := newJSONRequest(http.MethodPost, "/api/todos", `{"title":"x","priority":"urgent"}`)
+	assert.NoError(t, h.Create(c))
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	assert.Contains(t, rec.Body.String(), `"code":"validation_failed"`)
+	assert.Contains(t, rec.Body.String(), `"field":"priority"`)
+}
+
+func TestHandler_Create_201BodyShape(t *testing.T) {
+	t.Parallel()
+	h, _ := newTestHandler(t)
+	_, c, rec := newJSONRequest(http.MethodPost, "/api/todos", `{"title":"buy milk","priority":"high"}`)
+	assert.NoError(t, h.Create(c))
+	assert.Equal(t, http.StatusCreated, rec.Code)
+
+	var got Todo
+	assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &got))
+	assert.NotEmpty(t, got.ID, "server must assign an id")
+	assert.Equal(t, "buy milk", got.Title)
+	assert.Equal(t, PriorityHigh, got.Priority)
+	assert.False(t, got.Completed)
+	assert.False(t, got.CreatedAt.IsZero())
+	assert.Equal(t, got.CreatedAt, got.UpdatedAt)
 }
