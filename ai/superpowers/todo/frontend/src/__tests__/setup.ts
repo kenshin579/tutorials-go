@@ -1,2 +1,11 @@
-// Phase 5에서 MSW server 등록 추가됨.
-// 현재는 testing-library 자동 cleanup만 활성화 (vitest globals + jsdom으로 충분).
+import { afterAll, afterEach, beforeAll } from 'vitest'
+import '@testing-library/react'
+import { server } from './mocks/server'
+import { resetMockTodos } from './mocks/handlers'
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+afterEach(() => {
+  server.resetHandlers()
+  resetMockTodos([])
+})
+afterAll(() => server.close())
