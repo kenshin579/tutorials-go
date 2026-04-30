@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -94,4 +95,177 @@ func (s *Store) Delete(id string) error {
 	}
 	delete(s.todos, id)
 	return nil
+}
+
+// StatusFilter narrows List results by completion state.
+type StatusFilter string
+
+const (
+	StatusAll       StatusFilter = "all"
+	StatusActive    StatusFilter = "active"
+	StatusCompleted StatusFilter = "completed"
+)
+
+// IsValid reports whether s is one of the defined StatusFilter constants.
+func (s StatusFilter) IsValid() bool {
+	switch s {
+	case StatusAll, StatusActive, StatusCompleted:
+		return true
+	default:
+		return false
+	}
+}
+
+// SortKey selects the field used to order List results.
+type SortKey string
+
+const (
+	SortCreatedAt SortKey = "createdAt"
+	SortDueDate   SortKey = "dueDate"
+	SortPriority  SortKey = "priority"
+)
+
+// IsValid reports whether k is one of the defined SortKey constants.
+func (k SortKey) IsValid() bool {
+	switch k {
+	case SortCreatedAt, SortDueDate, SortPriority:
+		return true
+	default:
+		return false
+	}
+}
+
+// OrderDir is ascending or descending.
+type OrderDir string
+
+const (
+	OrderAsc  OrderDir = "asc"
+	OrderDesc OrderDir = "desc"
+)
+
+// IsValid reports whether o is one of the defined OrderDir constants.
+func (o OrderDir) IsValid() bool {
+	switch o {
+	case OrderAsc, OrderDesc:
+		return true
+	default:
+		return false
+	}
+}
+
+// Query is the input to Store.List. Zero values mean defaults:
+// Status defaults to StatusAll, Sort to SortCreatedAt, Order to OrderDesc.
+type Query struct {
+	Status StatusFilter
+	Sort   SortKey
+	Order  OrderDir
+}
+
+func (q Query) withDefaults() Query {
+	if q.Status == "" {
+		q.Status = StatusAll
+	}
+	if q.Sort == "" {
+		q.Sort = SortCreatedAt
+	}
+	if q.Order == "" {
+		q.Order = OrderDesc
+	}
+	return q
+}
+
+// List returns todos matching the query, sorted as requested.
+// nil dueDate values are placed last regardless of Order (deterministic).
+// Tie-breaks fall back to createdAt ascending (stable sort).
+func (s *Store) List(q Query) []Todo {
+	q = q.withDefaults()
+	s.mu.RLock()
+	out := make([]Todo, 0, len(s.todos))
+	for _, t := range s.todos {
+		if !matchesStatus(t, q.Status) {
+			continue
+		}
+		out = append(out, t)
+	}
+	s.mu.RUnlock()
+	sortTodos(out, q.Sort, q.Order)
+	return out
+}
+
+func matchesStatus(t Todo, f StatusFilter) bool {
+	switch f {
+	case StatusActive:
+		return !t.Completed
+	case StatusCompleted:
+		return t.Completed
+	default:
+		return true
+	}
+}
+
+// sortTodos sorts ts in place by the given key/order.
+// nil dueDate values always sort last regardless of order (deterministic).
+// Tie-breaks fall back to createdAt ascending (stable sort).
+func sortTodos(ts []Todo, key SortKey, order OrderDir) {
+	asc := order == OrderAsc
+	sort.SliceStable(ts, func(i, j int) bool {
+		a, b := ts[i], ts[j]
+
+		// dueDate 정렬: nil은 항상 마지막 (asc/desc 무관)
+		if key == SortDueDate {
+			if a.DueDate == nil && b.DueDate == nil {
+				return a.CreatedAt.Before(b.CreatedAt)
+			}
+			if a.DueDate == nil {
+				return false
+			}
+			if b.DueDate == nil {
+				return true
+			}
+		}
+
+		cmp := primaryCompare(a, b, key)
+		if cmp == 0 {
+			return a.CreatedAt.Before(b.CreatedAt) // tie-break: createdAt asc
+		}
+		if asc {
+			return cmp < 0
+		}
+		return cmp > 0
+	})
+}
+
+func primaryCompare(a, b Todo, key SortKey) int {
+	switch key {
+	case SortPriority:
+		return priorityRank(a.Priority) - priorityRank(b.Priority)
+	case SortDueDate:
+		// 호출 시점에 둘 다 non-nil 보장됨 (sortTodos에서 nil 분기)
+		return compareTime(*a.DueDate, *b.DueDate)
+	default: // SortCreatedAt
+		return compareTime(a.CreatedAt, b.CreatedAt)
+	}
+}
+
+func priorityRank(p Priority) int {
+	switch p {
+	case PriorityLow:
+		return 1
+	case PriorityMedium:
+		return 2
+	case PriorityHigh:
+		return 3
+	default:
+		return 0
+	}
+}
+
+func compareTime(a, b time.Time) int {
+	if a.Before(b) {
+		return -1
+	}
+	if a.After(b) {
+		return 1
+	}
+	return 0
 }
