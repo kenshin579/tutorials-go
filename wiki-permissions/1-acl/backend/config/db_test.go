@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/gorm"
 
 	"github.com/kenshin579/tutorials-go/wiki-permissions/1-acl/backend/domain"
 )
@@ -26,5 +25,4 @@ func TestOpenDB_AutoMigratesAllTables(t *testing.T) {
 	sqlDB, err := db.DB()
 	require.NoError(t, err)
 	assert.NoError(t, sqlDB.Close())
-	_ = (*gorm.DB)(nil)
 }
