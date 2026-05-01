@@ -10,6 +10,8 @@ import (
 // ACLRepository는 GORM 기반 domain.ACLRepository 구현체다.
 type ACLRepository struct{ db *gorm.DB }
 
+var _ domain.ACLRepository = (*ACLRepository)(nil)
+
 // NewACLRepository는 *gorm.DB에서 동작하는 ACLRepository를 생성한다.
 func NewACLRepository(db *gorm.DB) *ACLRepository { return &ACLRepository{db: db} }
 

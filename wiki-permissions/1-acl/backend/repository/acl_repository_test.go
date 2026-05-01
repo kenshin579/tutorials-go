@@ -42,3 +42,25 @@ func TestACLRepository_Revoke_RemovesAllActions(t *testing.T) {
 	entries, _ := repo.FindByPageAndUser(1, 2)
 	assert.Empty(t, entries)
 }
+
+// ListByPage는 user_id, action 순으로 정렬해 owner UI에서 그룹화하기 쉽게 한다.
+// 'edit' < 'read' (알파벳순)이므로 한 사용자가 둘 다 가지면 edit이 먼저 온다.
+func TestACLRepository_ListByPage_OrdersByUserThenAction(t *testing.T) {
+	db, err := config.OpenDB(":memory:")
+	require.NoError(t, err)
+	repo := NewACLRepository(db)
+
+	require.NoError(t, repo.Grant(1, 3, domain.ActionRead))
+	require.NoError(t, repo.Grant(1, 2, domain.ActionRead))
+	require.NoError(t, repo.Grant(1, 2, domain.ActionEdit))
+
+	entries, err := repo.ListByPage(1)
+	require.NoError(t, err)
+	require.Len(t, entries, 3)
+
+	assert.Equal(t, uint(2), entries[0].UserID)
+	assert.Equal(t, domain.ActionEdit, entries[0].Action)
+	assert.Equal(t, uint(2), entries[1].UserID)
+	assert.Equal(t, domain.ActionRead, entries[1].Action)
+	assert.Equal(t, uint(3), entries[2].UserID)
+}
