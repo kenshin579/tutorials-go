@@ -30,3 +30,17 @@ func TestEvaluateACL_NoGrant(t *testing.T) {
 	page := &Page{ID: 1, OwnerID: 100}
 	assert.False(t, EvaluateACL(page, 999, ActionRead, nil))
 }
+
+// 다른 페이지/다른 사용자에 대한 entry는 평가에 영향이 없어야 한다 (방어적 필터 보장).
+func TestEvaluateACL_IgnoresEntriesForOtherPagesOrUsers(t *testing.T) {
+	page := &Page{ID: 1, OwnerID: 100}
+	entries := []ACLEntry{
+		{PageID: 2, UserID: 200, Action: ActionRead}, // 다른 페이지
+		{PageID: 1, UserID: 999, Action: ActionRead}, // 다른 사용자
+	}
+	assert.False(t, EvaluateACL(page, 200, ActionRead, entries))
+}
+
+func TestEvaluateACL_NilPage(t *testing.T) {
+	assert.False(t, EvaluateACL(nil, 100, ActionRead, nil))
+}
