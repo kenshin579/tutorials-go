@@ -305,3 +305,67 @@ func TestFx_Lifecycle(t *testing.T) {
 	app.RequireStop()
 	assert.True(t, stopCalled)
 }
+
+// --- fx.Group: 동일 인터페이스 여러 구현체 모으기 ---
+
+type Notifier interface {
+	Send(msg string) string
+}
+
+type EmailNotifier struct{}
+
+func (e *EmailNotifier) Send(msg string) string { return "email:" + msg }
+
+type SlackNotifier struct{}
+
+func (s *SlackNotifier) Send(msg string) string { return "slack:" + msg }
+
+type SMSNotifier struct{}
+
+func (s *SMSNotifier) Send(msg string) string { return "sms:" + msg }
+
+// fx.In의 group 태그로 같은 그룹의 모든 구현체를 슬라이스로 수신
+type NotifierParams struct {
+	fx.In
+	Notifiers []Notifier `group:"notifiers"`
+}
+
+type NotifierService struct {
+	notifiers []Notifier
+}
+
+func NewNotifierService(p NotifierParams) *NotifierService {
+	return &NotifierService{notifiers: p.Notifiers}
+}
+
+func TestFx_Group_ValueGroups(t *testing.T) {
+	var svc *NotifierService
+
+	app := fxtest.New(t,
+		fx.Provide(
+			// fx.ResultTags로 같은 group에 여러 구현체 등록
+			fx.Annotate(func() Notifier { return &EmailNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			fx.Annotate(func() Notifier { return &SlackNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			fx.Annotate(func() Notifier { return &SMSNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			NewNotifierService,
+		),
+		fx.Invoke(func(s *NotifierService) {
+			svc = s
+		}),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Len(t, svc.notifiers, 3)
+
+	var results []string
+	for _, n := range svc.notifiers {
+		results = append(results, n.Send("hi"))
+	}
+	assert.Contains(t, results, "email:hi")
+	assert.Contains(t, results, "slack:hi")
+	assert.Contains(t, results, "sms:hi")
+}
