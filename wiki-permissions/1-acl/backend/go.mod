@@ -3,6 +3,7 @@ module github.com/kenshin579/tutorials-go/wiki-permissions/1-acl/backend
 go 1.25.0
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/labstack/echo/v4 v4.15.1
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/crypto v0.50.0
