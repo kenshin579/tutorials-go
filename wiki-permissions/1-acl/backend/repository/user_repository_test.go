@@ -32,5 +32,17 @@ func TestUserRepository_FindByID_NotFound(t *testing.T) {
 
 	_, err = repo.FindByID(999)
 	var nf domain.ErrNotFound
-	assert.True(t, errors.As(err, &nf))
+	require.True(t, errors.As(err, &nf))
+	assert.Equal(t, "user", nf.Resource)
+}
+
+func TestUserRepository_FindByEmail_NotFound(t *testing.T) {
+	db, err := config.OpenDB(":memory:")
+	require.NoError(t, err)
+	repo := NewUserRepository(db)
+
+	_, err = repo.FindByEmail("missing@example.com")
+	var nf domain.ErrNotFound
+	require.True(t, errors.As(err, &nf))
+	assert.Equal(t, "user", nf.Resource)
 }
