@@ -10,6 +10,10 @@ import (
 // HTTP 핸들러는 이 에러를 403 Forbidden으로 매핑한다.
 var ErrForbidden = errors.New("forbidden")
 
+// ErrInvalidAction은 클라이언트가 알려지지 않은 ACL action 값을 보냈을 때 반환된다.
+// HTTP 핸들러는 이 에러를 400 Bad Request로 매핑한다 (도메인의 ErrNotFound와 분리되는 입력 검증 실패다).
+var ErrInvalidAction = errors.New("invalid action")
+
 // PageUsecase는 페이지 조회/수정/목록 조회 흐름을 담당하며, 모든 액션 전에 ACL을 평가한다.
 type PageUsecase struct {
 	pages domain.PageRepository

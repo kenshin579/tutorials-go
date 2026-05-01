@@ -38,10 +38,10 @@ func (u *ACLUsecase) List(pageID, requesterID uint) ([]domain.ACLEntry, error) {
 }
 
 // Grant는 페이지 owner의 요청에 한해 (page, targetUser, action) ACL을 추가한다.
-// 잘못된 action 값은 ErrNotFound{"action"}으로 거부한다.
+// 잘못된 action 값은 ErrInvalidAction으로 거부한다 (입력 검증 → 권한 검증 → 실행 순).
 func (u *ACLUsecase) Grant(pageID, requesterID, targetUserID uint, action domain.Action) error {
 	if !action.Valid() {
-		return domain.ErrNotFound{Resource: "action"}
+		return ErrInvalidAction
 	}
 	if _, err := u.checkOwner(pageID, requesterID); err != nil {
 		return err
