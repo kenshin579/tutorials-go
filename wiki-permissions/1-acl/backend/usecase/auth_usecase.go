@@ -10,7 +10,9 @@ import (
 )
 
 // ErrInvalidCredentials는 잘못된 이메일 또는 비밀번호가 입력되었을 때 반환된다.
-// 사용자 존재 여부를 노출하지 않기 위해 두 경우(이메일 미존재 / 비번 불일치) 모두 동일 에러를 사용한다.
+// 사용자 존재 여부를 응답 본문(payload) 차원에서 노출하지 않기 위해
+// 두 경우(이메일 미존재 / 비번 불일치) 모두 동일 에러를 사용한다.
+// 단, 응답 시간 차이(timing oracle)로 인한 사용자 존재 추론 방지는 본 튜토리얼 범위 밖이다.
 var ErrInvalidCredentials = errors.New("invalid credentials")
 
 // AuthUsecase는 로그인 흐름을 담당한다. 이메일+비번 검증 후 JWT access token을 발급한다.
