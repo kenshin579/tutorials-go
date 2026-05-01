@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,5 +35,44 @@ func TestPageRepository_ListAccessibleBy(t *testing.T) {
 
 	got, err := pages.ListAccessibleBy(alice.ID)
 	require.NoError(t, err)
-	assert.Len(t, got, 2) // p1 (owner) + p2 (shared)
+	require.Len(t, got, 2) // p1 (owner) + p2 (shared)
+	// 결과 페이지 식별 + Order("pages.id ASC") 보장
+	assert.Equal(t, p1.ID, got[0].ID)
+	assert.Equal(t, p2.ID, got[1].ID)
+}
+
+// 같은 페이지에 read+edit 두 ACL이 부여돼도 Distinct로 한 번만 노출돼야 한다.
+func TestPageRepository_ListAccessibleBy_DistinctOnMultipleACLs(t *testing.T) {
+	db, err := config.OpenDB(":memory:")
+	require.NoError(t, err)
+
+	users := NewUserRepository(db)
+	pages := NewPageRepository(db)
+	acls := NewACLRepository(db)
+
+	alice := &domain.User{Email: "a@x", Name: "Alice", PasswordHash: "x"}
+	bob := &domain.User{Email: "b@x", Name: "Bob", PasswordHash: "x"}
+	require.NoError(t, users.Create(alice))
+	require.NoError(t, users.Create(bob))
+
+	page := &domain.Page{Title: "Bob's page", OwnerID: bob.ID}
+	require.NoError(t, pages.Create(page))
+
+	require.NoError(t, acls.Grant(page.ID, alice.ID, domain.ActionRead))
+	require.NoError(t, acls.Grant(page.ID, alice.ID, domain.ActionEdit))
+
+	got, err := pages.ListAccessibleBy(alice.ID)
+	require.NoError(t, err)
+	assert.Len(t, got, 1)
+}
+
+func TestPageRepository_FindByID_NotFound(t *testing.T) {
+	db, err := config.OpenDB(":memory:")
+	require.NoError(t, err)
+	repo := NewPageRepository(db)
+
+	_, err = repo.FindByID(999)
+	var nf domain.ErrNotFound
+	require.True(t, errors.As(err, &nf))
+	assert.Equal(t, "page", nf.Resource)
 }

@@ -7,8 +7,8 @@ import (
 	"github.com/kenshin579/tutorials-go/wiki-permissions/1-acl/backend/domain"
 )
 
-// ACLRepository는 GORM 기반 domain.ACLRepository 구현체다.
-// (Task 10에서 FindByPageAndUser/ListByPage/Revoke가 추가됨)
+// ACLRepository는 GORM 기반 domain.ACLRepository의 부분 구현체다.
+// 현재 Grant만 지원하며, FindByPageAndUser/ListByPage/Revoke는 Task 10에서 완성된다.
 type ACLRepository struct{ db *gorm.DB }
 
 // NewACLRepository는 *gorm.DB에서 동작하는 ACLRepository를 생성한다.
