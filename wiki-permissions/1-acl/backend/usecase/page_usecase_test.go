@@ -24,7 +24,8 @@ func setupPageEnv(t *testing.T) (*PageUsecase, map[string]uint) {
 
 	emailToID := map[string]uint{}
 	for _, e := range []string{"alice@example.com", "bob@example.com", "carol@example.com", "dave@example.com"} {
-		u, _ := users.FindByEmail(e)
+		u, err := users.FindByEmail(e)
+		require.NoError(t, err)
 		emailToID[e] = u.ID
 	}
 	titleToID := map[string]uint{}
@@ -77,4 +78,25 @@ func TestPageUsecase_Update_RequiresEdit(t *testing.T) {
 	p, err := uc.Update(ids["page:Engineering Roadmap"], ids["user:bob@example.com"], "Updated", "x")
 	require.NoError(t, err)
 	assert.Equal(t, "Updated", p.Title)
+
+	// 갱신이 실제 DB에 반영됐는지 별도 조회로 재확인
+	reread, err := uc.Get(ids["page:Engineering Roadmap"], ids["user:alice@example.com"])
+	require.NoError(t, err)
+	assert.Equal(t, "Updated", reread.Title)
+}
+
+func TestPageUsecase_Get_NotFound(t *testing.T) {
+	uc, ids := setupPageEnv(t)
+	_, err := uc.Get(99999, ids["user:alice@example.com"])
+	var nf domain.ErrNotFound
+	require.ErrorAs(t, err, &nf)
+	assert.Equal(t, "page", nf.Resource)
+}
+
+func TestPageUsecase_Update_NotFound(t *testing.T) {
+	uc, ids := setupPageEnv(t)
+	_, err := uc.Update(99999, ids["user:alice@example.com"], "x", "y")
+	var nf domain.ErrNotFound
+	require.ErrorAs(t, err, &nf)
+	assert.Equal(t, "page", nf.Resource)
 }
