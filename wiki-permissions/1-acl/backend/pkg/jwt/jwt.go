@@ -17,11 +17,12 @@ type Claims struct {
 // Issue는 user_id를 담은 access token을 secret으로 서명하여 발급한다.
 // ttl은 토큰의 유효 기간이며, 음수를 주면 즉시 만료된 토큰을 만들 수 있어 테스트에 유용하다.
 func Issue(userID uint, secret string, ttl time.Duration) (string, error) {
+	now := time.Now()
 	claims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwtv5.RegisteredClaims{
-			ExpiresAt: jwtv5.NewNumericDate(time.Now().Add(ttl)),
-			IssuedAt:  jwtv5.NewNumericDate(time.Now()),
+			ExpiresAt: jwtv5.NewNumericDate(now.Add(ttl)),
+			IssuedAt:  jwtv5.NewNumericDate(now),
 		},
 	}
 	tok := jwtv5.NewWithClaims(jwtv5.SigningMethodHS256, claims)
