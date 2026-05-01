@@ -11,6 +11,8 @@ import (
 // PageRepository는 GORM 기반 domain.PageRepository 구현체다.
 type PageRepository struct{ db *gorm.DB }
 
+var _ domain.PageRepository = (*PageRepository)(nil)
+
 // NewPageRepository는 *gorm.DB에서 동작하는 PageRepository를 생성한다.
 func NewPageRepository(db *gorm.DB) *PageRepository { return &PageRepository{db: db} }
 

@@ -11,6 +11,8 @@ import (
 // UserRepository는 GORM 기반 domain.UserRepository 구현체다.
 type UserRepository struct{ db *gorm.DB }
 
+var _ domain.UserRepository = (*UserRepository)(nil)
+
 // NewUserRepository는 *gorm.DB에서 동작하는 UserRepository를 생성한다.
 func NewUserRepository(db *gorm.DB) *UserRepository { return &UserRepository{db: db} }
 
