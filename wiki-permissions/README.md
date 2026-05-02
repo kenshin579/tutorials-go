@@ -11,7 +11,7 @@
 | 편 | 디렉토리 | 모델 | 시나리오 |
 |---|---|---|---|
 | 1편 | [`1-acl/`](./1-acl/) | Access Control List | 페이지마다 사용자에게 read/edit 직접 부여 |
-| 2편 | `2-rbac/` (예정) | Role-Based Access Control | admin/editor/viewer/guest 역할 기반 |
+| 2편 | [`2-rbac/`](./2-rbac/) | Role-Based Access Control | admin/editor/viewer 역할 기반 |
 | 3편 | `3-abac/` (예정) | Attribute-Based Access Control | 분류 + 부서 + 고용형태 등 속성 기반 정책 |
 
 ## 공통 기술 스택
@@ -20,3 +20,12 @@
 - Frontend: React 19 + TypeScript + Vite + Tailwind v4
 
 각 편의 코드는 self-contained이며, 하나의 디렉토리만 클론해도 독립 실행 가능하다.
+
+## 동시 실행
+
+각 편이 다른 포트를 사용하도록 설정되어 있어 1편과 2편을 동시에 띄워 비교 시연 가능하다.
+
+| 편 | Backend | Frontend |
+|---|---|---|
+| 1편 | :8080 | :3000 |
+| 2편 | :8081 | :3001 |
