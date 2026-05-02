@@ -400,3 +400,53 @@ func TestFx_Populate(t *testing.T) {
 	assert.NotNil(t, svc2)
 	assert.NotNil(t, logger2)
 }
+
+// --- fx.Private: Module 내부 전용 의존성 캡슐화 ---
+
+type internalDB struct {
+	name string
+}
+
+func newInternalDB() *internalDB {
+	return &internalDB{name: "private-db"}
+}
+
+type ModuleService struct {
+	db *internalDB
+}
+
+func newModuleService(db *internalDB) *ModuleService {
+	return &ModuleService{db: db}
+}
+
+func TestFx_Private(t *testing.T) {
+	// PrivateModule:
+	//   - 첫 번째 fx.Provide()에 fx.Private을 함께 넣어 *internalDB를 Module 내부 전용으로
+	//   - 두 번째 fx.Provide()는 일반 노출. *ModuleService는 외부에서 추출 가능
+	PrivateModule := fx.Module("private",
+		fx.Provide(
+			fx.Private,
+			newInternalDB,
+		),
+		fx.Provide(newModuleService),
+	)
+
+	// 정상: ModuleService는 외부 노출 → 추출 성공
+	var svc *ModuleService
+	app := fxtest.New(t,
+		PrivateModule,
+		fx.Populate(&svc),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+	assert.Equal(t, "private-db", svc.db.name)
+
+	// 비정상: *internalDB는 Module 내부 전용 → 외부 추출 시도 시 fx.New가 에러 반환
+	var leaked *internalDB
+	leakApp := fx.New(
+		PrivateModule,
+		fx.Populate(&leaked),
+		fx.NopLogger, // 에러를 stdout으로 출력하지 않음
+	)
+	assert.Error(t, leakApp.Err(), "internalDB는 Module 외부에서 보이지 않아야 한다")
+}
