@@ -305,3 +305,151 @@ func TestFx_Lifecycle(t *testing.T) {
 	app.RequireStop()
 	assert.True(t, stopCalled)
 }
+
+// --- fx.Group: 동일 인터페이스 여러 구현체 모으기 ---
+
+type Notifier interface {
+	Send(msg string) string
+}
+
+type EmailNotifier struct{}
+
+func (e *EmailNotifier) Send(msg string) string { return "email:" + msg }
+
+type SlackNotifier struct{}
+
+func (s *SlackNotifier) Send(msg string) string { return "slack:" + msg }
+
+type SMSNotifier struct{}
+
+func (s *SMSNotifier) Send(msg string) string { return "sms:" + msg }
+
+// fx.In의 group 태그로 같은 그룹의 모든 구현체를 슬라이스로 수신
+type NotifierParams struct {
+	fx.In
+	Notifiers []Notifier `group:"notifiers"`
+}
+
+type NotifierService struct {
+	notifiers []Notifier
+}
+
+func NewNotifierService(p NotifierParams) *NotifierService {
+	return &NotifierService{notifiers: p.Notifiers}
+}
+
+func TestFx_Group_ValueGroups(t *testing.T) {
+	var svc *NotifierService
+
+	app := fxtest.New(t,
+		fx.Provide(
+			// fx.ResultTags로 같은 group에 여러 구현체 등록
+			fx.Annotate(func() Notifier { return &EmailNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			fx.Annotate(func() Notifier { return &SlackNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			fx.Annotate(func() Notifier { return &SMSNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			NewNotifierService,
+		),
+		fx.Invoke(func(s *NotifierService) {
+			svc = s
+		}),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Len(t, svc.notifiers, 3)
+
+	var results []string
+	for _, n := range svc.notifiers {
+		results = append(results, n.Send("hi"))
+	}
+	assert.Contains(t, results, "email:hi")
+	assert.Contains(t, results, "slack:hi")
+	assert.Contains(t, results, "sms:hi")
+}
+
+// --- fx.Populate: fx 컨테이너에서 인스턴스를 외부 변수로 추출 ---
+
+func TestFx_Populate(t *testing.T) {
+	// 형태 1: 단일 인스턴스 추출
+	var svc1 *UserService
+	app1 := fxtest.New(t,
+		fx.Provide(NewLogger, NewMysqlUserRepo, NewUserService),
+		fx.Populate(&svc1),
+	)
+	defer app1.RequireStop()
+	app1.RequireStart()
+
+	assert.NotNil(t, svc1)
+	assert.Equal(t, "user-1", svc1.repo.FindByID(1))
+
+	// 형태 2: 여러 인스턴스를 한꺼번에 추출
+	var (
+		svc2    *UserService
+		logger2 Logger
+	)
+	app2 := fxtest.New(t,
+		fx.Provide(NewLogger, NewMysqlUserRepo, NewUserService),
+		fx.Populate(&svc2, &logger2),
+	)
+	defer app2.RequireStop()
+	app2.RequireStart()
+
+	assert.NotNil(t, svc2)
+	assert.NotNil(t, logger2)
+}
+
+// --- fx.Private: Module 내부 전용 의존성 캡슐화 ---
+
+type internalDB struct {
+	name string
+}
+
+func newInternalDB() *internalDB {
+	return &internalDB{name: "private-db"}
+}
+
+type ModuleService struct {
+	db *internalDB
+}
+
+func newModuleService(db *internalDB) *ModuleService {
+	return &ModuleService{db: db}
+}
+
+func TestFx_Private(t *testing.T) {
+	// PrivateModule:
+	//   - 첫 번째 fx.Provide()에 fx.Private을 마지막 인자로 넣어 *internalDB를 Module 내부 전용으로
+	//   - 두 번째 fx.Provide()는 일반 노출. *ModuleService는 외부에서 추출 가능
+	PrivateModule := fx.Module("private",
+		fx.Provide(
+			newInternalDB,
+			fx.Private,
+		),
+		fx.Provide(newModuleService),
+	)
+
+	// 정상: ModuleService는 외부 노출 → 추출 성공
+	var svc *ModuleService
+	app := fxtest.New(t,
+		PrivateModule,
+		fx.Populate(&svc),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+	assert.Equal(t, "private-db", svc.db.name)
+
+	// 비정상: *internalDB는 Module 내부 전용 → 외부 추출 시도 시 fx.New가 에러 반환
+	var leaked *internalDB
+	leakApp := fx.New(
+		PrivateModule,
+		fx.Populate(&leaked),
+		fx.NopLogger, // 에러를 stdout으로 출력하지 않음
+	)
+	err := leakApp.Err()
+	assert.Error(t, err, "internalDB는 Module 외부에서 보이지 않아야 한다")
+	assert.Contains(t, err.Error(), "*main.internalDB",
+		"에러 메시지에 외부 추출이 막힌 타입이 명시되어야 한다")
+}
