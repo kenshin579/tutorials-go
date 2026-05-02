@@ -12,11 +12,11 @@ import (
 
 // Seed는 RBAC 시리즈 2편 시연을 위한 시드 데이터를 삽입한다 (idempotent).
 //
-//   사용자 4 (alice/bob/carol/dave, 비밀번호 모두 "password")
-//   페이지 3 (Engineering Roadmap, Q4 Marketing Plan, Public Onboarding Guide)
-//   permissions 6 (pages:read/create/edit/delete, users:read/manage)
-//   roles 3 (admin/editor/viewer)
-//   role-permission 매트릭스 + user-role 매핑
+//	사용자 4 (alice/bob/carol/dave, 비밀번호 모두 "password")
+//	페이지 3 (Engineering Roadmap, Q4 Marketing Plan, Public Onboarding Guide)
+//	permissions 6 (pages:read/create/edit/delete, users:read/manage)
+//	roles 3 (admin/editor/viewer)
+//	role-permission 매트릭스 + user-role 매핑
 //
 // 두 번째 호출 시에도 중복 row 없이 동일 결과를 보장한다 (앱 부팅 시 단일 호출 가정).
 func Seed(db *gorm.DB) error {

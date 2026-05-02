@@ -20,11 +20,11 @@ func NewPermissionRepository(db *gorm.DB) *PermissionRepository {
 // FindByUserID는 user → role → permission 3-hop JOIN으로 사용자의 모든 효과적 권한을 모아 반환한다.
 // 같은 permission이 여러 role에 묶여 중복될 수 있어 Distinct로 정리하고, resource/action 순으로 정렬한다.
 //
-//   SELECT DISTINCT permissions.* FROM permissions
-//     JOIN role_permissions ON role_permissions.permission_id = permissions.id
-//     JOIN user_roles       ON user_roles.role_id = role_permissions.role_id
-//     WHERE user_roles.user_id = ?
-//     ORDER BY permissions.resource, permissions.action
+//	SELECT DISTINCT permissions.* FROM permissions
+//	  JOIN role_permissions ON role_permissions.permission_id = permissions.id
+//	  JOIN user_roles       ON user_roles.role_id = role_permissions.role_id
+//	  WHERE user_roles.user_id = ?
+//	  ORDER BY permissions.resource, permissions.action
 func (r *PermissionRepository) FindByUserID(userID uint) ([]domain.Permission, error) {
 	var perms []domain.Permission
 	err := r.db.
