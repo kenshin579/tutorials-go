@@ -27,10 +27,10 @@ func setupPageEnv(t *testing.T) (uc *PageUsecase, ids map[string]uint) {
 		require.NoError(t, err)
 		ids[e] = u.ID
 	}
-	for _, t := range []string{"Engineering Roadmap", "Q4 Marketing Plan", "Public Onboarding Guide"} {
+	for _, title := range []string{"Engineering Roadmap", "Q4 Marketing Plan", "Public Onboarding Guide"} {
 		var p domain.Page
-		require.NoError(t, db.Where("title = ?", t).First(&p).Error)
-		ids[t] = p.ID
+		require.NoError(t, db.Where("title = ?", title).First(&p).Error)
+		ids[title] = p.ID
 	}
 	return uc, ids
 }
