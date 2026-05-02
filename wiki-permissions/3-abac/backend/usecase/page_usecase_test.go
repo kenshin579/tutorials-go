@@ -43,7 +43,12 @@ func setupPageEnv(t *testing.T) (uc *PageUsecase, ids map[string]uint) {
 //
 //	페이지: EngRoadmap (internal/Eng), Q4 (confidential/Mkt), Onboarding (public)
 //
-// 기대값: alice 3, bob 2 (Eng + Public), carol 2 (Q4 + Public), dave 1 (Public)
+// 기대값:
+//
+//	alice 2 (EngRoadmap owner + Onboarding public; Q4는 다른 부서 confidential)
+//	bob   2 (EngRoadmap 같은 부서 internal + Onboarding public; Q4는 다른 부서)
+//	carol 2 (Q4 owner + Onboarding public; EngRoadmap는 다른 부서)
+//	dave  1 (Onboarding public; EngRoadmap 다른 부서, Q4 contract)
 func TestPageUsecase_List_FiltersByPolicy(t *testing.T) {
 	uc, ids := setupPageEnv(t)
 
@@ -51,7 +56,7 @@ func TestPageUsecase_List_FiltersByPolicy(t *testing.T) {
 		email string
 		count int
 	}{
-		{"alice@example.com", 3},
+		{"alice@example.com", 2},
 		{"bob@example.com", 2},
 		{"carol@example.com", 2},
 		{"dave@example.com", 1},
