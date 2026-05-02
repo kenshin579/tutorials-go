@@ -369,3 +369,34 @@ func TestFx_Group_ValueGroups(t *testing.T) {
 	assert.Contains(t, results, "slack:hi")
 	assert.Contains(t, results, "sms:hi")
 }
+
+// --- fx.Populate: fx 컨테이너에서 인스턴스를 외부 변수로 추출 ---
+
+func TestFx_Populate(t *testing.T) {
+	// 형태 1: 단일 인스턴스 추출
+	var svc1 *UserService
+	app1 := fxtest.New(t,
+		fx.Provide(NewLogger, NewMysqlUserRepo, NewUserService),
+		fx.Populate(&svc1),
+	)
+	defer app1.RequireStop()
+	app1.RequireStart()
+
+	assert.NotNil(t, svc1)
+	assert.Equal(t, "user-1", svc1.repo.FindByID(1))
+
+	// 형태 2: 여러 인스턴스를 한꺼번에 추출
+	var (
+		svc2    *UserService
+		logger2 Logger
+	)
+	app2 := fxtest.New(t,
+		fx.Provide(NewLogger, NewMysqlUserRepo, NewUserService),
+		fx.Populate(&svc2, &logger2),
+	)
+	defer app2.RequireStop()
+	app2.RequireStart()
+
+	assert.NotNil(t, svc2)
+	assert.NotNil(t, logger2)
+}
