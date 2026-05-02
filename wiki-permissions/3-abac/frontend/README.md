@@ -1,73 +1,35 @@
-# React + TypeScript + Vite
+# 3-abac frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + TypeScript + Vite + Tailwind v4. 백엔드(`localhost:8082`)와 함께 동작하며 dev 서버가 `/api`와 `/auth` 요청을 백엔드로 proxy한다. 1·2편과 동시에 띄울 수 있도록 `:3002`를 사용한다.
 
-Currently, two official plugins are available:
+## 실행
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev    # http://localhost:3002
+npm run build  # 프로덕션 번들
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 화면
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `/login` — 시드 계정 로그인
+- `/pages` — ABAC read 정책을 통과한 페이지만 표시. 페이지마다 `confidentiality` + 부서 뱃지
+- `/pages/:id` — 페이지 상세 + **Decision 카드** (read/edit 각각의 reason과 policy 식별자를 사용자에게 표시)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## ABAC 결과 표시 (`Decision` 카드)
+
+1·2편과의 가장 큰 UX 차이는 페이지 상세 화면이다. 서버가 내려준 `Decision{allowed, reason, policy}`를 그대로 카드로 보여준다.
+
 ```
+✓ 읽기 권한  policy: internal
+   same department, internal page
+
+✗ 편집 권한  policy: department-match
+   different department
+```
+
+권한이 없을 때 단순히 "거부"가 아니라 **"왜 거부됐는지"** 를 사용자에게 명시한다 — ABAC 평가 결과가 풍부하기 때문에 가능한 UX다.
+
+## 주의
+
+권한 평가는 항상 **서버**가 한다. 클라이언트는 서버가 내려준 decision을 표시할 뿐이며, 권한 없는 사용자가 직접 API를 호출해도 서버가 정책 평가로 막는다.
