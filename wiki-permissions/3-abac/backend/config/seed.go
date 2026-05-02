@@ -12,9 +12,9 @@ import (
 
 // Seed는 ABAC 시리즈 3편 시연을 위한 시드 데이터를 삽입한다 (idempotent).
 //
-//   부서 2 (Engineering, Marketing)
-//   사용자 4 — alice/bob (Eng/fulltime), carol (Mkt/fulltime), dave (Mkt/contract)
-//   페이지 3 — Engineering Roadmap (internal/Eng), Q4 Marketing Plan (confidential/Mkt), Public Onboarding Guide (public)
+//	부서 2 (Engineering, Marketing)
+//	사용자 4 — alice/bob (Eng/fulltime), carol (Mkt/fulltime), dave (Mkt/contract)
+//	페이지 3 — Engineering Roadmap (internal/Eng), Q4 Marketing Plan (confidential/Mkt), Public Onboarding Guide (public)
 //
 // 4 사용자 × 3 페이지 = 12 케이스로 4개 ABAC 정책(owner/public/internal/confidential)이 모두 시연된다.
 func Seed(db *gorm.DB) error {
