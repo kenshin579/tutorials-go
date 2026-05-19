@@ -14,25 +14,21 @@ import (
 
 	"github.com/labstack/echo"
 
-	"github.com/spf13/viper"
-
 	"go.uber.org/fx"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func registerHooks(lifecycle fx.Lifecycle, e *echo.Echo, v *viper.Viper) {
+func registerHooks(lifecycle fx.Lifecycle, e *echo.Echo, cfg *config.Config) {
 	lifecycle.Append(
 		fx.Hook{
 			OnStart: func(context.Context) error {
 				fmt.Println("Starting server")
-				go e.Start(v.GetString("server.address"))
+				go e.Start(cfg.Server.Address)
 				return nil
 			},
 			OnStop: func(context.Context) error {
 				fmt.Println("Stopping server")
-				// logger.Print("Stopping admin server.")
-				// return logger.Sync()
 				return nil
 			},
 		},
@@ -46,12 +42,10 @@ func NewEcho() *echo.Echo {
 	return e
 }
 
-func ProvideBasicConfig() time.Duration {
-	duration := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	return duration
+func ProvideBasicConfig(cfg *config.Config) time.Duration {
+	return time.Duration(cfg.Context.Timeout) * time.Second
 }
 
-// todo: 구동이후에 api 호출 주소가 등록이 안된 것 같음
 func main() {
 	app := fx.New(
 		fx.Provide(
@@ -77,19 +71,4 @@ func main() {
 	}
 
 	<-app.Done()
-
-	// 아래 버전은 잘 됨
-	// v := config.New()
-	// db, _ := database.New(v)
-	//
-	// e := NewEcho()
-	//
-	// authorRepo := author.NewMysqlAuthorRepository(db)
-	// ar := article.NewMysqlArticleRepository(db)
-	//
-	// timeoutContext := time.Duration(v.GetInt("context.timeout")) * time.Second
-	// au := article.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	// article.NewArticleHandler(e, au)
-	//
-	// e.Start(v.GetString("server.address"))
 }
