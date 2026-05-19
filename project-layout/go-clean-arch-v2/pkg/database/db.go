@@ -5,22 +5,17 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/spf13/viper"
+	"github.com/kenshin579/tutorials-go/project-layout/go-clean-arch-v2/pkg/config"
 )
 
-func New(v *viper.Viper) (*sql.DB, error) {
+func New(cfg *config.Config) (*sql.DB, error) {
 	fmt.Println("db config")
-	dbHost := v.GetString(`database.host`)
-	dbPort := v.GetString(`database.port`)
-	dbUser := v.GetString(`database.user`)
-	dbPass := v.GetString(`database.pass`)
-	dbName := v.GetString(`database.name`)
-	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	d := cfg.Database
+	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", d.User, d.Pass, d.Host, d.Port, d.Name)
 	val := url.Values{}
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Seoul")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 
-	return sql.Open(`mysql`, dsn)
-
+	return sql.Open("mysql", dsn)
 }

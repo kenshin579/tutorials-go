@@ -1,26 +1,42 @@
 package config
 
 import (
-	"log"
+	"os"
 
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
-const (
-	ConfigPath = "project-layout/go-clean-arch/config.json"
-)
+type Config struct {
+	Debug    bool     `yaml:"debug"`
+	Server   Server   `yaml:"server"`
+	Context  Context  `yaml:"context"`
+	Database Database `yaml:"database"`
+}
 
-func New() *viper.Viper {
-	v := viper.New()
-	v.SetConfigFile(ConfigPath)
-	err := v.ReadInConfig()
+type Server struct {
+	Address string `yaml:"address"`
+}
+
+type Context struct {
+	Timeout int `yaml:"timeout"` // seconds
+}
+
+type Database struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+	User string `yaml:"user"`
+	Pass string `yaml:"pass"`
+	Name string `yaml:"name"`
+}
+
+func New() (*Config, error) {
+	data, err := os.ReadFile("config.yaml")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-
-	if v.GetBool(`debug`) {
-		log.Println("Service RUN on DEBUG mode")
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, err
 	}
-
-	return v
+	return &cfg, nil
 }
