@@ -105,7 +105,7 @@ func createSampleMembers(max int, data []byte) []*redis.Z {
 func readJsonFile() []byte {
 	b, err := ioutil.ReadFile(filepath.Join("./sample.json"))
 	if err != nil {
-		fmt.Errorf("err:%v", err)
+		panic(fmt.Errorf("err:%v", err))
 	}
 	return b
 }

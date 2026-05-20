@@ -14,13 +14,13 @@ func NewInMemoryMongoDB() *mongo.Database {
 	option := getOption()
 	mongoServer, err := memongo.StartWithOptions(option)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err)
 	}
 
 	clientOpts := options.Client().ApplyURI(mongoServer.URI())
 	client, err := mongo.Connect(context.Background(), clientOpts)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err)
 	}
 
 	return client.Database(memongo.RandomDatabase())

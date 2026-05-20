@@ -27,5 +27,4 @@ func MyFunc() (resp Response, err error) {
 		}
 	}()
 	panic("test")
-	return Response{Message: "Success"}, nil
 }

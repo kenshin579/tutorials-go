@@ -20,7 +20,7 @@ func main() {
 	//Create consumer
 	consumer, err := sarama.NewConsumer(strings.Split(*brokers, ","), nil)
 	if err != nil {
-		fmt.Println("Failed to start consumer: %s", err)
+		fmt.Printf("Failed to start consumer: %s\n", err)
 		return
 	}
 	//Set partition

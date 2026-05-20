@@ -52,8 +52,6 @@ func NewAnimal(animalType AnimalType, name string) Animal {
 		return NewDog(name)
 	} else if animalType == CatType {
 		return NewCat(name)
-	} else {
-		fmt.Errorf("unknown type: %s", animalType)
 	}
 	return nil
 }

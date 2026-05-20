@@ -23,7 +23,7 @@ func TestChromedpTestSuite(t *testing.T) {
 }
 
 func (suite *chromedpTestSuite) SetupSuite() {
-	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, timeoutCancel := context.WithTimeout(context.Background(), 15*time.Second)
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("headless", true),
@@ -34,8 +34,18 @@ func (suite *chromedpTestSuite) SetupSuite() {
 	)
 
 	// Create a Chrome instance
-	suite.ctx, suite.cancel = chromedp.NewExecAllocator(ctx, opts...)
+	allocCtx, allocCancel := chromedp.NewExecAllocator(ctx, opts...)
+	suite.ctx = allocCtx
+	suite.cancel = func() {
+		allocCancel()
+		timeoutCancel()
+	}
+}
 
+func (suite *chromedpTestSuite) TearDownSuite() {
+	if suite.cancel != nil {
+		suite.cancel()
+	}
 }
 
 func (suite *chromedpTestSuite) Test_Chromedp() {

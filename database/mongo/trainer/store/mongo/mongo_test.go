@@ -74,7 +74,7 @@ func TestInsert_FindOne(t *testing.T) {
 	err := store.Insert(ctx, trainerList[0])
 	assert.NoError(t, err)
 
-	result, err := store.FindOne(ctx, bson.D{{"name", "Ash"}})
+	result, err := store.FindOne(ctx, bson.D{{Key: "name", Value: "Ash"}})
 	assert.NoError(t, err)
 	assert.Equal(t, "Ash", result.Name)
 
@@ -97,19 +97,19 @@ func TestUpdate(t *testing.T) {
 	err := store.Insert(ctx, trainerList[0])
 	assert.NoError(t, err)
 
-	result, _ := store.FindOne(ctx, bson.D{{"name", "Ash"}})
+	result, _ := store.FindOne(ctx, bson.D{{Key: "name", Value: "Ash"}})
 	assert.Equal(t, 10, result.Age)
 
 	err = store.Update(ctx,
-		bson.D{{"name", "Ash"}},
+		bson.D{{Key: "name", Value: "Ash"}},
 		bson.D{
-			{"$inc", bson.D{
-				{"age", 1},
+			{Key: "$inc", Value: bson.D{
+				{Key: "age", Value: 1},
 			}},
 		})
 	assert.NoError(t, err)
 
-	result, err = store.FindOne(ctx, bson.D{{"name", "Ash"}})
+	result, err = store.FindOne(ctx, bson.D{{Key: "name", Value: "Ash"}})
 	assert.NoError(t, err)
 	assert.Equal(t, 11, result.Age)
 }
@@ -118,7 +118,7 @@ func TestDeleteMany(t *testing.T) {
 	err := store.InsertMany(ctx, trainerList)
 	assert.NoError(t, err)
 
-	err = store.Delete(ctx, bson.D{{"name", "Ash"}})
+	err = store.Delete(ctx, bson.D{{Key: "name", Value: "Ash"}})
 	assert.NoError(t, err)
 	findOptions := options.Find()
 	// findOptions.SetLimit(2) //최대 검색 객수 2개로 제한함
