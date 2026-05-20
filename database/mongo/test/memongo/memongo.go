@@ -11,8 +11,7 @@ import (
 
 func NewMemongoDB() (*mongo.Database, error) {
 	opts := &memongo.Options{
-		MongoVersion:     "4.2.1",
-		ShouldUseReplica: false,
+		MongoVersion: "4.2.1",
 	}
 
 	if runtime.GOARCH == "arm64" {

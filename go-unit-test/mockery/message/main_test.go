@@ -12,16 +12,15 @@ type smsServiceMock struct {
 }
 
 // Our mocked smsService method
-func (m *smsServiceMock) SendChargeNotification(value int) bool {
+func (m *smsServiceMock) SendChargeNotification(value int) error {
 	fmt.Println("Mocked charge notification function")
 	fmt.Printf("Value passed in: %d\n", value)
 	// this records that the method was called and passes in the value
 	// it was called with
 	args := m.Called(value)
 	// it then returns whatever we tell it to return
-	// in this case true to simulate an SMS Service Notification
-	// sent out
-	return args.Bool(0)
+	// in this case nil to simulate a successfully sent SMS Service Notification
+	return args.Error(0)
 }
 
 // we need to satisfy our MessageService interface
@@ -39,7 +38,7 @@ func TestChargeCustomer(t *testing.T) {
 	// we then define what should be returned from SendChargeNotification
 	// when we pass in the value 100 to it. In this case, we want to return
 	// true as it was successful in sending a notification
-	smsService.On("SendChargeNotification", 100).Return(true)
+	smsService.On("SendChargeNotification", 100).Return(nil)
 
 	// next we want to define the service we wish to test
 	myService := MyService{smsService}

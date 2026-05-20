@@ -1,6 +1,7 @@
 package sort
 
 import (
+	"cmp"
 	"fmt"
 	"sort"
 	"strings"
@@ -68,8 +69,8 @@ func Example_slicesSortFunc() {
 		{"Bob", 25},
 	}
 
-	slices.SortFunc(employees, func(x, y model.Employee) bool {
-		return x.Age < y.Age
+	slices.SortFunc(employees, func(x, y model.Employee) int {
+		return cmp.Compare(x.Age, y.Age)
 	})
 	fmt.Println(employees)
 
