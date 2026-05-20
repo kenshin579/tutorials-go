@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/rivo/tview"
@@ -16,7 +15,7 @@ var (
 
 func currentTimeString() string {
 	t := time.Now()
-	return fmt.Sprintf(t.Format("Current time is 15:04:05"))
+	return t.Format("Current time is 15:04:05")
 }
 
 func updateTime() {

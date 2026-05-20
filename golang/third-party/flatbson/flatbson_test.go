@@ -44,7 +44,7 @@ func Test_Mongo_Update로_업데이트하는_경우_해당데이터_전체가_re
 	setup(ctx, collection)
 	defer teardown(ctx, collection)
 
-	filter := bson.D{{"_id", "user-01"}}
+	filter := bson.D{{Key: "_id", Value: "user-01"}}
 
 	user := model.User{
 		Address: model.Address{
@@ -52,7 +52,7 @@ func Test_Mongo_Update로_업데이트하는_경우_해당데이터_전체가_re
 		},
 	}
 	update := bson.D{
-		{"$set", user}}
+		{Key: "$set", Value: user}}
 
 	//Address 데이터 전테가 다 replace 되어버린다
 	updateResult, err := collection.UpdateOne(ctx, filter, update)
@@ -64,7 +64,7 @@ func Test_Mongo_Update로_업데이트하는_경우_해당데이터_전체가_re
 	assert.Equal(t, 1, int(updateResult.ModifiedCount))
 
 	findUser := model.User{}
-	collection.FindOne(ctx, bson.D{{"_id", "user-01"}}).Decode(&findUser)
+	collection.FindOne(ctx, bson.D{{Key: "_id", Value: "user-01"}}).Decode(&findUser)
 	assert.Empty(t, findUser.Address.City)
 
 }
@@ -108,7 +108,7 @@ func Test_Mongo_Update_With_FlatBson_Partially_업데이트가_된다(t *testing
 	setup(ctx, collection)
 	defer teardown(ctx, collection)
 
-	filter := bson.D{{"_id", "user-01"}}
+	filter := bson.D{{Key: "_id", Value: "user-01"}}
 
 	user := model.User{
 		Address: model.Address{
@@ -117,7 +117,7 @@ func Test_Mongo_Update_With_FlatBson_Partially_업데이트가_된다(t *testing
 	}
 	flatten, _ := flatbson.Flatten(user)
 	update := bson.D{
-		{"$set", flatten}}
+		{Key: "$set", Value: flatten}}
 
 	//Address 데이터 전테가 다 replace 되어버린다
 	updateResult, err := collection.UpdateOne(ctx, filter, update)
@@ -129,7 +129,7 @@ func Test_Mongo_Update_With_FlatBson_Partially_업데이트가_된다(t *testing
 	assert.Equal(t, 1, int(updateResult.ModifiedCount))
 
 	findUser := model.User{}
-	collection.FindOne(ctx, bson.D{{"_id", "user-01"}}).Decode(&findUser)
+	collection.FindOne(ctx, bson.D{{Key: "_id", Value: "user-01"}}).Decode(&findUser)
 	assert.Equal(t, "seoul", findUser.Address.City)
 }
 

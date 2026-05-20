@@ -54,9 +54,9 @@ func (suite *accountTestSuite) TestAccountMutex() {
 	suite.Equal(10000, a.GetBalance("angela"))
 }
 
-func (suite *accountTestSuite) updateBalanceMutix() AccountMutex {
+func (suite *accountTestSuite) updateBalanceMutix() *AccountMutex {
 	defer util.Timer()("updateBalanceMutix")
-	a := AccountMutex{
+	a := &AccountMutex{
 		customerBalance: map[string]int{"frank": 0, "angela": 0},
 	}
 

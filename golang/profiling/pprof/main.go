@@ -27,14 +27,14 @@ func main() {
 	fmt.Println("hello world")
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go leakyFunction(wg)
+	go leakyFunction(&wg)
 	wg.Wait()
 }
 
 // leakyFunction은 슬라이스에 문자열을 계속 추가하여 메모리 누수를 시뮬레이션한다.
 // append()가 반복될 때마다 슬라이스의 내부 배열이 재할당되면서 메모리 사용량이 지속적으로 증가한다.
 // pprof heap 프로파일에서 이 함수의 메모리 할당을 확인할 수 있다.
-func leakyFunction(wg sync.WaitGroup) {
+func leakyFunction(wg *sync.WaitGroup) {
 	defer wg.Done()
 	s := make([]string, 3)
 	for i := 0; i < 10000000; i++ {

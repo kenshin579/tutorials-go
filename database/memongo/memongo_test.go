@@ -30,11 +30,11 @@ func (suite *MongoTestSuite) SetupSuite() {
 	suite.ctx = context.TODO()
 
 	docs := []interface{}{
-		bson.D{{"type", "Masala"}, {"rating", 10}, {"vendor", bson.A{"A", "C"}}},
-		bson.D{{"type", "English Breakfast"}, {"rating", 6}},
-		bson.D{{"type", "Oolong"}, {"rating", 7}, {"vendor", bson.A{"C"}}},
-		bson.D{{"type", "Assam"}, {"rating", 5}},
-		bson.D{{"type", "Earl Grey"}, {"rating", 8}, {"vendor", bson.A{"A", "B"}}},
+		bson.D{{Key: "type", Value: "Masala"}, {Key: "rating", Value: 10}, {Key: "vendor", Value: bson.A{"A", "C"}}},
+		bson.D{{Key: "type", Value: "English Breakfast"}, {Key: "rating", Value: 6}},
+		bson.D{{Key: "type", Value: "Oolong"}, {Key: "rating", Value: 7}, {Key: "vendor", Value: bson.A{"C"}}},
+		bson.D{{Key: "type", Value: "Assam"}, {Key: "rating", Value: 5}},
+		bson.D{{Key: "type", Value: "Earl Grey"}, {Key: "rating", Value: 8}, {Key: "vendor", Value: bson.A{"A", "B"}}},
 	}
 	_, err := suite.rating.InsertMany(suite.ctx, docs)
 	require.NoError(suite.T(), err)
@@ -51,7 +51,7 @@ func (suite *MongoTestSuite) TearDownSuite() {
 func (suite *MongoTestSuite) TestQuery() {
 	ctx := suite.ctx
 
-	filter := bson.D{{"type", "Oolong"}}
+	filter := bson.D{{Key: "type", Value: "Oolong"}}
 	cursor, err := suite.rating.Find(ctx, filter)
 
 	var results []bson.D
