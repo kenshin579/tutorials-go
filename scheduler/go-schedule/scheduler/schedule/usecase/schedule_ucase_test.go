@@ -6,11 +6,11 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/config"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/cronner"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/config"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/cronner"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/schedule/store/local"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/schedule/store/local"
 )
 
 var (

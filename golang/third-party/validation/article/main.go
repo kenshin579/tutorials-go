@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/kenshin579/tutorials-go/go-validation/article/handler"
-	"github.com/kenshin579/tutorials-go/go-validation/article/router"
-	"github.com/kenshin579/tutorials-go/go-validation/article/store"
-	"github.com/kenshin579/tutorials-go/go-validation/article/usecase"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/handler"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/router"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/store"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/usecase"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/kenshin579/tutorials-go/third-party/go-echo-web-framework/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/echo-web-framework/article/model"
 	"github.com/labstack/gommon/log"
 )
 

@@ -3,9 +3,9 @@ package local
 import (
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/cronner"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain/job"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/cronner"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain/job"
 	"github.com/stretchr/testify/assert"
 )
 

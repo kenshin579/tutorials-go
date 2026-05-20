@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
+	domain "github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 

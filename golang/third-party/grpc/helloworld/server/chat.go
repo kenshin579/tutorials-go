@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/kenshin579/tutorials-go/go-grpc/helloworld/chat"
+	"github.com/kenshin579/tutorials-go/golang/third-party/grpc/helloworld/chat"
 	"golang.org/x/net/context"
 )
 

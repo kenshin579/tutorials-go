@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/model"
 )
 
 func TestValidatePostStatus(t *testing.T) {

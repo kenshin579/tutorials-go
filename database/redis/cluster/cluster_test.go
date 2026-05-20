@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-redis/model"
+	"github.com/kenshin579/tutorials-go/database/redis/model"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-redis/cluster/config"
+	"github.com/kenshin579/tutorials-go/database/redis/cluster/config"
 
 	"github.com/go-redis/redis/v8"
 )

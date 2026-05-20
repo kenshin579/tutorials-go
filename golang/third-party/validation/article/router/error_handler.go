@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/exception"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/exception"
 
 	"github.com/go-playground/validator/v10"
 

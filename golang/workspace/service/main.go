@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/kenshin579/tutorials-go/go-workspace/adder"
+	"github.com/kenshin579/tutorials-go/golang/workspace/adder"
 )
 
 func main() {

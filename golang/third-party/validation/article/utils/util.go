@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/model"
 )
 
 func Index(list interface{}, t interface{}) int {

@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/third-party/go-echo-web-framework/article/model"
-	"github.com/kenshin579/tutorials-go/third-party/go-echo-web-framework/article/utils"
+	"github.com/kenshin579/tutorials-go/golang/third-party/echo-web-framework/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/echo-web-framework/article/utils"
 	"github.com/labstack/echo"
 )
 

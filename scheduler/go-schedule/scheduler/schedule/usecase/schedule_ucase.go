@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/config"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/config"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain"
 	"github.com/labstack/gommon/log"
 )
 

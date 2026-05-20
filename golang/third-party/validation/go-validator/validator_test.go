@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/third-party/go-validation/go-validator/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/go-validator/model"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/go-playground/locales/en"

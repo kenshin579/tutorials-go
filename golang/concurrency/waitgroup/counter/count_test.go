@@ -13,7 +13,7 @@ import (
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"github.com/kenshin579/tutorials-go/common/util"
-	"github.com/kenshin579/tutorials-go/test/testcontainers"
+	testcontainers "github.com/kenshin579/tutorials-go/go-unit-test/testcontainers"
 	lock "github.com/square/mongo-lock"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/mongo"

@@ -5,9 +5,9 @@ import (
 
 	"github.com/labstack/gommon/log"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/errors"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/errors"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain"
 	"github.com/labstack/echo"
 )
 

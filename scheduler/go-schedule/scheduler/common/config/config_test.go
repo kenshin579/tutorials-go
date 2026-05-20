@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/config"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/config"
 )
 
 func init() {

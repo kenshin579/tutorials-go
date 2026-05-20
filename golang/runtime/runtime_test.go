@@ -19,7 +19,7 @@ func bar() string {
 func Test_실행중인_함수이름_가져오기(t *testing.T) {
 	result := bar()
 	assert.Equal(t,
-		"github.com/kenshin579/tutorials-go/go-runtime.Test_실행중인_함수이름_가져오기",
+		"github.com/kenshin579/tutorials-go/golang/runtime.Test_실행중인_함수이름_가져오기",
 		result)
 }
 

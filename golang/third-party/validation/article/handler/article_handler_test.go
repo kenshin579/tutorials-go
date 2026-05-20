@@ -9,17 +9,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/exception"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/exception"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/store"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/store"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/router"
-	"github.com/kenshin579/tutorials-go/go-validation/article/usecase"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/router"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/usecase"
 
-	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/model"
 	"github.com/labstack/echo"
 )
 

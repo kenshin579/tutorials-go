@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/kenshin579/tutorials-go/go-yaml/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/yaml/model"
 
 	"gopkg.in/yaml.v3"
 )
