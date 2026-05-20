@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"github.com/kenshin579/tutorials-go/asynq/tasks"
+	"github.com/kenshin579/tutorials-go/scheduler/asynq/tasks"
 )
 
 const (
