@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-redis/redis/v9"
 	"github.com/hibiken/asynq"
-	"github.com/kenshin579/tutorials-go/asynq/tasks"
+	"github.com/kenshin579/tutorials-go/scheduler/asynq/tasks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -115,7 +115,8 @@ func Test_Periodic_Task_Manager(t *testing.T) {
 			schedulerInfoMap[i] = schedulerInfo{scheduler: scheduler, manager: manager}
 
 			if err := manager.Start(); err != nil {
-				t.Fatalf("Failed to start PeriodicTaskManager: %v", err)
+				t.Errorf("Failed to start PeriodicTaskManager: %v", err)
+				return
 			}
 
 			log.Printf("%d.running task manager", i)
