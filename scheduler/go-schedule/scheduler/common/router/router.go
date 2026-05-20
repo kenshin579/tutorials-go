@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/errors"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/errors"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )

@@ -2,8 +2,8 @@ package store
 
 import (
 	"github.com/google/uuid"
-	"github.com/kenshin579/tutorials-go/go-validation/article/exception"
-	"github.com/kenshin579/tutorials-go/go-validation/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/exception"
+	"github.com/kenshin579/tutorials-go/golang/third-party/validation/article/model"
 )
 
 type ArticleStore struct {

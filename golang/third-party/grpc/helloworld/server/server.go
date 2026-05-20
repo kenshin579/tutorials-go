@@ -6,7 +6,7 @@ import (
 	"net"
 
 	_ "github.com/jnewmano/grpc-json-proxy/codec"
-	"github.com/kenshin579/tutorials-go/go-grpc/helloworld/chat"
+	"github.com/kenshin579/tutorials-go/golang/third-party/grpc/helloworld/chat"
 	"google.golang.org/grpc"
 )
 

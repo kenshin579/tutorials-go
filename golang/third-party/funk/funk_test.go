@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-funk/domain"
+	"github.com/kenshin579/tutorials-go/golang/third-party/funk/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/thoas/go-funk"
 )

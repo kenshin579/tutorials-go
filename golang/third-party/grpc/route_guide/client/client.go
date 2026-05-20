@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"time"
 
-	pb "github.com/kenshin579/tutorials-go/go-grpc/route_guide/routeguide"
+	pb "github.com/kenshin579/tutorials-go/golang/third-party/grpc/route_guide/routeguide"
 	"google.golang.org/grpc"
 )
 

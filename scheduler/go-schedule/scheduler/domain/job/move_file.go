@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/utils"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/utils"
 
 	"github.com/labstack/gommon/log"
 )

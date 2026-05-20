@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/go-redis/blackboard/domain"
+	"github.com/kenshin579/tutorials-go/database/redis/blackboard/domain"
 	"github.com/labstack/echo"
 )
 

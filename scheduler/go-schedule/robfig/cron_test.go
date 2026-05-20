@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/job"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/job"
 	"github.com/robfig/cron/v3"
 )
 

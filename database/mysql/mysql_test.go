@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	db "github.com/kenshin579/tutorials-go/go-mysql/common/database"
-	"github.com/kenshin579/tutorials-go/go-mysql/config"
-	"github.com/kenshin579/tutorials-go/go-mysql/model"
+	db "github.com/kenshin579/tutorials-go/database/mysql/common/database"
+	"github.com/kenshin579/tutorials-go/database/mysql/config"
+	"github.com/kenshin579/tutorials-go/database/mysql/model"
 	"gorm.io/gorm"
 )
 

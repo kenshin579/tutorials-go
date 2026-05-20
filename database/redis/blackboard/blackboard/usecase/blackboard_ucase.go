@@ -1,6 +1,6 @@
 package usecase
 
-import "github.com/kenshin579/tutorials-go/go-redis/blackboard/domain"
+import "github.com/kenshin579/tutorials-go/database/redis/blackboard/domain"
 
 type blackBoardUsecase struct {
 	blackBoardStore domain.BlackBoardStore

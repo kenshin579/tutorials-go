@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kenshin579/tutorials-go/go-data-structure/sort/model"
+	"github.com/kenshin579/tutorials-go/golang/data-structure/sort/model"
 	"golang.org/x/exp/slices"
 )
 

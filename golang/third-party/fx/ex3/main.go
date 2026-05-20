@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/kenshin579/tutorials-go/go-fx/ex3/internal/handler"
-	"github.com/kenshin579/tutorials-go/go-fx/ex3/internal/loggerfx"
-	"github.com/kenshin579/tutorials-go/go-fx/ex3/internal/routes"
+	"github.com/kenshin579/tutorials-go/golang/third-party/fx/ex3/internal/handler"
+	"github.com/kenshin579/tutorials-go/golang/third-party/fx/ex3/internal/loggerfx"
+	"github.com/kenshin579/tutorials-go/golang/third-party/fx/ex3/internal/routes"
 	"go.uber.org/fx"
 )
 

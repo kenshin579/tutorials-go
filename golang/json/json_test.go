@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-json/model"
+	"github.com/kenshin579/tutorials-go/golang/json/model"
 
 	"github.com/stretchr/testify/assert"
 )

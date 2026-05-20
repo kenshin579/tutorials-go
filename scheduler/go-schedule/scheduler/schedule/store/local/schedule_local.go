@@ -8,10 +8,10 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/cronner"
-	scheduleError "github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/errors"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/domain/job"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/cronner"
+	scheduleError "github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/errors"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/domain/job"
 	"github.com/labstack/gommon/log"
 )
 

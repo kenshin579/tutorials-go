@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-errors/custom/model"
+	"github.com/kenshin579/tutorials-go/golang/errors/custom/model"
 )
 
 func ExampleCreating_Error_New() {

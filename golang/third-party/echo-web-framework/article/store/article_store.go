@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/kenshin579/tutorials-go/go-echo-web-framework/article/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/echo-web-framework/article/model"
 )
 
 var (

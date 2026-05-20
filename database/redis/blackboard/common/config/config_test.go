@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-redis/blackboard/common/config"
+	"github.com/kenshin579/tutorials-go/database/redis/blackboard/common/config"
 	"github.com/stretchr/testify/assert"
 )
 

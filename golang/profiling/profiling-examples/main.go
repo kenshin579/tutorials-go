@@ -10,11 +10,11 @@ import (
 	"syscall"
 
 	"github.com/google/gops/agent"
-	"github.com/kenshin579/tutorials-go/go-profiling/profiling-examples/pkg/block"
-	"github.com/kenshin579/tutorials-go/go-profiling/profiling-examples/pkg/cpu"
-	"github.com/kenshin579/tutorials-go/go-profiling/profiling-examples/pkg/memory"
-	"github.com/kenshin579/tutorials-go/go-profiling/profiling-examples/pkg/mutex"
-	"github.com/kenshin579/tutorials-go/go-profiling/profiling-examples/pkg/threadcreate"
+	"github.com/kenshin579/tutorials-go/golang/profiling/profiling-examples/pkg/block"
+	"github.com/kenshin579/tutorials-go/golang/profiling/profiling-examples/pkg/cpu"
+	"github.com/kenshin579/tutorials-go/golang/profiling/profiling-examples/pkg/memory"
+	"github.com/kenshin579/tutorials-go/golang/profiling/profiling-examples/pkg/mutex"
+	"github.com/kenshin579/tutorials-go/golang/profiling/profiling-examples/pkg/threadcreate"
 )
 
 // 종합 프로파일링 예제 - CPU, 메모리, 블로킹, 뮤텍스, 스레드 생성 프로파일을 동시에 수집할 수 있다.

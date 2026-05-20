@@ -3,15 +3,15 @@ package main
 import (
 	"log"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/cronner"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/cronner"
 
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/cmd/cli"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/config"
-	"github.com/kenshin579/tutorials-go/go-schedule/scheduler/common/router"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/cmd/cli"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/config"
+	"github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/common/router"
 
-	_scheduleHandler "github.com/kenshin579/tutorials-go/go-schedule/scheduler/schedule/route/http"
-	_scheduleStore "github.com/kenshin579/tutorials-go/go-schedule/scheduler/schedule/store/local"
-	_scheduleUsecase "github.com/kenshin579/tutorials-go/go-schedule/scheduler/schedule/usecase"
+	_scheduleHandler "github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/schedule/route/http"
+	_scheduleStore "github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/schedule/store/local"
+	_scheduleUsecase "github.com/kenshin579/tutorials-go/scheduler/go-schedule/scheduler/schedule/usecase"
 )
 
 func main() {

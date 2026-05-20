@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/adapter/mongodb"
+	"github.com/kenshin579/tutorials-go/database/mongo/adapter/mongodb"
 
 	"github.com/chidiwilliams/flatbson"
 
@@ -18,9 +18,9 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/kenshin579/tutorials-go/go-flatbson/model"
+	"github.com/kenshin579/tutorials-go/golang/third-party/flatbson/model"
 
-	"github.com/kenshin579/tutorials-go/go-mongo/config"
+	"github.com/kenshin579/tutorials-go/database/mongo/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )

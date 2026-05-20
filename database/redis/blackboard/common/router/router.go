@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/kenshin579/tutorials-go/go-redis/blackboard/common/errors"
+	"github.com/kenshin579/tutorials-go/database/redis/blackboard/common/errors"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )

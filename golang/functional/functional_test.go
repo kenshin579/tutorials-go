@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kenshin579/tutorials-go/go-functional/util"
+	"github.com/kenshin579/tutorials-go/golang/functional/util"
 )
 
 func setup() []string {

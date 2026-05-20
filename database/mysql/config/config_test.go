@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kenshin579/tutorials-go/go-mysql/config"
+	"github.com/kenshin579/tutorials-go/database/mysql/config"
 	"github.com/stretchr/testify/assert"
 )
 

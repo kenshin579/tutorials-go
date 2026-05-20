@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kenshin579/tutorials-go/go-data-structure/slices/model"
+	"github.com/kenshin579/tutorials-go/golang/data-structure/slices/model"
 )
 
 func Test_Delete_Item_Index_From_Slice(t *testing.T) {
