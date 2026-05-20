@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+// Result는 에러 이름과 발생 횟수를 담는 결과 타입이다.
+type Result struct {
+	ErrorName          string
+	NumberOfOccurances int64
+}
+
 func Test_Separate_Channel_Both_Result_And_Error(t *testing.T) {
 	fmt.Println("Using separate channels for error and result")
 
