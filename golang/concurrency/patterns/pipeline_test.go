@@ -12,19 +12,19 @@ import (
 func generator(nums ...int) <-chan int {
 	out := make(chan int)
 	go func() {
-		defer close(out)
+		defer close(out) // 입력을 모두 보낸 후 자동 close → 다음 stage에 종료 신호 전파
 		for _, n := range nums {
 			out <- n
 		}
 	}()
-	return out
+	return out // 수신 전용 반환: 호출자가 실수로 송신하는 것 방지
 }
 
 // square - 값을 제곱하는 중간 스테이지
 func square(in <-chan int) <-chan int {
 	out := make(chan int)
 	go func() {
-		defer close(out)
+		defer close(out) // 입력 close → range 종료 → 본인도 close → 다음 stage로 전파
 		for n := range in {
 			out <- n * n
 		}
