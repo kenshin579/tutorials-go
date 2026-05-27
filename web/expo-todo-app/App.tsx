@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Todo = {
   id: string;
@@ -16,9 +17,34 @@ type Todo = {
   done: boolean;
 };
 
+const STORAGE_KEY = '@expo_todo_app/todos';
+
 export default function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [text, setText] = useState('');
+  const [loaded, setLoaded] = useState(false);
+
+  // 앱 시작 시 저장된 todo 불러오기
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) setTodos(JSON.parse(raw));
+      } catch (e) {
+        console.warn('todo 불러오기 실패', e);
+      } finally {
+        setLoaded(true);
+      }
+    })();
+  }, []);
+
+  // todos가 바뀔 때마다 저장 (최초 로드 완료 후)
+  useEffect(() => {
+    if (!loaded) return;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(todos)).catch((e) =>
+      console.warn('todo 저장 실패', e),
+    );
+  }, [todos, loaded]);
 
   const addTodo = () => {
     const trimmed = text.trim();
