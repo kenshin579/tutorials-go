@@ -51,6 +51,55 @@ npx expo start
 | `w` | 웹 브라우저에서 실행 | - |
 | QR 스캔 | 실기기에서 실행 | Expo Go 앱 |
 
+## iOS 시뮬레이터가 없다면?
+
+iOS 시뮬레이터는 **macOS + Xcode**가 있어야만 쓸 수 있습니다. Xcode가 없거나(또는 Windows/Linux 사용 중이거나) 설치가 번거롭다면, 시뮬레이터 없이도 충분히 실행할 수 있습니다.
+
+### 방법 1. 실기기 + Expo Go (가장 권장)
+
+시뮬레이터/에뮬레이터 없이 **내 폰에서 바로** 실행하는 가장 쉬운 방법입니다.
+
+1. 스마트폰에 [Expo Go](https://expo.dev/go) 앱 설치 (iOS 앱스토어 / Android 플레이스토어)
+2. `npx expo start` 실행
+3. 터미널에 표시된 QR 코드를 스캔
+   - **iOS**: 기본 카메라 앱으로 QR을 찍으면 Expo Go로 연결
+   - **Android**: Expo Go 앱 안의 스캐너로 QR 스캔
+4. 단, **PC와 스마트폰이 같은 Wi-Fi 네트워크**에 있어야 합니다. 회사망 등으로 연결이 안 되면 터널 모드로 우회하세요.
+
+```bash
+npx expo start --tunnel
+```
+
+### 방법 2. 웹 브라우저로 실행
+
+가장 빠르게 UI를 확인하는 방법입니다. 아무 것도 설치할 필요가 없습니다.
+
+```bash
+npx expo start --web
+# 또는 expo start 실행 후 터미널에서 w 키
+```
+
+이 Todo 앱은 웹에서도 동작하며, AsyncStorage가 웹에서는 브라우저 `localStorage`로 처리되어 **새로고침 후에도 목록이 유지**됩니다. 다만 웹은 React Native Web으로 렌더링되므로 실제 모바일과 미세한 차이가 있을 수 있습니다.
+
+### 방법 3. Android 에뮬레이터
+
+[Android Studio](https://developer.android.com/studio)가 설치되어 있다면, AVD(Android Virtual Device)를 만들고 `a` 키로 실행할 수 있습니다. iOS 시뮬레이터 없이 가상 기기에서 테스트하고 싶을 때 좋습니다.
+
+### 방법 4. iOS 시뮬레이터를 설치하고 싶다면 (macOS 한정)
+
+1. Mac 앱스토어에서 **Xcode** 설치
+2. Xcode를 한 번 실행해 라이선스 동의 및 추가 구성요소 설치
+3. **Xcode → Settings → Components**(버전에 따라 Platforms)에서 iOS 시뮬레이터 런타임 다운로드
+4. 커맨드라인 도구 경로 지정 (필요 시):
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```
+
+5. 이후 `npx expo start` → `i` 키로 시뮬레이터 실행
+
+> 정리: **빠르게 확인만 하려면 방법 2(웹)**, **실제 모바일 감각이 필요하면 방법 1(실기기 + Expo Go)**을 추천합니다. iOS 시뮬레이터 설치는 선택 사항입니다.
+
 ## npm 스크립트
 
 | 명령 | 설명 |
