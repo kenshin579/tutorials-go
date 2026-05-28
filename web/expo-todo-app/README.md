@@ -16,10 +16,10 @@ React Native 입문 + Expo 개발 흐름을 익히기 위한 실습용 코드입
 
 | 항목 | 버전 |
 |------|------|
-| Expo SDK | ~56.0 |
-| React | 19.2 |
-| React Native | 0.85 |
-| TypeScript | ~6.0 |
+| Expo SDK | ~54.0 |
+| React | 19.1 |
+| React Native | 0.81 |
+| TypeScript | ~5.9 |
 | @react-native-async-storage/async-storage | 2.2 |
 
 > 버전은 `package.json` 기준입니다. 새로 시작한다면 최신 SDK로 만들어도 코드는 거의 그대로 동작합니다.
