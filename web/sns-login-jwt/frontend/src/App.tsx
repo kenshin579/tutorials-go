@@ -26,7 +26,7 @@ function App() {
           }
         />
         <Route
-          path="/auth/callback"
+          path="/auth/jwt/callback"
           element={<OAuthCallback onLogin={login} />}
         />
         <Route

@@ -69,7 +69,8 @@ func main() {
 
 	auth := api.Group("/auth")
 	auth.GET("/:provider/url", authHandler.GetAuthURL)
-	auth.GET("/:provider/callback", authHandler.HandleCallback)
+	// 세션 버전은 Google이 백엔드로 직접 redirect하는 전용 콜백 (JWT 버전과 구분되도록 /session 경로 사용)
+	auth.GET("/session/callback", authHandler.HandleCallback)
 	auth.POST("/logout", authHandler.Logout)
 
 	user := api.Group("/user", customMiddleware.SessionAuth(sessionService))

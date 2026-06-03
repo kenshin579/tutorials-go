@@ -27,9 +27,9 @@ func (h *AuthHandler) GetAuthURL(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"url": url})
 }
 
-// GET /api/auth/:provider/callback — Google이 직접 redirect (redirect_uri = 백엔드)
+// GET /api/auth/session/callback — Google이 직접 redirect (redirect_uri = 백엔드)
 func (h *AuthHandler) HandleCallback(c echo.Context) error {
-	providerName := c.Param("provider")
+	const providerName = "google" // 세션 버전은 Google 전용 서버 redirect 콜백
 	code := c.QueryParam("code")
 	state := c.QueryParam("state")
 	if code == "" {
