@@ -14,85 +14,62 @@ import (
 )
 
 type AuthService struct {
-	providers    map[string]provider.OAuthProvider
-	userRepo     *repository.UserRepository
-	tokenService *TokenService
-	states       sync.Map // state 파라미터 저장 (CSRF 방지)
+	providers      map[string]provider.OAuthProvider
+	userRepo       *repository.UserRepository
+	sessionService *SessionService
+	states         sync.Map
 }
 
 func NewAuthService(
 	providers map[string]provider.OAuthProvider,
 	userRepo *repository.UserRepository,
-	tokenService *TokenService,
+	sessionService *SessionService,
 ) *AuthService {
 	return &AuthService{
-		providers:    providers,
-		userRepo:     userRepo,
-		tokenService: tokenService,
+		providers:      providers,
+		userRepo:       userRepo,
+		sessionService: sessionService,
 	}
 }
 
-// GetAuthURL은 OAuth 인증 URL과 state를 반환한다
 func (s *AuthService) GetAuthURL(providerName string) (string, error) {
 	p, ok := s.providers[providerName]
 	if !ok {
 		return "", errors.New("지원하지 않는 provider: " + providerName)
 	}
-
 	state := generateState()
 	s.states.Store(state, true)
-
 	return p.GetAuthURL(state), nil
 }
 
-// HandleCallback은 OAuth 콜백을 처리하고 JWT 토큰을 반환한다
-func (s *AuthService) HandleCallback(ctx context.Context, providerName, code, state string) (*TokenPair, *model.User, error) {
-	// state 검증 (CSRF 방지)
+// HandleCallback은 OAuth 콜백을 처리하고 세션을 생성, 세션 ID를 반환한다.
+func (s *AuthService) HandleCallback(ctx context.Context, providerName, code, state string) (*model.Session, *model.User, error) {
 	if _, ok := s.states.LoadAndDelete(state); !ok {
 		return nil, nil, errors.New("유효하지 않은 state")
 	}
-
 	p, ok := s.providers[providerName]
 	if !ok {
 		return nil, nil, errors.New("지원하지 않는 provider: " + providerName)
 	}
-
-	// Authorization Code → 사용자 정보 교환
 	userInfo, err := p.ExchangeCode(ctx, code)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	// 사용자 조회 또는 생성
 	user, err := s.findOrCreateUser(userInfo)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	// JWT 토큰 발급
-	tokens, err := s.tokenService.GenerateTokenPair(user.ID)
+	sess, err := s.sessionService.Create(user.ID)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	return tokens, user, nil
+	return sess, user, nil
 }
 
-// RefreshToken은 Refresh Token으로 새 토큰 쌍을 발급한다
-func (s *AuthService) RefreshToken(refreshToken string) (*TokenPair, error) {
-	claims, err := s.tokenService.ValidateToken(refreshToken)
-	if err != nil {
-		return nil, errors.New("유효하지 않은 refresh token")
-	}
-
-	if claims.TokenType != TokenTypeRefresh {
-		return nil, errors.New("refresh token이 아닙니다")
-	}
-
-	return s.tokenService.GenerateTokenPair(claims.UserID)
+func (s *AuthService) Logout(sessionID string) error {
+	return s.sessionService.Delete(sessionID)
 }
 
-// GetUser는 사용자 ID로 사용자를 조회한다
 func (s *AuthService) GetUser(userID uint) (*model.User, error) {
 	return s.userRepo.FindByID(userID)
 }
@@ -100,7 +77,6 @@ func (s *AuthService) GetUser(userID uint) (*model.User, error) {
 func (s *AuthService) findOrCreateUser(info *provider.UserInfo) (*model.User, error) {
 	user, err := s.userRepo.FindByProviderID(info.Provider, info.ProviderID)
 	if err == nil {
-		// 재로그인: 프로필 최신화 (A-3)
 		user.Name = info.Name
 		user.AvatarURL = info.AvatarURL
 		if err := s.userRepo.Update(user); err != nil {
@@ -108,11 +84,9 @@ func (s *AuthService) findOrCreateUser(info *provider.UserInfo) (*model.User, er
 		}
 		return user, nil
 	}
-
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
-
 	newUser := &model.User{
 		Email:      info.Email,
 		Name:       info.Name,
