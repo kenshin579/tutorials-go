@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/kenshin579/tutorials-go/web/sns-login-session/backend/config"
 	"github.com/kenshin579/tutorials-go/web/sns-login-session/backend/handler"
@@ -27,7 +28,7 @@ func main() {
 	}
 
 	// 테이블 자동 마이그레이션
-	if err := db.AutoMigrate(&model.User{}); err != nil {
+	if err := db.AutoMigrate(&model.User{}, &model.Session{}); err != nil {
 		log.Fatal("마이그레이션 실패:", err)
 	}
 
@@ -43,10 +44,11 @@ func main() {
 	}
 
 	userRepo := repository.NewUserRepository(db)
-	tokenService := service.NewTokenService(cfg.JWTSecret)
-	authService := service.NewAuthService(providers, userRepo, tokenService)
+	sessionRepo := repository.NewSessionRepository(db)
+	sessionService := service.NewSessionService(sessionRepo, 7*24*time.Hour) // 세션 7일
+	authService := service.NewAuthService(providers, userRepo, sessionService)
 
-	authHandler := handler.NewAuthHandler(authService)
+	authHandler := handler.NewAuthHandler(authService, cfg.FrontendURL)
 	userHandler := handler.NewUserHandler(authService)
 
 	// Echo 서버 설정
@@ -58,22 +60,19 @@ func main() {
 	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 		AllowOrigins:     []string{cfg.FrontendURL},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Authorization", "Content-Type"},
+		AllowHeaders:     []string{"Content-Type"},
 		AllowCredentials: true,
 	}))
 
 	// 라우트 등록
 	api := e.Group("/api")
 
-	// 인증 라우트 (공개)
 	auth := api.Group("/auth")
 	auth.GET("/:provider/url", authHandler.GetAuthURL)
 	auth.GET("/:provider/callback", authHandler.HandleCallback)
-	auth.POST("/refresh", authHandler.RefreshToken)
 	auth.POST("/logout", authHandler.Logout)
 
-	// 사용자 라우트 (인증 필요)
-	user := api.Group("/user", customMiddleware.JWTAuth(tokenService))
+	user := api.Group("/user", customMiddleware.SessionAuth(sessionService))
 	user.GET("/me", userHandler.GetMe)
 
 	// 헬스체크

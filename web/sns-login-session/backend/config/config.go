@@ -10,7 +10,6 @@ type Config struct {
 	GoogleClientID     string
 	GoogleClientSecret string
 	GoogleRedirectURL  string
-	JWTSecret          string
 	FrontendURL        string
 	ServerPort         string
 }
@@ -21,8 +20,7 @@ func Load() *Config {
 	return &Config{
 		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
-		GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:3000/auth/callback"),
-		JWTSecret:          getEnv("JWT_SECRET", "dev-only-change-me"),
+		GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:8080/api/auth/google/callback"),
 		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 		ServerPort:         getEnv("SERVER_PORT", "8080"),
 	}
