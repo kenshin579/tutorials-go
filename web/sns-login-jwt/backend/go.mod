@@ -1,4 +1,4 @@
-module github.com/kenshin579/tutorials-go/web/sns-login/backend
+module github.com/kenshin579/tutorials-go/web/sns-login-jwt/backend
 
 go 1.25
 

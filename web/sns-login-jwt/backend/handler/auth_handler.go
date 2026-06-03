@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/kenshin579/tutorials-go/web/sns-login/backend/service"
+	"github.com/kenshin579/tutorials-go/web/sns-login-jwt/backend/service"
 	"github.com/labstack/echo/v4"
 )
 

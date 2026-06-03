@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/kenshin579/tutorials-go/web/sns-login/backend/model"
+	"github.com/kenshin579/tutorials-go/web/sns-login-jwt/backend/model"
 	"gorm.io/gorm"
 )
 

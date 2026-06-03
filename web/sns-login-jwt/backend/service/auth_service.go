@@ -7,9 +7,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/kenshin579/tutorials-go/web/sns-login/backend/model"
-	"github.com/kenshin579/tutorials-go/web/sns-login/backend/provider"
-	"github.com/kenshin579/tutorials-go/web/sns-login/backend/repository"
+	"github.com/kenshin579/tutorials-go/web/sns-login-jwt/backend/model"
+	"github.com/kenshin579/tutorials-go/web/sns-login-jwt/backend/provider"
+	"github.com/kenshin579/tutorials-go/web/sns-login-jwt/backend/repository"
 	"gorm.io/gorm"
 )
 
