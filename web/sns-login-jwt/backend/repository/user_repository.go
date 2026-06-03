@@ -37,3 +37,8 @@ func (r *UserRepository) FindByID(id uint) (*model.User, error) {
 	}
 	return &user, nil
 }
+
+// Update는 사용자 정보를 저장한다
+func (r *UserRepository) Update(user *model.User) error {
+	return r.db.Save(user).Error
+}

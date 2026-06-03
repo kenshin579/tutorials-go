@@ -94,9 +94,14 @@ func (s *AuthService) GetUser(userID uint) (*model.User, error) {
 }
 
 func (s *AuthService) findOrCreateUser(info *provider.UserInfo) (*model.User, error) {
-	// 기존 사용자 조회
 	user, err := s.userRepo.FindByProviderID(info.Provider, info.ProviderID)
 	if err == nil {
+		// 재로그인: 프로필 최신화 (A-3)
+		user.Name = info.Name
+		user.AvatarURL = info.AvatarURL
+		if err := s.userRepo.Update(user); err != nil {
+			return nil, err
+		}
 		return user, nil
 	}
 
@@ -104,7 +109,6 @@ func (s *AuthService) findOrCreateUser(info *provider.UserInfo) (*model.User, er
 		return nil, err
 	}
 
-	// 새 사용자 생성
 	newUser := &model.User{
 		Email:      info.Email,
 		Name:       info.Name,
@@ -115,7 +119,6 @@ func (s *AuthService) findOrCreateUser(info *provider.UserInfo) (*model.User, er
 	if err := s.userRepo.Create(newUser); err != nil {
 		return nil, err
 	}
-
 	return newUser, nil
 }
 
