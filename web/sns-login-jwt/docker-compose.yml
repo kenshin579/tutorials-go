@@ -6,8 +6,8 @@ services:
     environment:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URL=http://localhost:8080/api/auth/google/callback
-      - JWT_SECRET=${JWT_SECRET:-my-secret-key}
+      - GOOGLE_REDIRECT_URL=http://localhost:3000/auth/callback
+      - JWT_SECRET=${JWT_SECRET:-dev-only-change-me}
       - FRONTEND_URL=http://localhost:3000
       - SERVER_PORT=8080
     volumes:
