@@ -10,6 +10,31 @@ import (
 	"gorm.io/gorm"
 )
 
+func TestRefreshToken_RejectsAccessToken(t *testing.T) {
+	ts := NewTokenService("test-secret")
+	s := &AuthService{tokenService: ts}
+
+	pair, err := ts.GenerateTokenPair(1)
+	if err != nil {
+		t.Fatalf("토큰 생성 실패: %v", err)
+	}
+
+	// access token으로 refresh 시도 → 반드시 에러 반환
+	_, err = s.RefreshToken(pair.AccessToken)
+	if err == nil {
+		t.Error("access token으로 RefreshToken 호출 시 에러가 발생해야 함")
+	}
+
+	// refresh token으로 refresh 시도 → 성공
+	newPair, err := s.RefreshToken(pair.RefreshToken)
+	if err != nil {
+		t.Errorf("refresh token으로 RefreshToken 호출 시 에러가 없어야 함: %v", err)
+	}
+	if newPair == nil {
+		t.Error("새 토큰 쌍이 nil이면 안 됨")
+	}
+}
+
 func newTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})

@@ -85,6 +85,10 @@ func (s *AuthService) RefreshToken(refreshToken string) (*TokenPair, error) {
 		return nil, errors.New("유효하지 않은 refresh token")
 	}
 
+	if claims.TokenType != TokenTypeRefresh {
+		return nil, errors.New("refresh token이 아닙니다")
+	}
+
 	return s.tokenService.GenerateTokenPair(claims.UserID)
 }
 
@@ -124,6 +128,6 @@ func (s *AuthService) findOrCreateUser(info *provider.UserInfo) (*model.User, er
 
 func generateState() string {
 	b := make([]byte, 16)
-	rand.Read(b)
+	_, _ = rand.Read(b)
 	return hex.EncodeToString(b)
 }

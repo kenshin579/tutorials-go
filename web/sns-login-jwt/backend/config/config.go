@@ -23,7 +23,7 @@ func Load() *Config {
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 		GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:3000/auth/callback"),
 		JWTSecret:          getEnv("JWT_SECRET", "dev-only-change-me"),
-		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:5173"),
+		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 		ServerPort:         getEnv("SERVER_PORT", "8080"),
 	}
 }
