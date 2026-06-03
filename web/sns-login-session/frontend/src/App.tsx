@@ -2,11 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { LoginButton } from './components/LoginButton';
 import { UserProfile } from './components/UserProfile';
-import { OAuthCallback } from './components/OAuthCallback';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
-  const { user, loading, isAuthenticated, login, logout } = useAuth();
+  const { user, loading, isAuthenticated, logout } = useAuth();
 
   if (loading) {
     return (
@@ -21,13 +20,7 @@ function App() {
       <Routes>
         <Route
           path="/login"
-          element={
-            isAuthenticated ? <Navigate to="/" replace /> : <LoginButton />
-          }
-        />
-        <Route
-          path="/auth/callback"
-          element={<OAuthCallback onLogin={login} />}
+          element={isAuthenticated ? <Navigate to="/" replace /> : <LoginButton />}
         />
         <Route
           path="/"
