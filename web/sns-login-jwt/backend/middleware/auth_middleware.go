@@ -28,7 +28,11 @@ func JWTAuth(tokenService *service.TokenService) echo.MiddlewareFunc {
 				return echo.NewHTTPError(http.StatusUnauthorized, "유효하지 않은 토큰")
 			}
 
-			// Context에 사용자 ID 저장
+			// access 토큰만 보호 API 접근 허용 (refresh 토큰 차단)
+			if claims.TokenType != service.TokenTypeAccess {
+				return echo.NewHTTPError(http.StatusUnauthorized, "access 토큰이 필요합니다")
+			}
+
 			c.Set("user_id", claims.UserID)
 			return next(c)
 		}
