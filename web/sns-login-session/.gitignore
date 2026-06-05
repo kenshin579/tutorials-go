@@ -1,0 +1,7 @@
+# 런타임 산출물
+backend/data/
+backend/bin/
+backend/.env
+frontend/dist/
+frontend/node_modules/
+frontend/.env

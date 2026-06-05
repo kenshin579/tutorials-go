@@ -4,8 +4,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      # WEB_SNS_LOGIN_* 가 있으면 우선, 없으면 GOOGLE_* 로 fallback (backend config 와 동일 우선순위)
+      - WEB_SNS_LOGIN_GOOGLE_CLIENT_ID=${WEB_SNS_LOGIN_GOOGLE_CLIENT_ID:-}
+      - WEB_SNS_LOGIN_GOOGLE_CLIENT_SECRET=${WEB_SNS_LOGIN_GOOGLE_CLIENT_SECRET:-}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
       - GOOGLE_REDIRECT_URL=http://localhost:8080/api/auth/session/callback
       - FRONTEND_URL=http://localhost:3000
       - SERVER_PORT=8080
