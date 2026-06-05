@@ -18,8 +18,8 @@ func Load() *Config {
 	godotenv.Load() // .env 파일이 없어도 무시
 
 	return &Config{
-		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
-		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
+		GoogleClientID:     getEnvAny([]string{"WEB_SNS_LOGIN_GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_ID"}, ""),
+		GoogleClientSecret: getEnvAny([]string{"WEB_SNS_LOGIN_GOOGLE_CLIENT_SECRET", "GOOGLE_CLIENT_SECRET"}, ""),
 		GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:8080/api/auth/session/callback"),
 		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 		ServerPort:         getEnv("SERVER_PORT", "8080"),
@@ -29,6 +29,16 @@ func Load() *Config {
 func getEnv(key, defaultVal string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
+	}
+	return defaultVal
+}
+
+// getEnvAny는 keys를 순서대로 조회하여 처음으로 값이 있는 환경 변수를 반환한다.
+func getEnvAny(keys []string, defaultVal string) string {
+	for _, key := range keys {
+		if val := os.Getenv(key); val != "" {
+			return val
+		}
 	}
 	return defaultVal
 }
