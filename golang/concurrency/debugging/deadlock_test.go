@@ -17,7 +17,8 @@ func TestDeadlockFixed(t *testing.T) {
 
 	wg.Add(2)
 
-	// goroutine 1: muA → muB 순서
+	// 핵심: 모든 goroutine이 동일한 순서(muA → muB)로 lock을 잡는다
+	// circular wait가 형성되지 않으므로 deadlock 자체가 불가능
 	go func() {
 		defer wg.Done()
 		muA.Lock()
@@ -28,7 +29,6 @@ func TestDeadlockFixed(t *testing.T) {
 		muA.Unlock()
 	}()
 
-	// goroutine 2: 같은 순서 muA → muB (deadlock 방지)
 	go func() {
 		defer wg.Done()
 		muA.Lock()
@@ -47,13 +47,13 @@ func TestDeadlockFixed(t *testing.T) {
 // 원래 코드: unbuffered channel에 같은 goroutine에서 send → 영원히 block
 // 수정: buffered channel 사용 또는 별도 goroutine에서 send
 func TestChannelDeadlockFixed(t *testing.T) {
-	// 방법 1: buffered channel 사용
+	// 방법 1: buffered channel - 버퍼에 즉시 저장되므로 receive 없이도 진행 가능
 	ch := make(chan int, 1)
-	ch <- 42 // buffer가 있으므로 block되지 않음
+	ch <- 42
 	val := <-ch
 	assert.Equal(t, 42, val)
 
-	// 방법 2: 별도 goroutine에서 send
+	// 방법 2: send와 receive를 서로 다른 goroutine으로 분리 → rendezvous 성립
 	ch2 := make(chan int) // unbuffered
 	go func() {
 		ch2 <- 100
@@ -66,7 +66,8 @@ func TestChannelDeadlockFixed(t *testing.T) {
 func TestTimeoutPreventDeadlock(t *testing.T) {
 	ch := make(chan int)
 
-	// 아무도 보내지 않는 channel에서 대기 → timeout으로 방지
+	// select + time.After: 두 channel 중 먼저 준비된 쪽이 실행됨
+	// sender가 없어도 timeout이 발동하여 무한 대기를 방지
 	select {
 	case val := <-ch:
 		t.Fatalf("예상하지 않은 값 수신: %d", val)
@@ -77,9 +78,10 @@ func TestTimeoutPreventDeadlock(t *testing.T) {
 
 // TestMutexTimeoutPattern - mutex에 timeout 적용하는 패턴
 func TestMutexTimeoutPattern(t *testing.T) {
-	mu := make(chan struct{}, 1) // channel을 mutex처럼 사용
+	// 버퍼 크기 1 channel을 mutex로 활용 → sync.Mutex와 달리 timeout 적용 가능
+	mu := make(chan struct{}, 1)
 
-	// lock 획득
+	// lock 획득 (버퍼에 값 넣기)
 	mu <- struct{}{}
 
 	// 다른 goroutine에서 lock 시도 (timeout 포함)
@@ -96,6 +98,6 @@ func TestMutexTimeoutPattern(t *testing.T) {
 	result := <-acquired
 	assert.False(t, result, "lock을 획득하지 못해야 함 (timeout)")
 
-	// lock 해제
+	// lock 해제 (버퍼에서 값 빼기)
 	<-mu
 }

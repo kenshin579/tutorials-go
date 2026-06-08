@@ -16,16 +16,16 @@ func TestVisibilityProblem(t *testing.T) {
 
 	go func() {
 		data = 42
-		ready.Store(true) // atomic으로 happens-before 보장
+		// atomic Store는 이전에 발생한 모든 write를 함께 publish 한다 (release semantic)
+		ready.Store(true)
 	}()
 
-	// ready가 true가 될 때까지 대기
+	// atomic Load는 대응되는 Store 이전의 write들을 보게 된다 (acquire semantic)
 	for !ready.Load() {
 		// busy wait
 	}
 
-	// atomic 연산이 happens-before를 보장하므로 data=42가 보임
-	assert.Equal(t, 42, data)
+	assert.Equal(t, 42, data) // happens-before 덕분에 42가 반드시 보임
 }
 
 // TestVisibilityWithChannel - channel은 happens-before를 보장

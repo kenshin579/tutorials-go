@@ -10,8 +10,8 @@ import (
 
 // Broker - 간단한 Pub/Sub 브로커
 type Broker[T any] struct {
-	mu          sync.RWMutex
-	subscribers map[string]chan T
+	mu          sync.RWMutex      // RWMutex: 다중 Publish는 RLock으로 동시 진행, 구조 변경 시만 Lock
+	subscribers map[string]chan T // id → 구독자 channel 맵
 }
 
 func NewBroker[T any]() *Broker[T] {
@@ -21,29 +21,29 @@ func NewBroker[T any]() *Broker[T] {
 }
 
 func (b *Broker[T]) Subscribe(id string, bufSize int) <-chan T {
-	b.mu.Lock()
+	b.mu.Lock() // 맵 변경(쓰기)이므로 Lock 필요
 	defer b.mu.Unlock()
-	ch := make(chan T, bufSize)
+	ch := make(chan T, bufSize) // bufSize: 느린 구독자가 메시지를 버퍼링할 양
 	b.subscribers[id] = ch
-	return ch
+	return ch // 수신 전용 반환: 구독자는 받기만, 직접 송신/close 금지
 }
 
 func (b *Broker[T]) Unsubscribe(id string) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if ch, ok := b.subscribers[id]; ok {
-		close(ch)
-		delete(b.subscribers, id)
+		close(ch)                 // 구독자에게 종료 신호 (수신 측 range 종료)
+		delete(b.subscribers, id) // 맵에서 제거
 	}
 }
 
 func (b *Broker[T]) Publish(msg T) {
-	b.mu.RLock()
+	b.mu.RLock() // 읽기 잠금: 여러 publisher가 동시 발행 가능
 	defer b.mu.RUnlock()
 	for _, ch := range b.subscribers {
 		select {
-		case ch <- msg:
-		default: // 구독자가 느리면 메시지 드롭
+		case ch <- msg: // 정상 발행
+		default:        // 구독자 channel 가득 시 메시지 드롭 → 느린 구독자가 전체를 멈추지 않게 함
 		}
 	}
 }

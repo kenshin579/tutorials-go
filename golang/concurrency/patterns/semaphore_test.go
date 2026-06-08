@@ -12,6 +12,7 @@ import (
 // TestSemaphore - buffered channel로 동시 실행 수 제한
 func TestSemaphore(t *testing.T) {
 	const maxConcurrency = 3
+	// struct{}는 메모리 0바이트 → 값 자체는 의미 없고 슬롯 개수만 의미를 가짐
 	sem := make(chan struct{}, maxConcurrency)
 
 	var maxConcurrent atomic.Int64
@@ -23,10 +24,10 @@ func TestSemaphore(t *testing.T) {
 		go func() {
 			defer wg.Done()
 
-			sem <- struct{}{}        // 세마포어 획득
-			defer func() { <-sem }() // 세마포어 해제
+			sem <- struct{}{}        // 세마포어 획득: 버퍼가 가득 차면 여기서 블로킹
+			defer func() { <-sem }() // 세마포어 해제: 슬롯 반환 → 대기 중인 goroutine 진입 가능
 
-			// 동시 실행 수 추적
+			// CAS 루프로 lock 없이 maxConcurrent의 최댓값 갱신
 			cur := currentConcurrent.Add(1)
 			for {
 				old := maxConcurrent.Load()

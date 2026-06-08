@@ -16,8 +16,9 @@ type Result struct {
 
 // TestErrorChannel - error channel 패턴
 func TestErrorChannel(t *testing.T) {
+	// 각 worker는 자신만의 channel을 반환 → 호출자가 결과를 개별적으로 수집
 	work := func(id int) <-chan Result {
-		ch := make(chan Result, 1)
+		ch := make(chan Result, 1) // buffer 1: 결과 송신 후 worker 즉시 종료 가능
 		go func() {
 			defer close(ch)
 			if id%2 == 0 {
@@ -59,6 +60,7 @@ func TestMultiError(t *testing.T) {
 		}
 	}
 
+	// errors.Join은 nil 에러를 자동 필터링 → 모두 nil이면 nil 반환
 	combined := errors.Join(errs...)
 
 	assert.Error(t, combined)

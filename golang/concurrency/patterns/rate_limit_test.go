@@ -10,11 +10,11 @@ import (
 // TestRateLimitWithTicker - time.Ticker로 rate limiting
 func TestRateLimitWithTicker(t *testing.T) {
 	rate := time.NewTicker(20 * time.Millisecond) // 50 req/sec
-	defer rate.Stop()
+	defer rate.Stop()                             // 내부 goroutine leak 방지
 
 	start := time.Now()
 	for i := range 5 {
-		<-rate.C // tick을 기다림
+		<-rate.C // tick을 기다림: 각 작업 사이 최소 20ms 간격 보장
 		_ = i    // 작업 수행
 	}
 
@@ -28,19 +28,19 @@ func TestBurstRateLimit(t *testing.T) {
 	// 버스트 크기 3, 이후 20ms 간격
 	burstLimit := make(chan time.Time, 3)
 
-	// 초기 버스트 토큰 채우기
+	// 초기 토큰 채우기: 처음 3개 요청은 대기 없이 즉시 처리됨
 	for range 3 {
 		burstLimit <- time.Now()
 	}
 
-	// 토큰 보충 goroutine
+	// 토큰 보충 goroutine: 20ms마다 토큰 1개 추가
 	go func() {
 		ticker := time.NewTicker(20 * time.Millisecond)
 		defer ticker.Stop()
 		for t := range ticker.C {
 			select {
 			case burstLimit <- t:
-			default: // 버퍼가 가득 차면 버림
+			default: // 버퍼 가득 시 토큰 버림 → 토큰 무한 누적 방지
 			}
 		}
 	}()
