@@ -16,9 +16,12 @@ import (
 // Task는 여러 goroutine에 걸친 논리적 작업을 하나로 묶어준다.
 // go tool trace에서 Task별 latency 히스토그램을 확인할 수 있다.
 func TestTask_NewTask_End(t *testing.T) {
-	f, err := os.CreateTemp(t.TempDir(), "trace_task_*.out")
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer f.Close()
+
+	f, err := os.Create("tmp/trace_task.out")
+	assert.NoError(t, err)
+	defer func() { _ = f.Close() }()
 
 	err = rttrace.Start(f)
 	assert.NoError(t, err)
@@ -54,9 +57,12 @@ func TestTask_NewTask_End(t *testing.T) {
 // TestRegion_WithRegion - trace.WithRegion으로 구간 측정
 // Region은 단일 goroutine 내에서 특정 구간의 시간을 측정한다.
 func TestRegion_WithRegion(t *testing.T) {
-	f, err := os.CreateTemp(t.TempDir(), "trace_region_*.out")
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer f.Close()
+
+	f, err := os.Create("tmp/trace_region.out")
+	assert.NoError(t, err)
+	defer func() { _ = f.Close() }()
 
 	err = rttrace.Start(f)
 	assert.NoError(t, err)
@@ -88,9 +94,12 @@ func TestRegion_WithRegion(t *testing.T) {
 // TestRegion_StartRegion_End - StartRegion/End로 유연한 구간 측정
 // WithRegion과 달리 함수 클로저 바깥에서도 Region을 제어할 수 있다.
 func TestRegion_StartRegion_End(t *testing.T) {
-	f, err := os.CreateTemp(t.TempDir(), "trace_startregion_*.out")
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer f.Close()
+
+	f, err := os.Create("tmp/trace_startregion.out")
+	assert.NoError(t, err)
+	defer func() { _ = f.Close() }()
 
 	err = rttrace.Start(f)
 	assert.NoError(t, err)
@@ -121,9 +130,12 @@ func TestRegion_StartRegion_End(t *testing.T) {
 // TestLog_이벤트_마킹 - trace.Log로 trace에 커스텀 이벤트 기록
 // Log는 trace 타임라인에 특정 시점의 상태를 기록하여 디버깅에 활용한다.
 func TestLog_이벤트_마킹(t *testing.T) {
-	f, err := os.CreateTemp(t.TempDir(), "trace_log_*.out")
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer f.Close()
+
+	f, err := os.Create("tmp/trace_log.out")
+	assert.NoError(t, err)
+	defer func() { _ = f.Close() }()
 
 	err = rttrace.Start(f)
 	assert.NoError(t, err)

@@ -10,11 +10,15 @@ import (
 )
 
 // TestBasicTrace_Start_Stop - trace.Start/Stop으로 기본 trace 수집
-// 수집된 trace 파일은 `go tool trace trace_basic.out` 으로 분석 가능
+// 수집된 trace 파일은 `go tool trace tmp/trace_basic.out` 으로 분석 가능
 func TestBasicTrace_Start_Stop(t *testing.T) {
-	f, err := os.CreateTemp(t.TempDir(), "trace_basic_*.out")
+	// tmp 폴더에 영속적으로 저장 (t.TempDir()과 달리 테스트 후에도 남아 go tool trace로 분석 가능)
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer f.Close()
+
+	f, err := os.Create("tmp/trace_basic.out")
+	assert.NoError(t, err)
+	defer func() { _ = f.Close() }()
 
 	// trace 수집 시작
 	err = rttrace.Start(f)
