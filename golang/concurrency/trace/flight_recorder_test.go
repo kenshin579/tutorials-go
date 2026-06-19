@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	rttrace "runtime/trace"
 	"sync"
 	"testing"
@@ -73,8 +74,16 @@ func TestFlightRecorder_HTTP서버_Latency_감지(t *testing.T) {
 			var buf bytes.Buffer
 			n, err := fr.WriteTo(&buf)
 			assert.NoError(t, err)
+
+			// 스냅샷을 파일로 저장 → go tool trace로 분석 가능
+			err = os.MkdirAll("tmp", 0o755)
+			assert.NoError(t, err)
+			fname := fmt.Sprintf("tmp/trace_flight_%d.out", i)
+			err = os.WriteFile(fname, buf.Bytes(), 0o644)
+			assert.NoError(t, err)
+
 			snapshots = append(snapshots, n)
-			t.Logf("  → 스냅샷 캡처! (크기: %d bytes, latency: %v)", n, elapsed)
+			t.Logf("  → 스냅샷 캡처! (%s, 크기: %d bytes, latency: %v)", fname, n, elapsed)
 		}
 	}
 

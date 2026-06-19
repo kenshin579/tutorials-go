@@ -25,6 +25,12 @@ func TestWorkerPool(t *testing.T) {
 	jobs := make(chan Job, numJobs)
 	results := make(chan Result, numJobs)
 
+	// 실제 작업 단위. 예제라서 제곱 연산이지만, 실무에선 이 함수 안에
+	// HTTP 요청 / 이미지 리사이징 / 로그 파싱 같은 진짜 처리 로직이 들어간다.
+	process := func(input int) int {
+		return input * input
+	}
+
 	// Worker 시작
 	var wg sync.WaitGroup
 	for w := range numWorkers {
@@ -32,10 +38,9 @@ func TestWorkerPool(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for job := range jobs {
-				// 작업 처리: 제곱 계산
 				results <- Result{
 					JobID:  job.ID,
-					Output: job.Input * job.Input,
+					Output: process(job.Input), // ← Output은 "작업 함수가 만들어내는 값"
 				}
 				t.Logf("worker %d processed job %d", w, job.ID)
 			}

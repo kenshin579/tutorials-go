@@ -23,10 +23,13 @@ import (
 //  3. Worker 활용률: goroutine이 idle인 시간 비율
 //  4. Blocking 분석: channel 대기, HTTP 응답 대기 등
 func TestCrawler_Task_Region_계측(t *testing.T) {
-	// trace 수집 설정
-	f, err := os.CreateTemp(t.TempDir(), "trace_crawler_*.out")
+	// trace 수집 설정 (tmp 폴더에 영속 저장 → go tool trace tmp/trace_crawler.out)
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer f.Close()
+
+	f, err := os.Create("tmp/trace_crawler.out")
+	assert.NoError(t, err)
+	defer func() { _ = f.Close() }()
 
 	err = rttrace.Start(f)
 	assert.NoError(t, err)

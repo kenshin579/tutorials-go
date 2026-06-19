@@ -24,15 +24,19 @@ import (
 //  2. trace로 해당 구간의 동시성/타이밍을 분석하여
 //  3. 최적화 타겟을 정확히 결정할 수 있다
 func TestPprof_Trace_동시수집(t *testing.T) {
-	// 1. trace 파일 생성
-	traceFile, err := os.CreateTemp(t.TempDir(), "trace_combo_*.out")
+	// tmp 폴더에 영속 저장 (go tool trace tmp/trace_combo.out / go tool pprof tmp/cpu_combo.prof)
+	err := os.MkdirAll("tmp", 0o755)
 	assert.NoError(t, err)
-	defer traceFile.Close()
+
+	// 1. trace 파일 생성
+	traceFile, err := os.Create("tmp/trace_combo.out")
+	assert.NoError(t, err)
+	defer func() { _ = traceFile.Close() }()
 
 	// 2. CPU 프로파일 파일 생성
-	cpuFile, err := os.CreateTemp(t.TempDir(), "cpu_combo_*.prof")
+	cpuFile, err := os.Create("tmp/cpu_combo.prof")
 	assert.NoError(t, err)
-	defer cpuFile.Close()
+	defer func() { _ = cpuFile.Close() }()
 
 	// 3. trace 수집 시작
 	err = rttrace.Start(traceFile)

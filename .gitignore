@@ -30,3 +30,6 @@ terraform.tfstate.backup
 **/dist-ssr
 *.local
 .idea
+
+# go tool trace 출력물 (커밋 금지)
+golang/concurrency/trace/tmp/
