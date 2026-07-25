@@ -141,7 +141,7 @@
       },
       "targets": [
         {
-          "expr": "rate(orders_created_total{status=\"success\"}[5m]) / rate(orders_created_total[5m]) * 100",
+          "expr": "sum(rate(orders_created_total{status=\"success\"}[5m])) / sum(rate(orders_created_total[5m])) * 100",
           "legendFormat": "Success Rate",
           "refId": "A"
         }
