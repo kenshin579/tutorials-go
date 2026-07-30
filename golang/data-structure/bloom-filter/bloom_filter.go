@@ -3,6 +3,47 @@ package bloomfilter
 
 import "math"
 
+// BloomFilter는 비트 배열 기반의 확률적 집합이다.
+// Contains가 false를 반환하면 원소는 확실히 없고,
+// true를 반환하면 있을 수도 있다(false positive).
+type BloomFilter struct {
+	bits []uint64 // 비트 배열을 uint64 워드 단위로 저장
+	m    uint64   // 전체 비트 수
+	k    uint64   // 해시 함수 개수
+	n    uint64   // 추가된 원소 수
+}
+
+// New는 비트 수 m과 해시 함수 개수 k를 직접 지정해 생성한다.
+func New(m, k uint64) *BloomFilter {
+	if m == 0 {
+		m = 1
+	}
+	if k == 0 {
+		k = 1
+	}
+	return &BloomFilter{
+		bits: make([]uint64, (m+63)/64), // 올림 나눗셈
+		m:    m,
+		k:    k,
+	}
+}
+
+// NewWithEstimates는 예상 원소 수 n과 목표 false positive 확률 p로부터
+// m과 k를 자동 계산해 생성한다.
+func NewWithEstimates(n uint64, p float64) *BloomFilter {
+	m := OptimalM(n, p)
+	return New(m, OptimalK(m, n))
+}
+
+// Cap은 전체 비트 수 m을 반환한다.
+func (f *BloomFilter) Cap() uint64 { return f.m }
+
+// K는 해시 함수 개수를 반환한다.
+func (f *BloomFilter) K() uint64 { return f.k }
+
+// Count는 지금까지 추가된 원소 수를 반환한다.
+func (f *BloomFilter) Count() uint64 { return f.n }
+
 // OptimalM은 원소 수 n과 목표 false positive 확률 p에 대해 필요한 비트 수를 계산한다.
 // p가 (0, 1) 범위를 벗어나면 유효하지 않은 값으로 간주해 기본값 0.01로 대체한다.
 //
