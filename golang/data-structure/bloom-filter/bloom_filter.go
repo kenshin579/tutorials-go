@@ -10,6 +10,9 @@ import (
 // BloomFilter는 비트 배열 기반의 확률적 집합이다.
 // Contains가 false를 반환하면 원소는 확실히 없고,
 // true를 반환하면 있을 수도 있다(false positive).
+//
+// 동시성 안전하지 않다. 여러 goroutine에서 Add를 호출하려면
+// 호출하는 쪽에서 락을 걸어야 한다.
 type BloomFilter struct {
 	bits []uint64 // 비트 배열을 uint64 워드 단위로 저장
 	m    uint64   // 전체 비트 수
