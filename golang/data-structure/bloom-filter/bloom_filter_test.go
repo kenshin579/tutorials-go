@@ -12,6 +12,15 @@ func TestOptimalM(t *testing.T) {
 
 	// p가 작아질수록 더 많은 비트가 필요하다
 	assert.Greater(t, OptimalM(1_000_000, 0.001), OptimalM(1_000_000, 0.01))
+
+	// n이 0이면 비트가 필요 없지만 최소 1비트를 보장한다
+	assert.Equal(t, uint64(1), OptimalM(0, 0.01))
+
+	// p가 0 이하이면 유효하지 않으므로 기본값 0.01로 대체된다
+	assert.Equal(t, OptimalM(1000, 0.01), OptimalM(1000, 0))
+
+	// p가 1 이상이면 유효하지 않으므로 기본값 0.01로 대체된다
+	assert.Equal(t, OptimalM(1000, 0.01), OptimalM(1000, 1.5))
 }
 
 func TestOptimalK(t *testing.T) {
@@ -20,4 +29,7 @@ func TestOptimalK(t *testing.T) {
 
 	// 최소 1개는 보장한다
 	assert.Equal(t, uint64(1), OptimalK(10, 1_000_000))
+
+	// n이 0이면 나눗셈이 불가능하므로 최소 1개를 보장한다
+	assert.Equal(t, uint64(1), OptimalK(100, 0))
 }

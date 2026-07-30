@@ -4,6 +4,7 @@ package bloomfilter
 import "math"
 
 // OptimalM은 원소 수 n과 목표 false positive 확률 p에 대해 필요한 비트 수를 계산한다.
+// p가 (0, 1) 범위를 벗어나면 유효하지 않은 값으로 간주해 기본값 0.01로 대체한다.
 //
 //	m = -n * ln(p) / (ln2)^2
 func OptimalM(n uint64, p float64) uint64 {
