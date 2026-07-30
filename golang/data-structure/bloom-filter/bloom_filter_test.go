@@ -141,8 +141,9 @@ func TestBloomFilter_EstimatedFPR(t *testing.T) {
 
 	// 원소가 늘수록 false positive 확률은 커진다
 	assert.Greater(t, full, half)
-	// 설계 용량을 채웠을 때 목표치 1% 근처여야 한다
-	assert.InDelta(t, 0.01, full, 0.005)
+	// 설계 용량을 채웠을 때 목표치 1% 근처여야 한다.
+	// 이 값은 난수가 개입하지 않는 순수 계산이므로 델타를 넉넉히 잡을 이유가 없다.
+	assert.InDelta(t, 0.01, full, 0.001)
 }
 
 // 이론값과 실측값이 맞는지 확인한다. 본문 4.5절의 근거가 되는 테스트다.
@@ -168,9 +169,12 @@ func TestBloomFilter_실측_FalsePositiveRate(t *testing.T) {
 
 	actual := float64(falsePositives) / float64(trials)
 	t.Logf("m=%d k=%d n=%d", f.Cap(), f.K(), f.Count())
-	t.Logf("이론 FPR=%.4f 실측 FPR=%.4f", f.EstimatedFPR(), actual)
+	t.Logf("false positive 건수=%d/%d", falsePositives, trials)
+	t.Logf("이론 FPR=%.5f 실측 FPR=%.5f", f.EstimatedFPR(), actual)
 
-	// 이중 해싱 때문에 실측값이 이론값보다 다소 높을 수 있으나
-	// 목표치의 2배는 넘지 않아야 한다
-	assert.Less(t, actual, target*2)
+	// 이론값과 실측값의 차이는 통계적 오차 범위 안에서만 나타나야 한다.
+	// trials=100만, p=0.01이면 이항분포 표준편차가 약 99.5건(FPR로 1e-4)이므로
+	// 델타 0.001은 약 10σ에 해당한다. 게다가 xxhash는 시드가 없고 입력이 고정되어
+	// 매 실행 결과가 동일하므로 이 정도로 좁혀도 간헐적 실패가 나지 않는다.
+	assert.InDelta(t, target, actual, 0.001)
 }
