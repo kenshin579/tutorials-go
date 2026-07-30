@@ -16,6 +16,34 @@ func benchKeys(count int) [][]byte {
 	return keys
 }
 
+// missKeys는 필터에 넣지 않은 키를 만든다. 채운 범위(0..benchN-1) 밖을 쓴다.
+func missKeys(count int) [][]byte {
+	keys := make([][]byte, count)
+	for i := range keys {
+		keys[i] = []byte(makeURL(benchN + i))
+	}
+	return keys
+}
+
+// 조회 벤치마크는 설계 용량까지 채운 필터로 측정한다.
+// 필터가 비어 있으면 "없는 키"가 첫 프로브에서 곧바로 반환되어
+// 실제보다 빠르게 나오고 구현 간 차이도 사라진다.
+func fillMine() *BloomFilter {
+	f := NewWithEstimates(benchN, 0.01)
+	for i := 0; i < benchN; i++ {
+		f.Add([]byte(makeURL(i)))
+	}
+	return f
+}
+
+func fillLib() *bloom.BloomFilter {
+	f := bloom.NewWithEstimates(benchN, 0.01)
+	for i := 0; i < benchN; i++ {
+		f.Add([]byte(makeURL(i)))
+	}
+	return f
+}
+
 func BenchmarkAdd_직접구현(b *testing.B) {
 	keys := benchKeys(1000)
 	f := NewWithEstimates(benchN, 0.01)
@@ -39,60 +67,45 @@ func BenchmarkAdd_라이브러리(b *testing.B) {
 }
 
 func BenchmarkContains_직접구현(b *testing.B) {
+	f := fillMine()
 	keys := benchKeys(1000)
-	f := NewWithEstimates(benchN, 0.01)
-	for _, k := range keys {
-		f.Add(k)
-	}
 
-	b.ResetTimer()
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		f.Contains(keys[i%len(keys)])
 	}
 }
 
 func BenchmarkContains_라이브러리(b *testing.B) {
+	f := fillLib()
 	keys := benchKeys(1000)
-	f := bloom.NewWithEstimates(benchN, 0.01)
-	for _, k := range keys {
-		f.Add(k)
-	}
 
-	b.ResetTimer()
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		f.Test(keys[i%len(keys)])
 	}
 }
 
-// 실제 워크로드는 대부분 "없는 키" 조회다. 첫 0비트에서 조기 반환하므로 더 빠르다.
 func BenchmarkContains_직접구현_없는키(b *testing.B) {
-	keys := benchKeys(1000)
-	missing := []byte("이 필터에-절대-없는-키")
-	f := NewWithEstimates(benchN, 0.01)
-	for _, k := range keys {
-		f.Add(k)
-	}
+	f := fillMine()
+	keys := missKeys(1000)
 
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		f.Contains(missing)
+		f.Contains(keys[i%len(keys)])
 	}
 }
 
 func BenchmarkContains_라이브러리_없는키(b *testing.B) {
-	keys := benchKeys(1000)
-	missing := []byte("이 필터에-절대-없는-키")
-	f := bloom.NewWithEstimates(benchN, 0.01)
-	for _, k := range keys {
-		f.Add(k)
-	}
+	f := fillLib()
+	keys := missKeys(1000)
 
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		f.Test(missing)
+		f.Test(keys[i%len(keys)])
 	}
 }
