@@ -14,7 +14,7 @@ type BloomFilter struct {
 	bits []uint64 // 비트 배열을 uint64 워드 단위로 저장
 	m    uint64   // 전체 비트 수
 	k    uint64   // 해시 함수 개수
-	n    uint64   // 추가된 원소 수
+	n    uint64   // Add 호출 횟수
 }
 
 // New는 비트 수 m과 해시 함수 개수 k를 직접 지정해 생성한다.
@@ -45,7 +45,8 @@ func (f *BloomFilter) Cap() uint64 { return f.m }
 // K는 해시 함수 개수를 반환한다.
 func (f *BloomFilter) K() uint64 { return f.k }
 
-// Count는 지금까지 추가된 원소 수를 반환한다.
+// Count는 Add를 호출한 횟수를 반환한다.
+// 같은 원소를 두 번 넣으면 2로 세므로, 중복 삽입이 있으면 실제 원소 수보다 크다.
 func (f *BloomFilter) Count() uint64 { return f.n }
 
 // OptimalM은 원소 수 n과 목표 false positive 확률 p에 대해 필요한 비트 수를 계산한다.
@@ -81,9 +82,16 @@ func OptimalK(m, n uint64) uint64 {
 // 이중 해싱(Kirsch-Mitzenmacher)에 쓸 두 값을 만든다.
 // 해시 함수를 k개 따로 두지 않아도 통계적으로 동등한 분포를 얻는다.
 //
-// 주의: h2가 0이거나 짝수이면 인덱스가 일부 위치에 뭉치므로 홀수로 보정한다.
+// h2를 홀수로 보정하는 것은 h2 == 0을 막기 위해서다.
+// h2가 0이면 k개 인덱스가 모두 h1 한 곳으로 겹쳐 사실상 k=1이 된다.
+// 확률은 2^-32로 극히 낮지만 비용이 없어 방어해 둔다.
+//
+// 짝수 h2 자체는 해롭지 않다. k개 인덱스가 겹치려면 m/gcd(h2, m) < k 여야 하는데,
+// m이 수백만이고 k가 한 자릿수인 실제 범위에서는 일어나지 않는다.
 func (f *BloomFilter) hashes(data []byte) (uint64, uint64) {
 	sum := xxhash.Sum64(data)
+	// h1은 하위 32비트만 쓴다. m이 2^32를 넘으면 pos <= k*(2^32-1) 이라
+	// 배열 뒤쪽에 도달할 수 없다. m > 2^32는 512MiB 이상이라 이 예제 범위 밖이다.
 	h1 := sum & 0xffffffff
 	h2 := (sum >> 32) | 1
 	return h1, h2

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestOptimalM(t *testing.T) {
@@ -101,7 +102,7 @@ func TestBloomFilter_FalseNegative가_없다(t *testing.T) {
 
 	for i := 0; i < n; i++ {
 		key := fmt.Sprintf("member-%d", i)
-		assert.True(t, f.Contains([]byte(key)), "추가한 원소 %s 가 없다고 나왔다", key)
+		require.True(t, f.Contains([]byte(key)), "추가한 원소 %s 가 없다고 나왔다", key)
 	}
 }
 
