@@ -1,6 +1,7 @@
 package bloomfilter
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -70,4 +71,53 @@ func TestNewWithEstimates(t *testing.T) {
 
 	assert.Equal(t, uint64(9585059), f.Cap())
 	assert.Equal(t, uint64(7), f.K())
+}
+
+func TestBloomFilter_AddContains(t *testing.T) {
+	f := NewWithEstimates(1000, 0.01)
+
+	f.Add([]byte("hello"))
+	f.Add([]byte("world"))
+
+	assert.True(t, f.Contains([]byte("hello")))
+	assert.True(t, f.Contains([]byte("world")))
+	assert.Equal(t, uint64(2), f.Count())
+}
+
+func TestBloomFilter_빈_필터는_아무것도_포함하지_않는다(t *testing.T) {
+	f := NewWithEstimates(1000, 0.01)
+
+	assert.False(t, f.Contains([]byte("hello")))
+}
+
+// Bloom Filter의 핵심 보장: false negative는 절대 발생하지 않는다.
+func TestBloomFilter_FalseNegative가_없다(t *testing.T) {
+	const n = 100_000
+	f := NewWithEstimates(n, 0.01)
+
+	for i := 0; i < n; i++ {
+		f.Add([]byte(fmt.Sprintf("member-%d", i)))
+	}
+
+	for i := 0; i < n; i++ {
+		key := fmt.Sprintf("member-%d", i)
+		assert.True(t, f.Contains([]byte(key)), "추가한 원소 %s 가 없다고 나왔다", key)
+	}
+}
+
+// Add와 Contains는 힙 할당 없이 동작해야 한다.
+// Task 5의 벤치마크에서 B/op를 라이브러리와 비교하려면 이 성질이 유지되어야 한다.
+func TestBloomFilter_할당이_없다(t *testing.T) {
+	f := NewWithEstimates(1000, 0.01)
+	key := []byte("hello")
+
+	addAllocs := testing.AllocsPerRun(100, func() {
+		f.Add(key)
+	})
+	assert.Equal(t, 0.0, addAllocs)
+
+	containsAllocs := testing.AllocsPerRun(100, func() {
+		f.Contains(key)
+	})
+	assert.Equal(t, 0.0, containsAllocs)
 }

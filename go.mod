@@ -54,6 +54,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/bsm/redislock v0.8.0
+	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
 	github.com/chromedp/chromedp v0.9.1
 	github.com/docker/go-connections v0.4.0
@@ -97,7 +98,6 @@ require (
 	github.com/bits-and-blooms/bitset v1.24.4 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/containerd/cgroups v1.0.1 // indirect
 	github.com/containerd/containerd v1.5.9 // indirect

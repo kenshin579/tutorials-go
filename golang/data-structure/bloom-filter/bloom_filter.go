@@ -1,7 +1,11 @@
 // Package bloomfilter는 Bloom Filter를 비트 배열과 이중 해싱으로 직접 구현한 예제이다.
 package bloomfilter
 
-import "math"
+import (
+	"math"
+
+	"github.com/cespare/xxhash/v2"
+)
 
 // BloomFilter는 비트 배열 기반의 확률적 집합이다.
 // Contains가 false를 반환하면 원소는 확실히 없고,
@@ -71,4 +75,39 @@ func OptimalK(m, n uint64) uint64 {
 		return 1
 	}
 	return uint64(math.Round(k))
+}
+
+// hashes는 xxhash 64비트 결과 하나를 상·하위 32비트로 쪼개
+// 이중 해싱(Kirsch-Mitzenmacher)에 쓸 두 값을 만든다.
+// 해시 함수를 k개 따로 두지 않아도 통계적으로 동등한 분포를 얻는다.
+//
+// 주의: h2가 0이거나 짝수이면 인덱스가 일부 위치에 뭉치므로 홀수로 보정한다.
+func (f *BloomFilter) hashes(data []byte) (uint64, uint64) {
+	sum := xxhash.Sum64(data)
+	h1 := sum & 0xffffffff
+	h2 := (sum >> 32) | 1
+	return h1, h2
+}
+
+// Add는 원소를 필터에 추가한다.
+func (f *BloomFilter) Add(data []byte) {
+	h1, h2 := f.hashes(data)
+	for i := uint64(0); i < f.k; i++ {
+		pos := (h1 + i*h2) % f.m
+		f.bits[pos/64] |= 1 << (pos % 64)
+	}
+	f.n++
+}
+
+// Contains는 원소가 있을 수 있는지 확인한다.
+// false면 확실히 없고, true면 있을 수도 있다.
+func (f *BloomFilter) Contains(data []byte) bool {
+	h1, h2 := f.hashes(data)
+	for i := uint64(0); i < f.k; i++ {
+		pos := (h1 + i*h2) % f.m
+		if f.bits[pos/64]&(1<<(pos%64)) == 0 {
+			return false
+		}
+	}
+	return true
 }
