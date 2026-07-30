@@ -119,3 +119,12 @@ func (f *BloomFilter) Contains(data []byte) bool {
 	}
 	return true
 }
+
+// EstimatedFPR은 현재 원소 수를 기준으로 false positive 확률의 이론값을 계산한다.
+// n은 Add 호출 횟수이므로 중복 삽입이 있으면 실제보다 높게 추정된다.
+//
+//	p = (1 - e^(-kn/m))^k
+func (f *BloomFilter) EstimatedFPR() float64 {
+	exponent := -float64(f.k) * float64(f.n) / float64(f.m)
+	return math.Pow(1-math.Exp(exponent), float64(f.k))
+}

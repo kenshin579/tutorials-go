@@ -122,3 +122,55 @@ func TestBloomFilter_할당이_없다(t *testing.T) {
 	})
 	assert.Equal(t, 0.0, containsAllocs)
 }
+
+func TestBloomFilter_EstimatedFPR(t *testing.T) {
+	f := NewWithEstimates(100_000, 0.01)
+
+	// 비어 있으면 false positive가 날 수 없다
+	assert.Equal(t, 0.0, f.EstimatedFPR())
+
+	for i := 0; i < 50_000; i++ {
+		f.Add([]byte(fmt.Sprintf("key-%d", i)))
+	}
+	half := f.EstimatedFPR()
+
+	for i := 50_000; i < 100_000; i++ {
+		f.Add([]byte(fmt.Sprintf("key-%d", i)))
+	}
+	full := f.EstimatedFPR()
+
+	// 원소가 늘수록 false positive 확률은 커진다
+	assert.Greater(t, full, half)
+	// 설계 용량을 채웠을 때 목표치 1% 근처여야 한다
+	assert.InDelta(t, 0.01, full, 0.005)
+}
+
+// 이론값과 실측값이 맞는지 확인한다. 본문 4.5절의 근거가 되는 테스트다.
+func TestBloomFilter_실측_FalsePositiveRate(t *testing.T) {
+	const (
+		n      = 100_000   // 설계 용량
+		trials = 1_000_000 // 넣지 않은 원소로 조회할 횟수
+		target = 0.01      // 목표 false positive 확률
+	)
+
+	f := NewWithEstimates(n, target)
+	for i := 0; i < n; i++ {
+		f.Add([]byte(fmt.Sprintf("member-%d", i)))
+	}
+
+	falsePositives := 0
+	for i := 0; i < trials; i++ {
+		// "member-" 접두사와 겹치지 않는 키만 조회한다
+		if f.Contains([]byte(fmt.Sprintf("stranger-%d", i))) {
+			falsePositives++
+		}
+	}
+
+	actual := float64(falsePositives) / float64(trials)
+	t.Logf("m=%d k=%d n=%d", f.Cap(), f.K(), f.Count())
+	t.Logf("이론 FPR=%.4f 실측 FPR=%.4f", f.EstimatedFPR(), actual)
+
+	// 이중 해싱 때문에 실측값이 이론값보다 다소 높을 수 있으나
+	// 목표치의 2배는 넘지 않아야 한다
+	assert.Less(t, actual, target*2)
+}
