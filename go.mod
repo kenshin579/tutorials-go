@@ -53,6 +53,7 @@ require (
 	github.com/Shopify/sarama v1.36.0
 	github.com/alicebob/miniredis/v2 v2.30.0
 	github.com/avast/retry-go v3.0.0+incompatible
+	github.com/bits-and-blooms/bloom/v3 v3.7.1
 	github.com/bsm/redislock v0.8.0
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
@@ -96,7 +97,6 @@ require (
 	github.com/antchfx/xpath v1.2.3 // indirect
 	github.com/avast/retry-go/v4 v4.7.0 // indirect
 	github.com/bits-and-blooms/bitset v1.24.4 // indirect
-	github.com/bits-and-blooms/bloom/v3 v3.7.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
