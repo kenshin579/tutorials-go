@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/kenshin579/tutorials-go/database/redis/model"
@@ -24,10 +25,18 @@ func teardown() {
 	client.Close()
 }
 
+// newRedisClient는 로컬 Redis에 접속하는 클라이언트를 생성한다.
+// 비밀번호는 REDIS_PASSWORD 환경변수로 재정의할 수 있으며,
+// 기본값은 cloud/docker/redis/Makefile의 requirepass 값과 동일하다.
 func newRedisClient() *redis.Client {
+	password := os.Getenv("REDIS_PASSWORD")
+	if password == "" {
+		password = "mypassword"
+	}
+
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
-		Password: "",
+		Password: password,
 		DB:       0,
 	})
 	return client
