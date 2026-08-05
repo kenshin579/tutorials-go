@@ -76,6 +76,158 @@ go test -race -v ./golang/singleflight
 | `TestUserLoaderDoesNotCacheCompletedResult` | 완료된 결과는 보관하지 않는다 |
 | `TestUserLoaderSharesErrorWithConcurrentCallers` | 조회 오류도 동시 호출자에게 공유한다 |
 
+## 테스트 흐름
+
+### 테스트가 동시성을 만드는 방법
+
+`go test`는 goroutine이 실제로 겹쳐서 실행되는 시점을 보장하지 않는다. "동시에 요청이
+몰린 상황"을 매번 똑같이 재현하려고 테스트는 채널 세 개로 타이밍을 직접 제어한다.
+
+| 채널 | 방향 | 역할 |
+| --- | --- | --- |
+| `start` | 테스트 → goroutine | `close`로 모든 요청을 같은 시점에 출발시킨다 |
+| `started` | fetch → 테스트 | 데이터 소스 호출이 실제로 시작됐음을 테스트에 알린다 |
+| `release` | 테스트 → fetch | `close` 전까지 fetch를 붙잡아 느린 조회를 재현한다 |
+
+`close`를 쓰는 이유는 값 송신과 달리 대기 중인 goroutine을 한 번에 모두 깨우기
+때문이다. 값을 열 번 보내는 대신 채널을 한 번 닫으면 broadcast가 된다.
+
+`started` 신호를 몇 번 받는지가 곧 데이터 소스가 몇 번 호출됐는지를 뜻하므로,
+테스트는 이 신호로 중복 제거 여부를 판별한다.
+
+### 1. 적용 전에는 요청 수만큼 조회한다
+
+`TestWithoutSingleflightCallsDataSourceForEveryRequest`는 `UserLoader`를 거치지 않고
+`fetch`를 직접 호출한다. 비교 기준이 되는 "적용 전" 상태다.
+
+```mermaid
+sequenceDiagram
+    participant T as 테스트 본체
+    participant G as goroutine 10개
+    participant F as fetch (직접 호출)
+
+    T->>G: goroutine 10개 시작
+    G->>F: fetch("user-1") 각자 호출
+    Note over F: calls 10 증가<br/>10개 모두 release 채널에서 대기
+    F-->>T: started 신호 10개
+    Note over T: 신호 10개 = 10개가 동시에 fetch 안에 있다
+    T->>F: close(release)
+    F-->>G: 10개 각각 결과 반환
+    Note over T: calls == 10
+```
+
+### 2. 같은 key의 동시 조회는 한 번만 실행한다
+
+`TestUserLoaderCombinesConcurrentCallsForSameKey`는 같은 흐름을 `UserLoader`를 통해
+실행한다. 먼저 도착한 goroutine(리더)만 `fetch`에 진입하고 나머지는 그 호출에 합류한다.
+
+```mermaid
+sequenceDiagram
+    participant T as 테스트 본체
+    participant L as 리더 goroutine
+    participant D as 중복 goroutine 9개
+    participant SF as singleflight.Group
+    participant F as fetch
+
+    T->>T: close(start) — 10개 동시 출발
+    L->>SF: Do("user-1")
+    SF->>F: fetch 실행 (리더 1개만)
+    F-->>T: started 신호 1개
+    Note over F: release 채널에서 대기
+    D->>SF: Do("user-1") 9개 도착
+    Note over D,SF: 새 실행을 시작하지 않고 진행 중인 호출에 합류
+    T->>T: waitForDuplicates — 20ms 동안 결과가<br/>오지 않아야 통과 (합류 시간 확보)
+    T->>F: close(release)
+    F-->>SF: User{ID: "user-1"}
+    SF-->>L: 결과, shared=true
+    SF-->>D: 같은 결과, shared=true
+    Note over T: calls == 1
+```
+
+`waitForDuplicates`는 두 가지 역할을 한다. 중복 goroutine 9개가 `Group.Do`까지
+도달할 시간을 벌어 주고, 그 사이에 결과가 먼저 도착하면 fetch가 예상과 달리 이미
+끝났다는 뜻이므로 테스트를 실패시킨다.
+
+### 3. 다른 key는 각각 실행한다
+
+`TestUserLoaderRunsDifferentKeysIndependently`에서는 `started`가 `chan string`이라
+어떤 key의 조회가 시작됐는지까지 확인할 수 있다.
+
+```mermaid
+sequenceDiagram
+    participant T as 테스트 본체
+    participant G1 as goroutine user-1
+    participant G2 as goroutine user-2
+    participant SF as singleflight.Group
+    participant F as fetch
+
+    G1->>SF: Do("user-1")
+    SF->>F: fetch("user-1")
+    F-->>T: started 신호 "user-1"
+    G2->>SF: Do("user-2")
+    SF->>F: fetch("user-2") 별도 실행
+    F-->>T: started 신호 "user-2"
+    Note over T: 두 ID를 모두 받음<br/>= 서로 막지 않았다는 증거
+    T->>F: close(release)
+    SF-->>G1: 결과, shared=false
+    SF-->>G2: 결과, shared=false
+    Note over T: calls == 2
+```
+
+각 key를 요청한 호출자가 하나뿐이므로 `shared`는 둘 다 `false`다.
+
+### 4. 완료된 결과는 보관하지 않는다
+
+`TestUserLoaderDoesNotCacheCompletedResult`는 유일하게 동시성이 없는 테스트다.
+같은 key를 순차로 두 번 조회한다.
+
+```mermaid
+sequenceDiagram
+    participant T as 테스트 본체
+    participant SF as singleflight.Group
+    participant F as fetch
+
+    T->>SF: Load("user-1") 1회차
+    SF->>F: fetch 실행
+    F-->>SF: User{ID: "user-1"}
+    SF-->>T: 결과, shared=false
+    Note over SF: 호출이 끝나면 key 정보를 버린다
+
+    T->>SF: Load("user-1") 2회차
+    SF->>F: fetch 재실행 (보관된 결과 없음)
+    F-->>SF: User{ID: "user-1"}
+    SF-->>T: 결과, shared=false
+    Note over T: calls == 2 — 캐시가 아니다
+```
+
+### 5. 조회 오류도 동시 호출자에게 공유한다
+
+`TestUserLoaderSharesErrorWithConcurrentCallers`는 2번과 구조가 같고 `fetch`의
+반환값만 오류다.
+
+```mermaid
+sequenceDiagram
+    participant T as 테스트 본체
+    participant L as 리더 goroutine
+    participant D as 중복 goroutine 9개
+    participant SF as singleflight.Group
+    participant F as fetch
+
+    T->>T: close(start) — 10개 동시 출발
+    L->>SF: Do("user-1")
+    SF->>F: fetch 실행 (리더 1개만)
+    F-->>T: started 신호 1개
+    D->>SF: Do("user-1") 9개 합류
+    T->>F: close(release)
+    F-->>SF: error "data source unavailable"
+    SF-->>L: 같은 error, shared=true
+    SF-->>D: 같은 error, shared=true
+    Note over T: calls == 1 — 오류도 그대로 공유된다
+```
+
+일시적인 오류 하나가 대기 중인 요청 전부에 전달된다는 뜻이기도 하다. 재시도 정책을
+설계할 때 고려해야 할 동작이다.
+
 ## 캐시와의 차이
 
 `singleflight`는 캐시가 아니다. 실행 중인 호출만 합치므로 첫 호출이 끝난 뒤 같은
