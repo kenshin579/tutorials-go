@@ -218,6 +218,7 @@ sequenceDiagram
     SF->>F: fetch 실행 (리더 1개만)
     F-->>T: started 신호 1개
     D->>SF: Do("user-1") 9개 합류
+    T->>T: waitForDuplicates — 20ms 동안 결과가<br/>오지 않아야 통과 (합류 시간 확보)
     T->>F: close(release)
     F-->>SF: error "data source unavailable"
     SF-->>L: 같은 error, shared=true
