@@ -579,3 +579,106 @@ func TestFx_As_MultipleInterfaces(t *testing.T) {
 	assert.Same(t, cache, closer, "두 인터페이스는 같은 인스턴스를 가리켜야 한다")
 	assert.True(t, cache.(*RedisCache).closed, "Close()가 같은 인스턴스에 반영되어야 한다")
 }
+
+// --- fx.ParamTags: fx.In 구조체 없이 파라미터에 태그 붙이기 ---
+
+// DBServiceV2는 DBService와 같은 일을 하지만 fx.In 구조체를 쓰지 않는다.
+type DBServiceV2 struct {
+	readDB  *DBConnection
+	writeDB *DBConnection
+}
+
+// 평범한 생성자다. fx 관련 타입이 시그니처에 전혀 없다.
+func NewDBServiceV2(readDB, writeDB *DBConnection) *DBServiceV2 {
+	return &DBServiceV2{readDB: readDB, writeDB: writeDB}
+}
+
+func TestFx_ParamTags_Named(t *testing.T) {
+	// ResultTags는 "내보내는 쪽"에, ParamTags는 "받는 쪽"에 태그를 붙인다.
+	var svc *DBServiceV2
+
+	app := fxtest.New(t,
+		fx.Provide(
+			// 생성자의 반환값에 이름을 부여 (내보내는 쪽)
+			fx.Annotate(NewReadDB, fx.ResultTags(`name:"readDB"`)),
+			fx.Annotate(NewWriteDB, fx.ResultTags(`name:"writeDB"`)),
+			// 생성자의 매개변수에 이름을 지정 (받는 쪽). 순서대로 매칭된다.
+			fx.Annotate(NewDBServiceV2, fx.ParamTags(`name:"readDB"`, `name:"writeDB"`)),
+		),
+		fx.Populate(&svc),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Equal(t, "read-replica:3306", svc.readDB.DSN)
+	assert.Equal(t, "primary:3306", svc.writeDB.DSN)
+}
+
+func TestFx_ParamTags_MismatchedOrder(t *testing.T) {
+	// ParamTags는 매개변수 "순서"로 매칭한다. 태그 순서를 뒤집으면
+	// 에러 없이 반대 커넥션이 주입된다.
+	var svc *DBServiceV2
+
+	app := fxtest.New(t,
+		fx.Provide(
+			fx.Annotate(NewReadDB, fx.ResultTags(`name:"readDB"`)),
+			fx.Annotate(NewWriteDB, fx.ResultTags(`name:"writeDB"`)),
+			fx.Annotate(NewDBServiceV2, fx.ParamTags(`name:"writeDB"`, `name:"readDB"`)),
+		),
+		fx.Populate(&svc),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	// readDB 자리에 write 커넥션이 들어왔다 (컴파일·런타임 모두 정상)
+	assert.Equal(t, "primary:3306", svc.readDB.DSN)
+	assert.Equal(t, "read-replica:3306", svc.writeDB.DSN)
+}
+
+// NotifierServiceV2는 NotifierParams(fx.In) 없이 슬라이스를 직접 받는다.
+type NotifierServiceV2 struct {
+	notifiers []Notifier
+}
+
+func NewNotifierServiceV2(notifiers []Notifier) *NotifierServiceV2 {
+	return &NotifierServiceV2{notifiers: notifiers}
+}
+
+func TestFx_ParamTags_Group(t *testing.T) {
+	// group도 같은 방식으로 받을 수 있다
+	var svc *NotifierServiceV2
+
+	app := fxtest.New(t,
+		fx.Provide(
+			fx.Annotate(func() Notifier { return &EmailNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			fx.Annotate(func() Notifier { return &SlackNotifier{} },
+				fx.ResultTags(`group:"notifiers"`)),
+			fx.Annotate(NewNotifierServiceV2, fx.ParamTags(`group:"notifiers"`)),
+		),
+		fx.Populate(&svc),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Len(t, svc.notifiers, 2)
+}
+
+func TestFx_ParamTags_WithoutResultTags(t *testing.T) {
+	// ParamTags만 붙이고 내보내는 쪽에 ResultTags가 없으면 매칭되지 않는다.
+	// 두 태그는 짝으로 동작한다.
+	var svc *DBServiceV2
+	app := fx.New(
+		fx.Provide(
+			NewReadDB, // 이름 없이 등록 → name:"readDB"로는 찾을 수 없다
+			fx.Annotate(NewWriteDB, fx.ResultTags(`name:"writeDB"`)),
+			fx.Annotate(NewDBServiceV2, fx.ParamTags(`name:"readDB"`, `name:"writeDB"`)),
+		),
+		fx.Populate(&svc),
+		fx.NopLogger,
+	)
+
+	err := app.Err()
+	assert.Error(t, err, "이름 없이 등록된 값은 name 태그로 주입받을 수 없다")
+	assert.Contains(t, err.Error(), `missing type: *main.DBConnection[name="readDB"]`)
+}
