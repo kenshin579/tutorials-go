@@ -453,3 +453,129 @@ func TestFx_Private(t *testing.T) {
 	assert.Contains(t, err.Error(), "*main.internalDB",
 		"에러 메시지에 외부 추출이 막힌 타입이 명시되어야 한다")
 }
+
+// --- fx.As: 구체 타입 생성자를 인터페이스로 등록 ---
+
+type Cache interface {
+	Get(key string) string
+}
+
+type Closer interface {
+	Close() error
+}
+
+// RedisCache는 Cache와 Closer를 모두 구현한다.
+type RedisCache struct {
+	closed bool
+}
+
+func (c *RedisCache) Get(key string) string { return "redis:" + key }
+
+func (c *RedisCache) Close() error {
+	c.closed = true
+	return nil
+}
+
+// NewRedisCache는 인터페이스가 아니라 구체 타입(*RedisCache)을 반환한다.
+func NewRedisCache() *RedisCache { return &RedisCache{} }
+
+type CacheService struct {
+	cache Cache
+}
+
+// NewCacheService는 구체 타입이 아니라 Cache 인터페이스를 요구한다.
+func NewCacheService(cache Cache) *CacheService {
+	return &CacheService{cache: cache}
+}
+
+func TestFx_As_WithoutAnnotation(t *testing.T) {
+	// fx는 타입으로 매칭한다. NewRedisCache를 그대로 Provide하면 그래프에는
+	// *RedisCache만 등록되므로, Cache를 요구하는 NewCacheService는 짝을 못 찾는다.
+	var svc *CacheService
+	app := fx.New(
+		fx.Provide(NewRedisCache, NewCacheService),
+		fx.Populate(&svc),
+		fx.NopLogger,
+	)
+
+	err := app.Err()
+	assert.Error(t, err, "Cache 타입을 제공하는 생성자가 없어야 한다")
+	assert.Contains(t, err.Error(), "main.Cache",
+		"에러 메시지에 채우지 못한 인터페이스 타입이 명시되어야 한다")
+}
+
+func TestFx_As_ProvideAsInterface(t *testing.T) {
+	// fx.As(new(Cache)): *RedisCache를 Cache 인터페이스로 등록
+	var svc *CacheService
+
+	app := fxtest.New(t,
+		fx.Provide(
+			fx.Annotate(NewRedisCache, fx.As(new(Cache))),
+			NewCacheService,
+		),
+		fx.Populate(&svc),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Equal(t, "redis:user:1", svc.cache.Get("user:1"))
+}
+
+func TestFx_As_ReplacesOriginalType(t *testing.T) {
+	// fx.As는 원래 반환 타입을 "추가"하는 게 아니라 "대체"한다.
+	// Cache로 등록된 순간 *RedisCache는 그래프에서 사라진다.
+	var concrete *RedisCache
+	app := fx.New(
+		fx.Provide(fx.Annotate(NewRedisCache, fx.As(new(Cache)))),
+		fx.Populate(&concrete),
+		fx.NopLogger,
+	)
+
+	err := app.Err()
+	assert.Error(t, err, "fx.As로 대체된 구체 타입은 주입받을 수 없어야 한다")
+	assert.Contains(t, err.Error(), "*main.RedisCache")
+}
+
+func TestFx_As_Self(t *testing.T) {
+	// fx.As(fx.Self())를 함께 붙이면 원래 구체 타입도 그래프에 남는다 (v1.20+)
+	var (
+		cache    Cache
+		concrete *RedisCache
+	)
+
+	app := fxtest.New(t,
+		fx.Provide(fx.Annotate(NewRedisCache,
+			fx.As(new(Cache)),
+			fx.As(fx.Self()),
+		)),
+		fx.Populate(&cache, &concrete),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Equal(t, "redis:k", cache.Get("k"))
+	assert.Same(t, concrete, cache, "두 타입은 같은 인스턴스를 가리켜야 한다")
+}
+
+func TestFx_As_MultipleInterfaces(t *testing.T) {
+	// fx.As를 여러 번 붙이면 하나의 생성자를 여러 인터페이스로 등록한다
+	var (
+		cache  Cache
+		closer Closer
+	)
+
+	app := fxtest.New(t,
+		fx.Provide(fx.Annotate(NewRedisCache,
+			fx.As(new(Cache)),
+			fx.As(new(Closer)),
+		)),
+		fx.Populate(&cache, &closer),
+	)
+	defer app.RequireStop()
+	app.RequireStart()
+
+	assert.Equal(t, "redis:k", cache.Get("k"))
+	assert.NoError(t, closer.Close())
+	assert.Same(t, cache, closer, "두 인터페이스는 같은 인스턴스를 가리켜야 한다")
+	assert.True(t, cache.(*RedisCache).closed, "Close()가 같은 인스턴스에 반영되어야 한다")
+}
