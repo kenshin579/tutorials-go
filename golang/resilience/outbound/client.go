@@ -45,11 +45,19 @@ type Options struct {
 
 	// MaxWaitTime은 permit(rate limiter) 또는 slot(bulkhead) 대기 상한이다.
 	// 초과 시 rate limiter는 ratelimiter.ErrExceeded, bulkhead는
-	// bulkhead.ErrFull을 반환한다.
+	// bulkhead.ErrFull을 반환한다. 이 두 에러는 재시도 대상에서 제외되므로
+	// (아래 NewClient의 AbortOnErrors 참고) 시도 1회당 대기는 최대
+	// MaxWaitTime(limiter) + MaxWaitTime(bulkhead)이다.
 	//
-	// 정책이 Limiter(Bulkhead(func)) 순으로 중첩되므로 한 요청이 최악의
-	// 경우 limiter에서 MaxWaitTime, bulkhead에서 다시 MaxWaitTime을 기다릴
-	// 수 있다. 즉 꼬리 지연(worst-case latency)은 MaxWaitTime의 최대 2배다.
+	// 다만 실제 429 응답(Retry-After)은 재시도 대상이고, 재시도마다 limiter를
+	// 다시 통과하므로 재시도를 켜면(MaxRetries > 0) 꼬리 지연은 그 (1 +
+	// MaxRetries)배까지 늘어날 수 있다: 최악의 경우
+	// (MaxWaitTime(limiter) + MaxWaitTime(bulkhead)) * (1 + MaxRetries).
+	//
+	// (참고: bulkhead의 대기는 슬롯이 빌 때까지 실제로 기다리는 타이머 기반이라
+	// 이 배수가 실제 지연으로 그대로 나타난다. rate limiter는 대기가
+	// MaxWaitTime을 넘길지 미리 계산하므로, 재시도가 막혀 있다면 애초에 이
+	// 배수를 체감할 일이 없다.)
 	MaxWaitTime time.Duration
 
 	MaxConcurrency int // 동시 실행 수 상한. 0이면 bulkhead 없음
@@ -75,8 +83,28 @@ func NewClient(opts Options) *http.Client {
 	if opts.MaxRetries > 0 {
 		// NewRetryPolicyBuilder는 429와 대부분의 5xx를 재시도하고,
 		// Retry-After 헤더가 있으면 그 값만큼 기다린다.
+		//
+		// AbortOnErrors(ratelimiter.ErrExceeded, bulkhead.ErrFull): 이 두
+		// 에러는 우리 쪽 limiter/bulkhead가 MaxWaitTime을 다 써버렸다는
+		// 뜻이다. retryHandleFunc는 이 둘을 포함해 거의 모든 에러를
+		// 재시도 대상으로 보므로(failsafehttp/policy.go), 걸러주지 않으면
+		// 재시도가 지연 없이(delay가 0으로 계산됨) 이미 고갈된 limiter/bulkhead에
+		// 곧바로 재진입해 MaxRetries번 반복한다 — 이 예제가 경고하는 재시도
+		// 폭풍(retry storm) 그 자체다. bulkhead.AcquirePermitWithMaxWait는
+		// 슬롯이 빌 때까지 실제 타이머로 기다리므로 이 반복은 꼬리 지연을
+		// (1+MaxRetries)배로 그대로 늘린다. ratelimiter는 permit 대기가
+		// MaxWaitTime을 넘길지 미리 계산해 넘기면 기다리지 않고 즉시 실패하므로
+		// (ratelimiter/ratelimiterstats.go) 지연 증폭은 없지만, 그래도 매
+		// 재시도가 쓸모없이 반복된다는 점은 같다. 대기해도(또는 계산상 대기가
+		// 무의미해도) 안 됐던 것을 0초 대기로 다시 시도해서 될 리가 없으므로,
+		// 여기서는 기다리는 것보다 즉시 실패하는 것이 맞다.
+		//
+		// AbortOnErrors는 append이므로 builder가 이미 설정한
+		// AbortOnErrors(context.Canceled)를 덮어쓰지 않는다
+		// (policy/policy.go의 BaseAbortablePolicy 참고).
 		policies = append(policies, failsafehttp.NewRetryPolicyBuilder().
 			WithMaxRetries(opts.MaxRetries).
+			AbortOnErrors(ratelimiter.ErrExceeded, bulkhead.ErrFull).
 			Build())
 	}
 

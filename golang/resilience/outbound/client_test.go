@@ -4,10 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/failsafe-go/failsafe-go/bulkhead"
 	"github.com/failsafe-go/failsafe-go/ratelimiter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -262,6 +265,144 @@ func TestClient_버스트_요청과_스로틀링_비교(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestClient_limiter가_고갈되면_ErrExceeded가_그대로_표면화된다는 retry와 rate
+// limiter를 함께 켰을 때, limiter가 MaxWaitTime을 다 써버린 요청이
+// ratelimiter.ErrExceeded로 그대로 실패하고 서버에는 도달하지 않는지를
+// 검증한다.
+//
+// 이 테스트는 AbortOnErrors 수정의 판별 신호(discriminating signal)가 아니다.
+// smoothStats.acquirePermits(ratelimiter/ratelimiterstats.go)는 요청 시점에
+// "이 permit을 기다리면 MaxWaitTime을 넘는가"를 미리 계산해 넘을 게 확실하면
+// 실제로 기다리지 않고 즉시 -1(ErrExceeded)을 반환한다. 즉 실패가 나노초~
+// 마이크로초 단위로 끝나며, 이는 재시도가 막혔는지 여부와 무관하다 —
+// AbortOnErrors를 지운 채로 MaxRetries를 200까지 올려 실측해도 총 소요는
+// 수십~수백 마이크로초 수준으로 거의 늘지 않았다(재시도 1회당 실패도 즉시
+// 끝나므로 누적 대기가 생기지 않는다). 그래서 여기서는 시간을 재지 않고
+// 에러 종류와 서버 미도달만 확인한다 — 재시도가 막혔는지 새는지를 실제로
+// 구분하는 건 아래 TestClient_bulkhead가_고갈되면_재시도하지_않고_즉시_실패한다이다.
+// (bulkhead는 슬롯이 비는 시점을 미리 알 수 없어 실제 타이머로 MaxWaitTime을
+// 기다린 뒤에야 ErrFull을 반환하므로, 재시도 여부가 실제 소요 시간에 반영된다.)
+func TestClient_limiter가_고갈되면_ErrExceeded가_그대로_표면화된다(t *testing.T) {
+	const (
+		requests      = 8 // 일부는 permit을 못 얻도록 충분히 많게
+		maxExecutions = 1
+		period        = time.Second
+		maxWaitTime   = 20 * time.Millisecond
+		maxRetries    = 3
+	)
+
+	// 벤더 한도를 넉넉히 잡아 서버의 429가 클라이언트 측 limiter 동작과
+	// 섞이지 않게 한다. 여기서 보는 것은 클라이언트 limiter의 동작이다.
+	server := newRateLimitedServer(1000)
+	defer server.Close()
+
+	client := NewClient(Options{
+		Mode:          LimiterSmooth,
+		MaxExecutions: maxExecutions,
+		Period:        period,
+		MaxWaitTime:   maxWaitTime,
+		MaxRetries:    maxRetries,
+	})
+
+	errs := make([]error, requests)
+	var wg sync.WaitGroup
+	for i := 0; i < requests; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			resp, err := client.Get(fmt.Sprintf("%s/maps/map-%02d", server.URL, i))
+			if err != nil {
+				errs[i] = err
+				return
+			}
+			resp.Body.Close()
+		}(i)
+	}
+	wg.Wait()
+
+	var exceeded int
+	for _, err := range errs {
+		if err == nil {
+			continue
+		}
+		require.True(t, errors.Is(err, ratelimiter.ErrExceeded),
+			"limiter 대기 상한을 넘은 요청은 ErrExceeded로 나타나야 한다 (재시도로 다른 에러로 바뀌면 안 된다): %v", err)
+		exceeded++
+	}
+	require.GreaterOrEqual(t, exceeded, 1, "적어도 하나는 permit을 못 얻어 ErrExceeded로 실패해야 한다")
+
+	// permit을 못 얻은 요청은 서버에 도달하지 않아야 한다. AbortOnErrors가
+	// 없어도(재시도가 새어도) 재시도가 다시 통과하려는 곳은 서버가 아니라 우리
+	// 쪽 limiter이므로 이 값 자체는 판별력이 없지만, 회귀 시 서버로 새는 다른
+	// 버그(예: limiter를 건너뛰는 재시도 경로)가 생기면 여기서 걸린다.
+	got := server.stats()
+	assert.Equal(t, requests-exceeded, got.Total,
+		"서버 호출 수는 permit을 얻은 요청 수와 같아야 한다 (limiter를 통과하지 못한 요청은 서버로 새면 안 된다)")
+}
+
+// TestClient_bulkhead가_고갈되면_재시도하지_않고_즉시_실패한다는 retry와
+// bulkhead를 함께 켰을 때, bulkhead가 MaxWaitTime을 다 써버린 요청(ErrFull)이
+// 재시도로 이어지지 않는지를 걸리는 시간으로 검증한다.
+//
+// 이 테스트가 판별력을 갖는 이유(위 rate limiter 테스트와의 차이): bulkhead는
+// 슬롯이 언제 빌지 미리 계산할 수 없는 세마포어 기반이라, AcquirePermitWithMaxWait
+// (bulkhead/bulkhead.go)가 실제 time.Timer로 MaxWaitTime을 채운 뒤에야 ErrFull을
+// 반환한다. 재시도가 막히지 않으면 이 실제 대기가 재시도마다 반복되어 총 소요가
+// (1 + MaxRetries) * MaxWaitTime에 가까워진다.
+//
+// 첫 요청이 응답을 slowResponse만큼 지연시켜 유일한 슬롯(MaxConcurrency=1)을
+// 계속 붙잡고 있는 동안 두 번째 요청을 보내 ErrFull까지 걸리는 시간을 잰다.
+// 막히면 ~MaxWaitTime(20ms), 재시도가 새면 ~(1+MaxRetries)*MaxWaitTime(80ms)이
+// 되므로 중간값 50ms를 기준으로 두면 스케줄링 지연을 감안해도 마진이 넉넉하다.
+func TestClient_bulkhead가_고갈되면_재시도하지_않고_즉시_실패한다(t *testing.T) {
+	const (
+		maxConcurrency = 1
+		maxWaitTime    = 20 * time.Millisecond
+		maxRetries     = 3
+		slowResponse   = 300 * time.Millisecond // 재시도가 새더라도(최대 80ms) 슬롯이 안 비도록 충분히 길게
+	)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		time.Sleep(slowResponse)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	client := NewClient(Options{
+		Mode:           LimiterNone,
+		MaxConcurrency: maxConcurrency,
+		MaxWaitTime:    maxWaitTime,
+		MaxRetries:     maxRetries,
+	})
+
+	// 첫 요청이 유일한 슬롯을 점유하도록 먼저 발사하고, 슬롯을 확실히 잡을
+	// 시간을 준다.
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		resp, err := client.Get(server.URL)
+		if err == nil {
+			resp.Body.Close()
+		}
+	}()
+	time.Sleep(30 * time.Millisecond)
+
+	start := time.Now()
+	_, err := client.Get(server.URL)
+	elapsed := time.Since(start)
+
+	require.Error(t, err, "슬롯을 못 얻은 요청은 실패해야 한다")
+	require.True(t, errors.Is(err, bulkhead.ErrFull),
+		"슬롯 대기 상한을 넘은 요청은 ErrFull로 나타나야 한다 (재시도로 다른 에러로 바뀌면 안 된다): %v", err)
+
+	assert.Less(t, elapsed, 50*time.Millisecond,
+		"재시도가 막혔다면 ErrFull까지 걸리는 시간은 MaxWaitTime 근처여야 한다 "+
+			"(재시도가 새면 (1+MaxRetries)*MaxWaitTime에 가까워진다): got %v", elapsed)
+
+	wg.Wait()
 }
 
 func TestClient_429를_받으면_RetryAfter만큼_기다린다(t *testing.T) {
