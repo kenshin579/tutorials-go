@@ -127,6 +127,52 @@ func TestNewClient_대기시간을_초과하면_ErrExceeded를_반환한다(t *t
 	assert.GreaterOrEqual(t, exceeded, 1, "적어도 하나는 대기 상한을 넘어 ErrExceeded를 반환해야 한다")
 }
 
+// bursty 모드는 다른 모드와 달리 아래 비교 테스트(TestClient_버스트_요청과_스로틀링_비교)의
+// 서브테스트 하나에만 등장하고, 그 서브테스트는 정책 없음과 수치가 똑같이 나오도록
+// 설계돼 있다. 그래서 이 직접 테스트가 없으면 newRateLimiter가 LimiterBursty
+// 분기를 잃어버려(nil을 반환해) limiter가 완전히 빠져도 비교 테스트가 계속
+// 통과한다 — limiter가 있는지 없는지 구분하지 못하는 것이다. 이 테스트는 bursty의
+// 두 가지 정의적 속성을 직접 검증해 그 구멍을 막는다.
+func TestNewClient_bursty모드는_주기_안의_버스트를_허용하고_초과분은_ErrExceeded로_막는다(t *testing.T) {
+	const (
+		maxExecutions = 3               // 버스트로 허용할 개수
+		period        = 2 * time.Second // 테스트 중 주기가 넘어가지 않도록 충분히 길게
+		maxWaitTime   = 20 * time.Millisecond
+	)
+
+	// 벤더 한도를 넉넉히 잡아 서버의 429가 클라이언트 측 limiter 동작과
+	// 섞이지 않게 한다. 여기서 보는 것은 클라이언트 limiter의 동작이다.
+	server := newRateLimitedServer(1000)
+	defer server.Close()
+
+	client := NewClient(Options{
+		Mode:          LimiterBursty,
+		MaxExecutions: maxExecutions,
+		Period:        period,
+		MaxWaitTime:   maxWaitTime,
+	})
+
+	// 속성 1 (버스트는 허용된다): 주기 안의 첫 maxExecutions개는 지연 없이
+	// 통과해야 한다. smooth였다면 간격을 두고 흘렸을 것이므로, 이 속성이
+	// bursty와 smooth를 구분한다.
+	start := time.Now()
+	for i := 0; i < maxExecutions; i++ {
+		resp, err := client.Get(fmt.Sprintf("%s/maps/map-%02d", server.URL, i))
+		require.NoError(t, err, "허용량 안의 요청은 성공해야 한다")
+		resp.Body.Close()
+	}
+	elapsed := time.Since(start)
+	assert.Less(t, elapsed, 500*time.Millisecond, "허용량 안의 요청은 대기 없이 즉시 통과해야 한다")
+
+	// 속성 2 (허용량은 유한하다): 허용량을 다 쓴 다음 요청은 짧은 대기 상한
+	// 안에 permit을 못 얻어 ErrExceeded로 막혀야 한다. LimiterNone이었다면
+	// 그대로 통과했을 것이므로, 이 속성이 bursty와 정책 없음을 구분한다.
+	_, err := client.Get(fmt.Sprintf("%s/maps/map-%02d", server.URL, maxExecutions))
+	require.Error(t, err, "허용량을 넘은 요청은 실패해야 한다")
+	assert.True(t, errors.Is(err, ratelimiter.ErrExceeded),
+		"허용량 초과는 ErrExceeded로 나타나야 한다")
+}
+
 func TestClient_버스트_요청과_스로틀링_비교(t *testing.T) {
 	const (
 		serverLimit = 20 // 벤더 한도
@@ -147,6 +193,15 @@ func TestClient_버스트_요청과_스로틀링_비교(t *testing.T) {
 			// 40회 / 2초 = 평균 20 QPS로 한도에 정확히 맞춘 설정이다.
 			// 그런데도 주기 시작에 40개를 한꺼번에 통과시켜 순간 QPS가 튄다.
 			// "1분에 1200회까지 가능하다"는 계산이 안전을 보장하지 않는 이유다.
+			//
+			// 이 서브테스트의 수치는 "정책 없음" 서브테스트와 동일하게 나오도록
+			// 의도됐다 — 주기 시작에 허용량을 한꺼번에 다 써버리는 bursty
+			// limiter는 이 40개짜리 단발 버스트 앞에서는 limiter가 없는 것과
+			// 구분되지 않는다는 것 자체가 가르치려는 요점이다. 버그가 아니다.
+			// 다만 그래서 이 서브테스트만으로는 bursty limiter가 실제로
+			// 붙어 있는지(vs 우연히 삭제됐는지) 증명할 수 없다 — 그 증명은
+			// TestNewClient_bursty모드는_주기_안의_버스트를_허용하고_초과분은_ErrExceeded로_막는다
+			// 가 담당한다.
 			name: "bursty - 평균 QPS를 한도에 맞춰도 429가 발생한다",
 			opts: Options{
 				Mode:          LimiterBursty,
@@ -210,8 +265,14 @@ func TestClient_버스트_요청과_스로틀링_비교(t *testing.T) {
 }
 
 func TestClient_429를_받으면_RetryAfter만큼_기다린다(t *testing.T) {
+	// 이 테스트는 실측 약 1초가 걸린다("수 초"는 아니다). 그런데도 이 테스트만
+	// -short로 건너뛰게 하는 이유는 시간 자체가 아니라 검증 대상이다 — 이
+	// 테스트는 실제 Retry-After 대기를 시간으로 재서 확인하는 유일한 테스트라
+	// 그 대기를 없앨 수 없다. 반면 위 TestClient_버스트_요청과_스로틀링_비교의
+	// smooth 서브테스트는 3.9초로 더 오래 걸리지만 이 예제의 헤드라인
+	// 데모이므로 항상 실행되게 남겨둔다.
 	if testing.Short() {
-		t.Skip("Retry-After 대기로 수 초가 걸린다")
+		t.Skip("Retry-After 대기로 약 1초가 걸린다")
 	}
 
 	const (
