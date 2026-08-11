@@ -75,6 +75,7 @@ require (
 	github.com/google/go-github/v42 v42.0.0
 	github.com/hibiken/asynq v0.24.1
 	github.com/itchyny/gojq v0.12.11
+	github.com/jonboulle/clockwork v0.4.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/redis/go-redis/v9 v9.0.3
@@ -142,7 +143,6 @@ require (
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
