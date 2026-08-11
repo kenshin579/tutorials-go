@@ -81,33 +81,20 @@ client := outbound.NewClient(outbound.Options{
 무관하다. resty를 쓴다면 `client.SetTransport(...)`로 같은 트랜스포트를 넣으면
 된다.
 
-**`MaxWaitTime`은 rate limiter와 bulkhead가 각각 독립적으로 소진한다.** 정책은
-`Limiter(Bulkhead(func))` 순으로 중첩되므로, 한 요청이 최악의 경우 limiter에서
-`MaxWaitTime`을 기다리고 permit을 얻은 뒤 bulkhead에서 다시 `MaxWaitTime`을
-기다릴 수 있다. 즉 **시도 1회당** 꼬리 지연은 `MaxWaitTime`의 최대 2배다. 위
-예제처럼 `MaxConcurrency`와 `MaxWaitTime`을 함께 쓸 때 이 누적을 감안해야 한다.
+**`MaxWaitTime`의 정직한 상한은 `2 × MaxWaitTime × (1 + MaxRetries)`다.** 정책이
+`Limiter(Bulkhead(func))`로 중첩되므로 한 요청이 limiter에서 `MaxWaitTime`,
+bulkhead에서 다시 `MaxWaitTime`을 기다릴 수 있다(시도 1회당 2배). 게다가 retry가
+가장 바깥이라 실제 429에 대한 재시도는 시도마다 limiter를 다시 통과한다 — 의도된
+동작이다([정책 순서가 중요한 이유](#정책-순서가-중요한-이유)). 위 예제
+(`MaxWaitTime: 30s`, `MaxRetries: 3`)면 최악 240초다. `MaxRetries`를 올릴 때 이
+곱셈을 함께 감안해야 한다.
 
-**"최대 2배"는 재시도를 켜면(`MaxRetries > 0`) 끝이 아니다.** `NewClient`는
-retry를 가장 바깥에 두므로(아래 [정책 순서가 중요한 이유](#정책-순서가-중요한-이유)
-참고), 실제 429 응답(Retry-After)에 대한 재시도는 시도마다 rate limiter를 다시
-통과한다 — 이건 의도된 동작이다. 그래서 재시도를 포함한 **꼬리 지연의 정직한
-상한은 시도 1회당 `MaxWaitTime`(limiter) + `MaxWaitTime`(bulkhead)에 `(1 +
-MaxRetries)`를 곱한 값**이다. 위 예제(`MaxWaitTime: 30s`, `MaxRetries: 3`)라면
-최악의 경우 `60초 × 4 = 240초`까지 갈 수 있다는 뜻이다. `MaxRetries`를 올릴 때
-`MaxWaitTime`도 그만큼 곱해서 감안해야 한다.
-
-**단, 우리 쪽 limiter/bulkhead가 스스로 포기한 경우(`ratelimiter.ErrExceeded`,
-`bulkhead.ErrFull`)는 이 배수에 들어가지 않는다.** `NewClient`의 재시도 정책은
-이 두 에러를 `AbortOnErrors`로 재시도 대상에서 제외한다. 벤더가 "429"라고
-말한 것과 "우리 쪽 limiter가 포기했다"는 것은 서로 다른 신호다: 전자는
-`Retry-After`를 존중하며 재시도할 가치가 있지만, 후자는 이미 `MaxWaitTime`을
-다 기다려 봤는데도 permit/슬롯을 못 얻었다는 뜻이라 0초 지연으로 즉시 재진입해도
-성공할 리가 없다. 이걸 걸러주지 않으면 재시도가 지연 없이 고갈된 limiter/bulkhead에
-곧바로 재진입해 `MaxRetries`번 반복하는, 이 예제가 경고하는 재시도 폭풍
-(retry storm) 그 자체가 된다. (`bulkhead.ErrFull`은 슬롯이 빌 때까지 실제
-타이머로 기다리는 방식이라 이 반복이 그대로 지연 배수가 되지만, `ratelimiter.ErrExceeded`는
-대기가 `MaxWaitTime`을 넘길지 미리 계산해 넘기면 즉시 실패하므로 지연 배수로는
-잘 드러나지 않는다 — 그래도 매 재시도가 쓸모없이 반복된다는 점은 같다.)
+**단, 우리 쪽 limiter/bulkhead가 포기한 경우는 재시도하지 않는다.** 재시도 정책이
+`ratelimiter.ErrExceeded`와 `bulkhead.ErrFull`을 `AbortOnErrors`로 제외한다.
+"벤더가 429를 줬다"와 "우리 limiter가 `MaxWaitTime`을 다 기다려도 permit을 못
+얻었다"는 다른 신호다. 전자는 `Retry-After`를 존중해 재시도할 가치가 있지만,
+후자에 지연 0으로 즉시 재진입하면 성공할 리가 없다. 이걸 걸러주지 않으면 그것이
+이 예제가 경고하는 재시도 폭풍 그 자체가 된다.
 
 **잘못된 설정은 조용히 넘어가지 않고 panic한다.** `Mode`가 `LimiterNone`이 아닌데
 `MaxExecutions <= 0`이거나 `Period <= 0`이면 `NewClient`가 panic한다. `int`를
@@ -135,7 +122,7 @@ rate limiter는 실행 *시작 시점*만 제어하고 in-flight 수는 제한�
 수가 쌓이지 않으므로, bulkhead 동작을 의미 있게 검증하려면 인위적 지연을 넣어야
 한다. `TestClient_bulkhead가_고갈되면_재시도하지_않고_즉시_실패한다`가 응답을
 일부러 지연시키는 서버로 이 지연 계층을 직접 검증한다(아래
-[재시도가 우리 쪽 limiter/bulkhead 고갈을 새지 않는지 검증하기](#재시도가-우리-쪽-limiterbulkhead-고갈을-새지-않는지-검증하기)
+[재시도가 limiter/bulkhead 고갈로 새지 않는지 검증하기](#재시도가-limiterbulkhead-고갈로-새지-않는지-검증하기)
 참고).
 
 ## singleflight가 실제로 하는 일
@@ -194,32 +181,23 @@ go test ./golang/resilience/outbound/... -short -v
 발생하고 재시도로 서버 호출이 10건에서 15건으로 늘어나며, 소요 1.00s 뒤 최종적으로
 모든 키가 성공한다.
 
-### 재시도가 우리 쪽 limiter/bulkhead 고갈을 새지 않는지 검증하기
+### 재시도가 limiter/bulkhead 고갈로 새지 않는지 검증하기
 
-앞서 [구성](#구성)에서 다룬 `AbortOnErrors(ratelimiter.ErrExceeded, bulkhead.ErrFull)`은
-두 테스트가 각각 다른 각도로 검증한다.
+[구성](#구성)의 `AbortOnErrors`는 두 테스트가 다른 각도로 검증한다.
 
-- `TestClient_bulkhead가_고갈되면_재시도하지_않고_즉시_실패한다`: **판별력이
-  있는** 테스트다. `bulkhead.AcquirePermitWithMaxWait`는 슬롯이 빌 때까지 실제
-  `time.Timer`로 기다리는 방식이라, `AbortOnErrors`를 걷어내면 재시도마다 그
-  대기가 반복되어 걸리는 시간이 눈에 보이게 늘어난다(이 저장소에서
-  `MaxWaitTime: 20ms`, `MaxRetries: 3`으로 실측하면 약 20ms → 약 84ms). 이
-  테스트는 그 시간 차이를 직접 잰다.
-- `TestClient_limiter가_고갈되면_ErrExceeded가_그대로_표면화된다`: **판별력이
-  없는** 테스트다. rate limiter(`ratelimiter/ratelimiterstats.go`)는 permit
-  대기가 `MaxWaitTime`을 넘길지 요청 시점에 미리 계산해, 넘길 게 확실하면 실제로
-  기다리지 않고 즉시 `ErrExceeded`를 반환한다. 그래서 `AbortOnErrors`를 걷어내고
-  `MaxRetries`를 200까지 올려 재시도를 반복시켜도 걸리는 시간은 거의 늘지 않는다
-  (실측 수십~수백 마이크로초 수준). 이 테스트는 시간이 아니라 에러 종류
-  (`errors.Is(err, ratelimiter.ErrExceeded)`)와 서버 미도달만 확인한다 — 재시도가
-  막혔는지 새는지는 이 테스트만으로는 구분할 수 없다. rate limiter와 bulkhead가
-  같은 `AbortOnErrors` 한 줄로 함께 걸러지므로, 판별력 있는 bulkhead 쪽 테스트가
-  통과하면 rate limiter 쪽도 같은 메커니즘으로 보호된다고 볼 수 있다.
+- `TestClient_bulkhead가_고갈되면_재시도하지_않고_즉시_실패한다` — **판별력 있음.**
+  bulkhead는 슬롯이 빌 때까지 실제 타이머로 기다리므로, `AbortOnErrors`를 걷어내면
+  재시도마다 그 대기가 반복되어 시간이 눈에 보이게 늘어난다(`MaxWaitTime: 20ms`,
+  `MaxRetries: 3`에서 약 20ms → 약 84ms). 이 시간 차이를 직접 잰다.
+- `TestClient_limiter가_고갈되면_ErrExceeded가_그대로_표면화된다` — **판별력 없음.**
+  rate limiter는 대기가 `MaxWaitTime`을 넘길지 미리 계산해 즉시 실패하므로, 재시도가
+  새더라도 시간이 늘지 않는다(`MaxRetries`를 200으로 올려도 수십 마이크로초). 이
+  테스트는 에러 종류와 서버 미도달만 확인한다.
 
-이 구분은 "재시도 폭풍이 꼬리 지연을 늘린다"는 경고가 정책마다 다르게 나타난다는
-뜻이다: bulkhead에서는 실제 지연으로, rate limiter에서는 (적어도 이 구현에서는)
-주로 낭비되는 재시도 횟수로 나타난다. 어느 쪽이든 재시도가 이미 포기한
-limiter/bulkhead에 즉시 재진입하는 것은 의미가 없으므로 막는 것이 맞다.
+두 정책이 같은 `AbortOnErrors` 한 줄로 함께 걸러지므로, 판별력 있는 bulkhead
+테스트가 통과하면 rate limiter 쪽도 같은 메커니즘으로 보호된다. 재시도 폭풍이
+bulkhead에서는 지연으로, rate limiter에서는 낭비되는 재시도 횟수로 나타나는 차이일
+뿐이다.
 
 ## 다음 단계
 
