@@ -79,7 +79,7 @@ README에 "다음 단계"로만 언급한다.
 
 조사 결과를 기록해 둔다.
 
-- **resty v2** (`v2.8.0`+): `SetRateLimiter(RateLimiter)`의 인터페이스가 `Allow() bool` 하나뿐이다. 논블로킹으로 초과분을 **즉시 버리고**, `wrapNoRetryErr`로 감싸서 재시도조차 하지 않는다. 캐시 갱신처럼 "늦게라도 다 보내야 하는" 요청에는 부적합하다. 참고로 이 저장소는 `v2.7.0`이라 이 API 자체가 없다.
+- **resty v2** (`v2.9.0`+): `SetRateLimiter(RateLimiter)`의 인터페이스가 `Allow() bool` 하나뿐이다. 논블로킹으로 초과분을 **즉시 버리고**, `wrapNoRetryErr`로 감싸서 재시도조차 하지 않는다. 캐시 갱신처럼 "늦게라도 다 보내야 하는" 요청에는 부적합하다. 참고로 이 저장소는 `v2.7.0`이라 이 API 자체가 없다.
 - **resty v3**: `SetRateLimiter(resty.NewRateLimitTokenBucket(rate, burst))`가 토큰이 생길 때까지 **대기**한다. 시맨틱은 적합하나 아직 `v3.0.0-rc.3`으로 정식 릴리스 전이다.
 - **결론**: `failsafehttp`는 `RoundTripper` 층에서 동작하므로 resty를 쓰든 안 쓰든 그대로 적용된다. 클라이언트 라이브러리에 종속되지 않는 쪽을 택한다.
 
