@@ -70,7 +70,16 @@ func (r *Refresher) RefreshAll(ctx context.Context, keys []string) Stats {
 }
 
 // refresh는 키 하나를 갱신한다.
-// 같은 키에 대해 이미 진행 중인 호출이 있으면 그 결과를 공유한다.
+//
+// group(singleflight)은 RefreshAll 한 번의 호출 "안"에서는 아무 역할도 하지
+// 않는다 — dedupe가 그 호출 안에서 이미 키 중복을 제거했으므로, 같은 키를
+// 가진 두 goroutine이 동시에 여기 들어올 일이 없기 때문이다(40→10 감소는
+// dedupe가 전부 만든다). group이 실제로 막는 것은 RefreshAll 호출들이
+// "겹칠" 때다: 이전 주기의 갱신이 아직 끝나지 않았는데 다음 주기가 같은 키를
+// 다시 요청하면, group이 그 요청을 진행 중인 호출에 합류시켜 벤더 API를
+// 다시 부르지 않는다. 이 보장은
+// TestRefresher_겹치는_요청은_singleflight로_합류하여_벤더_호출이_한번만_일어난다
+// 에서 직접 증명한다.
 func (r *Refresher) refresh(ctx context.Context, key string) error {
 	_, err, _ := r.group.Do(key, func() (any, error) {
 		value, err := r.fetch(ctx, key)
@@ -98,7 +107,7 @@ func (r *Refresher) fetch(ctx context.Context, key string) (string, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read body for key %s (status %d): %w", key, resp.StatusCode, err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("unexpected status %d for key %s", resp.StatusCode, key)
