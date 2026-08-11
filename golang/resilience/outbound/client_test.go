@@ -1,11 +1,13 @@
 package outbound
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/failsafe-go/failsafe-go/ratelimiter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -77,4 +79,49 @@ func TestNewClient_정책이_없으면_즉시_모두_보낸다(t *testing.T) {
 	require.Equal(t, requests, got.Total)
 	assert.Less(t, elapsed, 500*time.Millisecond, "스로틀링이 없으면 즉시 끝난다")
 	assert.Equal(t, requests, got.MaxQPS, "동시에 도달하므로 최대 QPS가 요청 수와 같다")
+}
+
+func TestNewClient_대기시간을_초과하면_ErrExceeded를_반환한다(t *testing.T) {
+	const requests = 5
+
+	server := newRateLimitedServer(1000)
+	defer server.Close()
+
+	// 주기당 1개만 허용하고 대기 상한을 짧게 잡아, 첫 요청 외에는 permit을
+	// 얻기 전에 반드시 시간 초과가 나도록 만든다.
+	client := NewClient(Options{
+		Mode:          LimiterSmooth,
+		MaxExecutions: 1,
+		Period:        time.Second,
+		MaxWaitTime:   20 * time.Millisecond,
+	})
+
+	errs := make([]error, requests)
+	var wg sync.WaitGroup
+	for i := 0; i < requests; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			resp, err := client.Get(fmt.Sprintf("%s/maps/map-%02d", server.URL, i))
+			if err != nil {
+				errs[i] = err
+				return
+			}
+			resp.Body.Close()
+		}(i)
+	}
+	wg.Wait()
+
+	var succeeded, exceeded int
+	for _, err := range errs {
+		switch {
+		case err == nil:
+			succeeded++
+		case errors.Is(err, ratelimiter.ErrExceeded):
+			exceeded++
+		}
+	}
+
+	assert.GreaterOrEqual(t, succeeded, 1, "적어도 하나는 즉시 permit을 얻어 성공해야 한다")
+	assert.GreaterOrEqual(t, exceeded, 1, "적어도 하나는 대기 상한을 넘어 ErrExceeded를 반환해야 한다")
 }
