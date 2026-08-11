@@ -27,6 +27,12 @@ resilience/
 │   ├── failsafe_example_test.go
 │   ├── failsafe_composed.go       # Fallback + Retry + Circuit Breaker 정책 조합
 │   └── failsafe_composed_test.go
+├── outbound/
+│   ├── client.go                  # rate limiter + bulkhead + 재시도 조립
+│   ├── client_test.go             # 정책 없음 vs bursty vs smooth 429 비교
+│   ├── refresher.go               # 키 중복 제거 + singleflight 캐시 갱신
+│   ├── refresher_test.go
+│   └── fakeserver_test.go         # sliding window rate limit 가짜 서버
 └── README.md
 ```
 
@@ -34,6 +40,7 @@ resilience/
 
 - [sony/gobreaker v2](https://github.com/sony/gobreaker) - 경량 Circuit Breaker
 - [failsafe-go](https://github.com/failsafe-go/failsafe-go) - 통합 Resilience 라이브러리
+- [golang.org/x/sync/singleflight](https://pkg.go.dev/golang.org/x/sync/singleflight) - 진행 중인 중복 호출 합치기
 
 ## 테스트
 
