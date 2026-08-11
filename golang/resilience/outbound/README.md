@@ -89,6 +89,10 @@ bulkhead에서 다시 `MaxWaitTime`을 기다릴 수 있다(시도 1회당 2배)
 (`MaxWaitTime: 30s`, `MaxRetries: 3`)면 최악 240초다. `MaxRetries`를 올릴 때 이
 곱셈을 함께 감안해야 한다.
 
+이 상한은 permit/slot 대기만 센 값이다. 벤더가 `Retry-After`로 지정한 대기는
+재시도 사이에 별도 타이머로 더해지므로 여기에 포함되지 않는다. `Retry-After`가
+10초인 벤더라면 위 예제에서 `3 × 10초`가 240초 위에 얹힌다.
+
 **단, 우리 쪽 limiter/bulkhead가 포기한 경우는 재시도하지 않는다.** 재시도 정책이
 `ratelimiter.ErrExceeded`와 `bulkhead.ErrFull`을 `AbortOnErrors`로 제외한다.
 "벤더가 429를 줬다"와 "우리 limiter가 `MaxWaitTime`을 다 기다려도 permit을 못

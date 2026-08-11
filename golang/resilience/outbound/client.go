@@ -54,6 +54,9 @@ type Options struct {
 	// MaxRetries)배까지 늘어날 수 있다: 최악의 경우
 	// (MaxWaitTime(limiter) + MaxWaitTime(bulkhead)) * (1 + MaxRetries).
 	//
+	// 이 상한은 permit/slot 대기만 센 것이다. 벤더가 Retry-After로 지정한
+	// 대기는 재시도 사이에 별도 타이머로 더해지므로 여기에 포함되지 않는다.
+	//
 	// (참고: bulkhead의 대기는 슬롯이 빌 때까지 실제로 기다리는 타이머 기반이라
 	// 이 배수가 실제 지연으로 그대로 나타난다. rate limiter는 대기가
 	// MaxWaitTime을 넘길지 미리 계산하므로, 재시도가 막혀 있다면 애초에 이
