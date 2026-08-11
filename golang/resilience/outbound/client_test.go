@@ -208,3 +208,40 @@ func TestClient_버스트_요청과_스로틀링_비교(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_429를_받으면_RetryAfter만큼_기다린다(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Retry-After 대기로 수 초가 걸린다")
+	}
+
+	const (
+		serverLimit = 5
+		requests    = 10
+	)
+
+	server := newRateLimitedServer(serverLimit)
+	defer server.Close()
+
+	// rate limiter 없이 발사해 일부러 429를 유발하고, 재시도로 복구되는지 본다.
+	// failsafehttp.NewRetryPolicyBuilder가 Retry-After 헤더(1초)를 존중한다.
+	client := NewClient(Options{
+		Mode:       LimiterNone,
+		MaxRetries: 5,
+	})
+	refresher := NewRefresher(client, server.URL)
+
+	keys := make([]string, requests)
+	for i := range keys {
+		keys[i] = fmt.Sprintf("map-%02d", i)
+	}
+
+	stats := refresher.RefreshAll(context.Background(), keys)
+	got := server.stats()
+
+	t.Logf("총 호출 %d, 429 %d, 소요 %v", got.Total, got.Rejected, stats.Elapsed)
+
+	assert.Positive(t, got.Rejected, "한도를 넘겼으므로 429가 발생해야 한다")
+	assert.Greater(t, got.Total, requests, "재시도만큼 서버 호출이 늘어난다")
+	assert.Zero(t, stats.Failed, "재시도로 모든 키가 최종 성공해야 한다")
+	assert.GreaterOrEqual(t, stats.Elapsed, time.Second, "Retry-After만큼 기다려야 한다")
+}
