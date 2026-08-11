@@ -1,6 +1,7 @@
 package outbound
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -124,4 +125,86 @@ func TestNewClient_대기시간을_초과하면_ErrExceeded를_반환한다(t *t
 
 	assert.GreaterOrEqual(t, succeeded, 1, "적어도 하나는 즉시 permit을 얻어 성공해야 한다")
 	assert.GreaterOrEqual(t, exceeded, 1, "적어도 하나는 대기 상한을 넘어 ErrExceeded를 반환해야 한다")
+}
+
+func TestClient_버스트_요청과_스로틀링_비교(t *testing.T) {
+	const (
+		serverLimit = 20 // 벤더 한도
+		requests    = 40 // 로봇 4대 x 지도 10개
+	)
+
+	tests := []struct {
+		name         string
+		opts         Options
+		expectReject bool
+	}{
+		{
+			name:         "정책 없음 - 동시에 발사하면 429가 발생한다",
+			opts:         Options{Mode: LimiterNone},
+			expectReject: true,
+		},
+		{
+			// 40회 / 2초 = 평균 20 QPS로 한도에 정확히 맞춘 설정이다.
+			// 그런데도 주기 시작에 40개를 한꺼번에 통과시켜 순간 QPS가 튄다.
+			// "1분에 1200회까지 가능하다"는 계산이 안전을 보장하지 않는 이유다.
+			name: "bursty - 평균 QPS를 한도에 맞춰도 429가 발생한다",
+			opts: Options{
+				Mode:          LimiterBursty,
+				MaxExecutions: 40,
+				Period:        2 * time.Second,
+				MaxWaitTime:   30 * time.Second,
+			},
+			expectReject: true,
+		},
+		{
+			// 한도의 50%인 10 QPS로 균등 분산한다.
+			// 20 QPS로 두면 sliding window 경계에서 21개로 셀 여지가 있어
+			// 마진이 없다. 벤더 한도의 50~70%만 쓰는 것이 권장된다.
+			name: "smooth - 균등 분산하면 429가 사라진다",
+			opts: Options{
+				Mode:          LimiterSmooth,
+				MaxExecutions: 10,
+				Period:        time.Second,
+				MaxWaitTime:   30 * time.Second,
+			},
+			expectReject: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// 이 테스트는 "429가 났는가"를 비교한다. 재시도를 켜면 429를 받은
+			// 요청이 다시 성공해 서버가 센 429 수가 늘고 케이스 간 차이가
+			// 흐려지므로 안전망을 끈다. 재시도 효과는 별도 테스트에서 본다.
+			require.Zero(t, tt.opts.MaxRetries, "비교 테스트는 재시도를 꺼야 한다")
+
+			server := newRateLimitedServer(serverLimit)
+			defer server.Close()
+
+			refresher := NewRefresher(NewClient(tt.opts), server.URL)
+
+			keys := make([]string, requests)
+			for i := range keys {
+				keys[i] = fmt.Sprintf("map-%02d", i)
+			}
+
+			stats := refresher.RefreshAll(context.Background(), keys)
+			got := server.stats()
+
+			t.Logf("총 호출 %d, 429 %d, 최대 관측 QPS %d, 소요 %v",
+				got.Total, got.Rejected, got.MaxQPS, stats.Elapsed)
+
+			assert.Equal(t, requests, got.Total, "재시도가 없으므로 키당 정확히 1회 호출된다")
+
+			if tt.expectReject {
+				assert.Positive(t, got.Rejected, "429가 발생해야 한다")
+				assert.Greater(t, got.MaxQPS, serverLimit, "순간 QPS가 한도를 넘어야 한다")
+				assert.Positive(t, stats.Failed, "429를 받은 키는 갱신에 실패한다")
+			} else {
+				assert.Zero(t, got.Rejected, "429가 없어야 한다")
+				assert.LessOrEqual(t, got.MaxQPS, serverLimit, "순간 QPS가 한도 이하여야 한다")
+				assert.Zero(t, stats.Failed, "모든 키가 갱신되어야 한다")
+			}
+		})
+	}
 }
