@@ -10,7 +10,7 @@
 | 1 | 시간을 파라미터로 받기 | `coupon.go` | `IsExpiredAt(now time.Time)` — 순수 함수로 만들어 테스트에서 임의 시각 전달 |
 | 2 | nowFunc 필드 주입 | `order.go` | 구조체에 `nowFunc func() time.Time` 필드(기본값 `time.Now`), 테스트에서 고정 시간 주입 |
 | 3 | Clock 인터페이스 주입 | `cache.go` | `clockwork.Clock` 주입, 테스트에서 `fakeClock.Advance()`로 시간 진행 |
-| 4 | testing/synctest | `cache_synctest_test.go` | 코드 수정 없이 가상 시간 버블에서 테스트 (Go 1.25+) |
+| 4 | testing/synctest | `naive_cache.go` | `time.Now()`를 직접 쓰는 코드를 수정 없이 가상 시간 버블에서 테스트 (Go 1.25+) |
 
 ## 어떤 패턴을 언제 쓸까
 
@@ -27,14 +27,14 @@
 - **패턴 1 (파라미터 전달)**: 가장 단순하고 순수하다. 다만 깊은 콜스택이면 모든 호출자가 시간을 넘겨야 한다.
 - **패턴 2 (nowFunc 주입)**: 인터페이스 없이 가볍고 관용적이다. `Now()`만 대체 가능하다. 필드가 unexported라 같은 패키지 테스트(white-box)에서만 주입할 수 있다는 점에 주의.
 - **패턴 3 (Clock 인터페이스)**: `Sleep`/`Ticker`/`After`까지 제어하고 시간 진행을 시뮬레이션한다. 의존성과 인터페이스 추가 비용이 든다.
-- **패턴 4 (synctest)**: 표준 라이브러리이고 코드 수정이 필요 없다 — 시계 주입 설계가 없는 코드도 테스트할 수 있다. 가상 시간이 결정론적이라 `now == expiresAt` 같은 정확한 경계도 flaky 없이 검증된다. 동시성+시간 조합에 특화되어 있고 Go 1.25 이상이 필요하다.
+- **패턴 4 (synctest)**: 표준 라이브러리이고 코드 수정이 필요 없다 — `NaiveCache`처럼 시계 주입 설계가 없는 코드도 테스트할 수 있다. 가상 시간이 결정론적이라 `now == expiresAt` 같은 정확한 경계도 flaky 없이 검증된다. 동시성+시간 조합에 특화되어 있고 Go 1.25 이상이 필요하다.
 
 ## 경계값 처리 주의
 
 이 예제의 두 구현은 만료 경계를 서로 다르게 처리한다. 의도적인 차이다.
 
 - 쿠폰(패턴 1): `now.After(expiresAt)` — 만료 시각과 정확히 같은 순간은 **아직 유효**
-- TTL 캐시(패턴 3/4): `!now.Before(expiresAt)` — 만료 시각 **정각부터 miss**
+- TTL 캐시(패턴 3의 `TTLCache`, 패턴 4의 `NaiveCache`): `!now.Before(expiresAt)` — 만료 시각 **정각부터 miss**
 
 둘 다 유효한 선택이지만, 시간 비교 코드는 경계 포함 여부를 테스트로 고정해 두는 것이 좋다
 (`coupon_test.go`의 "만료 시각과 동일" 케이스 참고).
