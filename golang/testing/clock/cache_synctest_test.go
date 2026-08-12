@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// 패턴 ③(가짜 시계 주입)과 달리, synctest는 코드 수정 없이
+// 패턴 3(가짜 시계 주입)과 달리, synctest는 코드 수정 없이
 // 실제 시계(RealClock)를 쓰는 캐시를 가상 시간 버블 안에서 테스트한다.
 // 버블 안에서는 time.Now()/time.Sleep()이 가상 시간으로 동작한다 (Go 1.25+).
 func Test_TTLCache_Synctest_실제_시계로_만료_검증(t *testing.T) {

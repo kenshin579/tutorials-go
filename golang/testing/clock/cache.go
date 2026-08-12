@@ -14,7 +14,7 @@ type cacheItem struct {
 
 // TTLCache는 TTL이 지나면 항목이 만료되는 인메모리 캐시다.
 // clockwork.Clock을 주입받아 테스트에서 가짜 시계로 시간을 "진행"시킬 수 있다.
-// nowFunc 주입(패턴 ②)과 달리 시간이 흘러야 검증되는 로직에 적합하다.
+// nowFunc 주입(패턴 2)과 달리 시간이 흘러야 검증되는 로직에 적합하다.
 type TTLCache struct {
 	clock clockwork.Clock
 	ttl   time.Duration
