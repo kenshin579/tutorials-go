@@ -46,6 +46,7 @@ wrapped_v2      = "vault:v1:…"  # KEK로 wrap된 DEK v2
 
 - Docker
 - Go 1.26 이상
+- `jq`, `xxd` (5단계에서 암호문의 DEK 버전 바이트를 확인할 때 쓴다)
 
 로컬에 `vault` CLI는 필요 없다. 스크립트와 아래 예시는 컨테이너 안의 CLI를 쓴다.
 
@@ -162,6 +163,10 @@ id=alice email=alice@example.com phone=010-1234-5678
 
 회전 뒤에도 `wrapped_v1`은 그대로 남는다.
 
+```bash
+vault kv get secret/member-api/dek
+```
+
 ```
 current_version    2
 wrapped_v1         vault:v1:8zDaIVly51ZlcQq+ulUFAlf0gSV9w7QEj0Cva0TSWp/F5uXVnvVVrwMSK7enqhcqZuO2mQpmco6xe2bz
@@ -197,6 +202,16 @@ error: decrypt email of alice: cipher: message authentication failed
 - 세 번째 실패: 버전 번호(v2)는 같지만 키가 다르다. AES-GCM이 인증 실패로 거부한다
 
 `data/members.json`은 그대로 남아 있지만 더는 복호화할 수 없다. 실제 운영에서 영구 스토리지와 백업(Raft snapshot)을 쓰는 이유다.
+
+## 이 예제가 다루지 않는 것
+
+학습용으로 범위를 좁혔다. 실제 서비스에 옮길 때는 다음을 따로 고려해야 한다.
+
+- **KEK 회전과 rewrap**: `transit/keys/member-api-kek/rotate`로 KEK 새 버전을 만든 뒤 `transit/rewrap/member-api-kek`로 KV의 wrap된 DEK를 다시 감싸는 과정은 구현하지 않았다
+- **AAD**: AES-GCM에 AAD를 쓰지 않는다. 같은 DEK로 암호화한 값이면 다른 레코드나 다른 필드로 옮겨도 복호화된다. 회원 ID와 필드 이름을 AAD로 넣으면 막을 수 있다
+- **동시 쓰기**: `member.Repository`는 파일을 읽고 고친 뒤 다시 쓰며 락이 없다. `reencrypt`와 `put`을 동시에 실행하면 한쪽 변경이 사라질 수 있다
+- **개인정보 입력 방식**: `put --email --phone`처럼 플래그로 넘긴 값은 셸 히스토리와 프로세스 목록에 남는다
+- **운영 구성**: dev 모드(메모리 스토리지, 고정 root token, TLS 없음)는 학습용이다. 영구 스토리지, init/unseal, TLS는 시리즈 2편에서 다룬다
 
 ## 테스트
 
