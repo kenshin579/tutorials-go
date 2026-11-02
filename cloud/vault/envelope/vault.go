@@ -22,8 +22,13 @@ const (
 	dekBits             = 256
 )
 
-// ErrDEKNotInitialized 는 KV 에 DEK 문서가 아직 없을 때 LoadKeyring 이 반환한다.
-var ErrDEKNotInitialized = errors.New("DEK not initialized")
+var (
+	// ErrDEKNotInitialized 는 KV 에 DEK 문서가 아직 없을 때 LoadKeyring 이 반환한다.
+	ErrDEKNotInitialized = errors.New("DEK not initialized")
+	// ErrDEKDeleted 는 DEK 문서의 최신 버전이 삭제(soft delete)된 상태일 때 반환된다.
+	// 옛 데이터가 그 DEK 에 의존할 수 있으므로 새로 만들지 않고 운영자에게 판단을 넘긴다.
+	ErrDEKDeleted = errors.New("DEK document is deleted")
+)
 
 // Config 는 KEK 이름과 wrap 된 DEK 를 저장할 KV v2 위치다.
 type Config struct {
@@ -41,8 +46,11 @@ var DefaultConfig = Config{
 
 // InitDEK 는 DEK 문서가 없을 때만 v1 을 만든다. 이미 있으면 아무것도 쓰지 않고 false 를 돌려준다.
 func InitDEK(ctx context.Context, c *vaultapi.Client, cfg Config) (bool, error) {
-	_, err := c.KVv2(cfg.KVMount).Get(ctx, cfg.KVPath)
+	secret, err := c.KVv2(cfg.KVMount).Get(ctx, cfg.KVPath)
 	if err == nil {
+		if secret.Data == nil {
+			return false, fmt.Errorf("%w: %s/%s", ErrDEKDeleted, cfg.KVMount, cfg.KVPath)
+		}
 		return false, nil
 	}
 	if !errors.Is(err, vaultapi.ErrSecretNotFound) {
@@ -55,18 +63,22 @@ func InitDEK(ctx context.Context, c *vaultapi.Client, cfg Config) (bool, error) 
 	return true, nil
 }
 
-// RotateDEK 는 Transit 으로 새 DEK 를 발급해 다음 버전으로 추가하고 current_version 을 올린다.
+// RotateDEK 는 Transit 으로 새 DEK 를 발급해 가장 큰 기존 버전의 다음 버전으로 추가하고,
+// current_version 을 그 버전으로 바꾼다.
 // 기존 버전 필드는 그대로 남겨서 옛 데이터를 계속 복호화할 수 있게 한다.
 // 동시에 두 번 실행되면 check-and-set 때문에 뒤에 쓰는 쪽이 실패한다.
 func RotateDEK(ctx context.Context, c *vaultapi.Client, cfg Config) (uint8, error) {
 	data := map[string]interface{}{}
-	var current uint8
+	wrapped := map[uint8]string{}
 	cas := 0
 
 	secret, err := c.KVv2(cfg.KVMount).Get(ctx, cfg.KVPath)
 	switch {
 	case err == nil:
-		if current, _, err = parseDEKData(secret.Data); err != nil {
+		if secret.Data == nil {
+			return 0, fmt.Errorf("%w: %s/%s", ErrDEKDeleted, cfg.KVMount, cfg.KVPath)
+		}
+		if _, wrapped, err = parseDEKData(secret.Data); err != nil {
 			return 0, err
 		}
 		for k, v := range secret.Data {
@@ -79,7 +91,7 @@ func RotateDEK(ctx context.Context, c *vaultapi.Client, cfg Config) (uint8, erro
 		return 0, fmt.Errorf("read DEK %s/%s: %w", cfg.KVMount, cfg.KVPath, err)
 	}
 
-	next, err := nextVersion(current)
+	next, err := nextVersion(wrapped)
 	if err != nil {
 		return 0, err
 	}
@@ -90,12 +102,12 @@ func RotateDEK(ctx context.Context, c *vaultapi.Client, cfg Config) (uint8, erro
 	if err != nil {
 		return 0, fmt.Errorf("generate DEK with %s: %w", cfg.KEKName, err)
 	}
-	wrapped, _ := resp.Data["ciphertext"].(string)
-	if wrapped == "" {
+	ciphertext, _ := resp.Data["ciphertext"].(string)
+	if ciphertext == "" {
 		return 0, errors.New("transit datakey returned no ciphertext")
 	}
 
-	data[wrappedField(next)] = wrapped
+	data[wrappedField(next)] = ciphertext
 	data[currentVersionField] = strconv.Itoa(int(next))
 	if err := writeDEK(ctx, c, cfg, data, cas); err != nil {
 		return 0, err
@@ -112,6 +124,9 @@ func LoadKeyring(ctx context.Context, c *vaultapi.Client, cfg Config) (*Keyring,
 	}
 	if err != nil {
 		return nil, fmt.Errorf("read DEK %s/%s: %w", cfg.KVMount, cfg.KVPath, err)
+	}
+	if secret.Data == nil {
+		return nil, fmt.Errorf("%w: %s/%s", ErrDEKDeleted, cfg.KVMount, cfg.KVPath)
 	}
 
 	current, wrapped, err := parseDEKData(secret.Data)
@@ -182,17 +197,26 @@ func parseDEKData(data map[string]interface{}) (uint8, map[uint8]string, error) 
 
 func parseVersion(s string) (uint8, error) {
 	v, err := strconv.ParseUint(s, 10, 8)
-	if err != nil || v == 0 {
+	// "01" 처럼 앞에 0 이 붙은 표기는 wrapped_v1 과 같은 버전으로 겹치므로 거부한다
+	if err != nil || v == 0 || strconv.FormatUint(v, 10) != s {
 		return 0, fmt.Errorf("invalid DEK version %q (want 1-255)", s)
 	}
 	return uint8(v), nil
 }
 
-func nextVersion(current uint8) (uint8, error) {
-	if current == 255 {
+// nextVersion 은 이미 있는 DEK 버전 중 가장 큰 값의 다음 버전을 돌려준다.
+// current_version 이 되돌려져 있어도 기존 버전 필드를 덮어쓰지 않기 위해서다.
+func nextVersion(wrapped map[uint8]string) (uint8, error) {
+	var highest uint8
+	for version := range wrapped {
+		if version > highest {
+			highest = version
+		}
+	}
+	if highest == 255 {
 		return 0, errors.New("DEK version limit (255) reached")
 	}
-	return current + 1, nil
+	return highest + 1, nil
 }
 
 func wrappedField(version uint8) string {

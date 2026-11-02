@@ -191,3 +191,46 @@ func TestPolicy_MigrationTokenCannotRotateKEK(t *testing.T) {
 	_, err := migration.Logical().WriteWithContext(context.Background(), "transit/keys/member-api-kek/rotate", nil)
 	assertStatus(t, err, http.StatusForbidden)
 }
+
+func TestRotateDEK_DoesNotOverwriteAfterRollback(t *testing.T) {
+	ctx := context.Background()
+	root := startVault(t)
+	migration := newTokenClient(t, root, "member-api-migration")
+
+	_, err := InitDEK(ctx, migration, DefaultConfig)
+	require.NoError(t, err)
+	_, err = RotateDEK(ctx, migration, DefaultConfig)
+	require.NoError(t, err)
+
+	// 운영자가 current_version 을 1 로 되돌린 상황
+	doc := readDEKDoc(t, root)
+	wrappedV2 := doc["wrapped_v2"]
+	doc["current_version"] = "1"
+	_, err = root.KVv2("secret").Put(ctx, "member-api/dek", doc)
+	require.NoError(t, err)
+
+	version, err := RotateDEK(ctx, migration, DefaultConfig)
+	require.NoError(t, err)
+	assert.Equal(t, uint8(3), version)
+
+	doc = readDEKDoc(t, root)
+	assert.Equal(t, wrappedV2, doc["wrapped_v2"], "기존 v2 를 덮어쓰지 않는다")
+	assert.Equal(t, "3", doc["current_version"])
+}
+
+func TestInitDEK_DeletedDocument(t *testing.T) {
+	ctx := context.Background()
+	root := startVault(t)
+	migration := newTokenClient(t, root, "member-api-migration")
+	app := newTokenClient(t, root, "member-api")
+
+	_, err := InitDEK(ctx, migration, DefaultConfig)
+	require.NoError(t, err)
+	require.NoError(t, root.KVv2("secret").Delete(ctx, "member-api/dek"))
+
+	_, err = InitDEK(ctx, migration, DefaultConfig)
+	assert.ErrorIs(t, err, ErrDEKDeleted)
+
+	_, err = LoadKeyring(ctx, app, DefaultConfig)
+	assert.ErrorIs(t, err, ErrDEKDeleted)
+}

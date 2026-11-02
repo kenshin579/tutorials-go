@@ -5,4 +5,5 @@ services:
     # dev 모드: 메모리 스토리지, 자동 unseal, root token 고정. 학습용으로만 쓴다
     command: server -dev -dev-root-token-id=root -dev-listen-address=0.0.0.0:8200
     ports:
-      - "8200:8200"
+      # root token 이 고정이라 호스트의 loopback 에만 연다
+      - "127.0.0.1:8200:8200"

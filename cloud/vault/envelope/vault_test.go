@@ -47,15 +47,26 @@ func TestParseDEKData_VersionOutOfRange(t *testing.T) {
 	}
 }
 
-func TestNextVersion_Overflow(t *testing.T) {
-	next, err := nextVersion(0)
+func TestNextVersion_UsesHighestExistingVersion(t *testing.T) {
+	next, err := nextVersion(map[uint8]string{})
 	require.NoError(t, err)
 	assert.Equal(t, uint8(1), next)
 
-	next, err = nextVersion(1)
+	// current_version 을 2 로 되돌린 뒤에도 v3 를 덮어쓰지 않도록 가장 큰 버전 다음을 쓴다
+	next, err = nextVersion(map[uint8]string{1: "a", 2: "b", 3: "c"})
 	require.NoError(t, err)
-	assert.Equal(t, uint8(2), next)
+	assert.Equal(t, uint8(4), next)
 
-	_, err = nextVersion(255)
+	_, err = nextVersion(map[uint8]string{255: "z"})
 	assert.Error(t, err)
+}
+
+func TestParseDEKData_LeadingZeroVersion(t *testing.T) {
+	_, _, err := parseDEKData(map[string]interface{}{
+		"current_version": "1",
+		"wrapped_v1":      "vault:v1:a",
+		"wrapped_v01":     "vault:v1:b",
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "wrapped_v01")
 }
