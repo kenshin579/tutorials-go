@@ -1,0 +1,61 @@
+package envelope
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestParseDEKData_Valid(t *testing.T) {
+	current, wrapped, err := parseDEKData(map[string]interface{}{
+		"current_version": "2",
+		"wrapped_v1":      "vault:v1:a",
+		"wrapped_v2":      "vault:v1:b",
+	})
+	require.NoError(t, err)
+	assert.Equal(t, uint8(2), current)
+	assert.Equal(t, map[uint8]string{1: "vault:v1:a", 2: "vault:v1:b"}, wrapped)
+}
+
+func TestParseDEKData_MissingCurrentField(t *testing.T) {
+	_, _, err := parseDEKData(map[string]interface{}{
+		"current_version": "2",
+		"wrapped_v1":      "vault:v1:a",
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "wrapped_v2")
+}
+
+func TestParseDEKData_NonNumericVersion(t *testing.T) {
+	_, _, err := parseDEKData(map[string]interface{}{
+		"current_version": "abc",
+		"wrapped_v1":      "vault:v1:a",
+	})
+	assert.Error(t, err)
+}
+
+func TestParseDEKData_VersionOutOfRange(t *testing.T) {
+	for _, v := range []string{"0", "256"} {
+		t.Run(v, func(t *testing.T) {
+			_, _, err := parseDEKData(map[string]interface{}{
+				"current_version": v,
+				"wrapped_v1":      "vault:v1:a",
+			})
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestNextVersion_Overflow(t *testing.T) {
+	next, err := nextVersion(0)
+	require.NoError(t, err)
+	assert.Equal(t, uint8(1), next)
+
+	next, err = nextVersion(1)
+	require.NoError(t, err)
+	assert.Equal(t, uint8(2), next)
+
+	_, err = nextVersion(255)
+	assert.Error(t, err)
+}
