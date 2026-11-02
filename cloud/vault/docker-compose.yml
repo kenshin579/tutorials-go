@@ -1,0 +1,8 @@
+services:
+  vault:
+    image: hashicorp/vault:2.2.1
+    container_name: vault-envelope-demo
+    # dev 모드: 메모리 스토리지, 자동 unseal, root token 고정. 학습용으로만 쓴다
+    command: server -dev -dev-root-token-id=root -dev-listen-address=0.0.0.0:8200
+    ports:
+      - "8200:8200"
