@@ -1,0 +1,4 @@
+# setup.sh가 발급한 Vault token
+.tokens/
+# member-cli가 만드는 회원 데이터 파일
+data/
