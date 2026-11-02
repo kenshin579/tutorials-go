@@ -15,7 +15,8 @@ if ! vault secrets list -format=json | grep -q '"transit/"'; then
   vault secrets enable transit
 fi
 
-vault write -f transit/keys/member-api-kek
+vault write -f transit/keys/member-api-kek > /dev/null
+echo "Transit KEK ready: member-api-kek"
 
 vault policy write member-api - < policies/member-api.hcl
 vault policy write member-api-migration - < policies/member-api-migration.hcl
